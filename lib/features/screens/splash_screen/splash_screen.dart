@@ -23,7 +23,7 @@ class SplashScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                "assets/images/splash_new.png",
+                "assets/images/splash.png",
                 width: Sizes.size150 + Sizes.size30,
                 height: Sizes.size150 + Sizes.size30,
               ),
