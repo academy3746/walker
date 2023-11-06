@@ -19,16 +19,14 @@ class SplashScreen extends StatelessWidget {
           Sizes.size20,
         ),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                "assets/images/splash.png",
-                width: Sizes.size150 + Sizes.size30,
-                height: Sizes.size150 + Sizes.size30,
-              ),
-            ],
-          ),
+          child: Align(
+            alignment: Alignment.center,
+            child: Image.asset(
+              "assets/images/splash.png",
+              width: Sizes.size150 + Sizes.size50,
+              height: Sizes.size150 + Sizes.size50,
+            ),
+          )
         ),
       ),
     );
