@@ -52,8 +52,10 @@ class _MainScreenState extends State<MainScreen> {
     AccessPermissionHandler permissionHandler = AccessPermissionHandler(context);
     permissionHandler.requestLocationPermission();
 
+    /// Get Current Location
     _determinePosition();
 
+    /// Update Location Info
     LocationInfo locationInfo = LocationInfo();
     locationInfo.getStreaming();
   }
