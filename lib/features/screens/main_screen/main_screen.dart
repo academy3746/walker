@@ -16,17 +16,17 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  /// Import Location Info
+  LocationInfo locationInfo = LocationInfo();
+
   /// GPS Initialize
   Position? currentPosition;
 
   /// Initialize Address
   String? currentAddress;
 
-  /// Request & get Current Location
+  /// Get Current Location Values
   Future<void> _determinePosition() async {
-    LocationInfo locationInfo = LocationInfo();
-
-    /// Get 위도, 경도, 주소
     try {
       Position position = await locationInfo.determinePermission();
       String address = await locationInfo.getCurrentAddress(
@@ -36,6 +36,7 @@ class _MainScreenState extends State<MainScreen> {
       setState(() {
         currentPosition = position;
         currentAddress = address;
+
         print("현재 위치 값: $currentPosition");
         print("현재 주소: $currentAddress");
       });
@@ -44,20 +45,25 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  /// Request Location Access Permission & Get Current Place
+  Future<void> _requestAndDeterminePosition() async {
+    AccessPermissionHandler permissionHandler = AccessPermissionHandler(context);
+    bool hasPermission = await permissionHandler.requestLocationPermission();
+
+    if (hasPermission) {
+      await _determinePosition();
+
+      locationInfo.getStreaming();
+    } else {
+      print("위치정보 서비스 권한이 거부되었습니다.");
+    }
+  }
+
   @override
   void initState() {
     super.initState();
 
-    /// Request user to permit location info
-    AccessPermissionHandler permissionHandler = AccessPermissionHandler(context);
-    permissionHandler.requestLocationPermission();
-
-    /// Get Current Location
-    _determinePosition();
-
-    /// Update Location Info
-    LocationInfo locationInfo = LocationInfo();
-    locationInfo.getStreaming();
+    _requestAndDeterminePosition();
   }
 
   @override

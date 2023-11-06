@@ -20,12 +20,6 @@ class LocationInfo {
           lastPosition = position;
           lastCountryCode = await _getCountryCode(position);
         } else {
-          /*if (lastPosition!.latitude != position.latitude ||
-              lastPosition!.longitude != position.longitude) {
-            print("위치 정보 업데이트: $lastPosition");
-            lastPosition = position;
-          }*/
-
           if (_hasLocationChanged(position)) {
             String? currentCountryCode = await _getCountryCode(position);
 
@@ -53,9 +47,15 @@ class LocationInfo {
   Future<String?> _getCountryCode(Position position) async {
     try {
       List<geocoding.Placemark> placeMarks = await geocoding.placemarkFromCoordinates(position.latitude, position.longitude);
-      return placeMarks.first.isoCountryCode;
+
+      var country = placeMarks.first.isoCountryCode;
+
+      print("현재 위치 국가 ISO Code: $country");
+
+      return country;
     } catch (e) {
       print("Fail to get National Code: $e");
+
       return null;
     }
   }
