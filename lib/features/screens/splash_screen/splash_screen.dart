@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:walker/constants/gaps.dart';
+import 'package:walker/constants/sizes.dart';
+import 'package:walker/features/screens/main_screen/main_screen.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -7,6 +10,37 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    Future.delayed(const Duration(seconds: 3), () {
+      Navigator.pushReplacementNamed(context, MainScreen.routeName);
+    });
+
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(
+          Sizes.size20,
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                "assets/images/splash.png",
+                width: Sizes.size150 + Sizes.size30,
+                height: Sizes.size150 + Sizes.size30,
+              ),
+              Gaps.v32,
+              const Text(
+                "TAKE A WALK",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: Sizes.size40,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
