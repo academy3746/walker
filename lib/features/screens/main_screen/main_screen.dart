@@ -46,7 +46,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   /// Request Location Access Permission & Get Current Place
-  Future<void> _requestAndDeterminePosition() async {
+  Future<void> _requestAndDetermine() async {
     AccessPermissionHandler permissionHandler = AccessPermissionHandler(context);
     bool hasPermission = await permissionHandler.requestLocationPermission();
 
@@ -63,7 +63,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
 
-    _requestAndDeterminePosition();
+    _requestAndDetermine();
   }
 
   @override
