@@ -48,9 +48,9 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
 
-    /// Request User Permission
+    /// Request user to permit location info
     AccessPermissionHandler permissionHandler = AccessPermissionHandler(context);
-    permissionHandler.requestPermission();
+    permissionHandler.requestLocationPermission();
 
     _determinePosition();
 

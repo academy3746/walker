@@ -8,16 +8,16 @@ class AccessPermissionHandler {
 
   AccessPermissionHandler(this.context);
 
-  Future<void> requestPermission() async {
-    PermissionStatus status = await Permission.manageExternalStorage.status;
+  Future<void> requestLocationPermission() async {
+    PermissionStatus status = await Permission.location.status;
 
     if (status.isGranted) {
-      PermissionStatus result = await Permission.manageExternalStorage.request();
+      PermissionStatus result = await Permission.location.request();
 
       if (result.isGranted) {
-        print("Permission has submitted by user");
+        print("Location Permission has submitted by user");
       } else {
-        print("Permission has denied by user");
+        print("Location Permission has denied by user");
       }
     }
   }
