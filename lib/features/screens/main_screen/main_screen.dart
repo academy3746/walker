@@ -152,6 +152,28 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 ),
               ),
+
+              /// 현재 걸음 수
+              const Text(
+                "현재 걸음 수",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: Sizes.size20,
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(
+                  top: Sizes.size10,
+                  bottom: Sizes.size24,
+                ),
+                child: const Text(
+                  "현재까지 500보 걸으셨네요!",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: Sizes.size16,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
