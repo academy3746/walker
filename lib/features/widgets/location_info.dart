@@ -4,6 +4,28 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
 
 class LocationInfo {
+  Position? lastPosition;
+
+  /// 위치 정보값 Update
+  void getStreaming() {
+    const locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 500,
+    );
+
+    Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+      (Position position) {
+        if (lastPosition == null) {
+          lastPosition = position;
+        } else if (lastPosition!.latitude != position.latitude ||
+            lastPosition!.longitude != position.longitude) {
+          print("위치 정보 업데이트");
+          lastPosition = position;
+        }
+      },
+    );
+  }
+
   /// 위도 및 경도값 GET
   Future<Position> determinePermission() async {
     bool serviceEnabled;
@@ -25,13 +47,17 @@ class LocationInfo {
       }
     }
 
-    return await Geolocator.getCurrentPosition();
+    return await Geolocator.getCurrentPosition(
+      timeLimit: const Duration(seconds: 30),
+      desiredAccuracy: LocationAccuracy.best,
+    );
   }
 
   /// 위도 및 경도값을 주소 Format으로 타입 변경
   Future<String> getCurrentAddress(double latitude, double longitude) async {
     try {
-      List<geocoding.Placemark> placeMarks = await geocoding.placemarkFromCoordinates(latitude, longitude);
+      List<geocoding.Placemark> placeMarks =
+          await geocoding.placemarkFromCoordinates(latitude, longitude);
 
       if (placeMarks.isNotEmpty) {
         geocoding.Placemark place = placeMarks.first;
@@ -54,7 +80,7 @@ class LocationInfo {
         return result;
       }
       return "주소를 찾을 수 없는 위치입니다!";
-    } catch(e) {
+    } catch (e) {
       print(e);
       return "주소 변환 중 오류가 발생하였습니다!";
     }

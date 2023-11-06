@@ -19,8 +19,6 @@ class AccessPermissionHandler {
       } else {
         print("Permission has denied by user");
       }
-    } else {
-      print("유저에 의해 특정 권한 접근이 거부되었습니다!");
     }
   }
 }

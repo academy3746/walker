@@ -53,6 +53,9 @@ class _MainScreenState extends State<MainScreen> {
     permissionHandler.requestPermission();
 
     _determinePosition();
+
+    LocationInfo locationInfo = LocationInfo();
+    locationInfo.getStreaming();
   }
 
   @override
