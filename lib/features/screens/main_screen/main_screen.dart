@@ -1,5 +1,9 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:walker/constants/sizes.dart';
+import 'package:walker/features/widgets/location_info.dart';
 import 'package:walker/features/widgets/permission_handler.dart';
 
 class MainScreen extends StatefulWidget {
@@ -12,6 +16,33 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  /// GPS Initialize
+  Position? currentPosition;
+
+  /// Initialize Address
+  String? currentAddress;
+
+  /// Request & get Current Location
+  Future<void> _determinePosition() async {
+    LocationInfo locationInfo = LocationInfo();
+
+    /// Get 위도, 경도, 주소
+    try {
+      Position position = await locationInfo.determinePermission();
+      String address = await locationInfo.getCurrentAddress(
+        position.latitude,
+        position.longitude,
+      );
+      setState(() {
+        currentPosition = position;
+        currentAddress = address;
+        print("현재 위치 값: $currentPosition");
+        print("현재 주소: $currentAddress");
+      });
+    } catch(e) {
+      print(e);
+    }
+  }
 
   @override
   void initState() {
@@ -20,6 +51,8 @@ class _MainScreenState extends State<MainScreen> {
     /// Request User Permission
     AccessPermissionHandler permissionHandler = AccessPermissionHandler(context);
     permissionHandler.requestPermission();
+
+    _determinePosition();
   }
 
   @override
@@ -62,9 +95,9 @@ class _MainScreenState extends State<MainScreen> {
                   top: Sizes.size10,
                   bottom: Sizes.size24,
                 ),
-                child: const Text(
-                  "Hey!",
-                  style: TextStyle(
+                child: Text(
+                  currentPosition?.latitude.toString() ?? "위도 값 갱신중",
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: Sizes.size16,
                   ),
@@ -84,16 +117,16 @@ class _MainScreenState extends State<MainScreen> {
                   top: Sizes.size10,
                   bottom: Sizes.size24,
                 ),
-                child: const Text(
-                  "Jude!",
-                  style: TextStyle(
+                child: Text(
+                  currentPosition?.longitude.toString() ?? "경도 값 갱신중",
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: Sizes.size16,
                   ),
                 ),
               ),
 
-              /// 위치 환산 into String
+              /// 주소 값
               const Text(
                 "현재 위치",
                 style: TextStyle(
@@ -106,9 +139,9 @@ class _MainScreenState extends State<MainScreen> {
                   top: Sizes.size10,
                   bottom: Sizes.size24,
                 ),
-                child: const Text(
-                  "현재 위치는 인천 입니다.",
-                  style: TextStyle(
+                child: Text(
+                  "현재 위치는 $currentAddress 입니다.",
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: Sizes.size16,
                   ),

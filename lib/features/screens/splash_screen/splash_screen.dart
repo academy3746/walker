@@ -30,7 +30,7 @@ class SplashScreen extends StatelessWidget {
               ),
               Gaps.v32,
               const Text(
-                "TAKE A WALK",
+                "부럽",
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: Sizes.size40,

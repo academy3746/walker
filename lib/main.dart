@@ -12,7 +12,7 @@ class WalkerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: '부럽',
       theme: ThemeData(
         primaryColor: Colors.blueAccent,
         useMaterial3: false,
