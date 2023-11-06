@@ -11,7 +11,7 @@ class LocationInfo {
   void getStreaming() {
     const locationSettings = LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 5000,
+      distanceFilter: 100,
     );
 
     Geolocator.getPositionStream(locationSettings: locationSettings).listen(
@@ -20,6 +20,12 @@ class LocationInfo {
           lastPosition = position;
           lastCountryCode = await _getCountryCode(position);
         } else {
+          /*if (lastPosition!.latitude != position.latitude ||
+              lastPosition!.longitude != position.longitude) {
+            print("위치 정보 업데이트: $lastPosition");
+            lastPosition = position;
+          }*/
+
           if (_hasLocationChanged(position)) {
             String? currentCountryCode = await _getCountryCode(position);
 
