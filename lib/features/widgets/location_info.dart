@@ -5,25 +5,53 @@ import 'package:geocoding/geocoding.dart' as geocoding;
 
 class LocationInfo {
   Position? lastPosition;
+  String? lastCountryCode;
 
-  /// 위치 정보값 Update
+  /// 위치 정보값 (국가 단위) Update
   void getStreaming() {
     const locationSettings = LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 500,
+      distanceFilter: 5000,
     );
 
     Geolocator.getPositionStream(locationSettings: locationSettings).listen(
-      (Position position) {
+      (Position position) async {
         if (lastPosition == null) {
           lastPosition = position;
-        } else if (lastPosition!.latitude != position.latitude ||
-            lastPosition!.longitude != position.longitude) {
-          print("위치 정보 업데이트: $lastPosition");
-          lastPosition = position;
+          lastCountryCode = await _getCountryCode(position);
+        } else {
+          if (_hasLocationChanged(position)) {
+            String? currentCountryCode = await _getCountryCode(position);
+
+            /// Send Push 로직 추후 구성
+            if (lastCountryCode != currentCountryCode) {
+              print("현재 국가 위치 변경: $currentCountryCode");
+              lastCountryCode = currentCountryCode;
+            }
+
+            print("위치 정보 업데이트: ${position.toString()}");
+            lastPosition = position;
+          }
         }
       },
     );
+  }
+
+  /// 위치 변경 여부 Check
+  bool _hasLocationChanged(Position position) {
+    return lastPosition!.latitude != position.latitude ||
+        lastPosition!.longitude != position.longitude;
+  }
+
+  /// 해당 국가 ISO Code GET
+  Future<String?> _getCountryCode(Position position) async {
+    try {
+      List<geocoding.Placemark> placeMarks = await geocoding.placemarkFromCoordinates(position.latitude, position.longitude);
+      return placeMarks.first.isoCountryCode;
+    } catch (e) {
+      print("Fail to get National Code: $e");
+      return null;
+    }
   }
 
   /// 위도 및 경도값 GET
@@ -34,7 +62,7 @@ class LocationInfo {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!serviceEnabled) {
-      print("GPS 서비스가 비활성화 된 상태입니다.");
+      print("위치정보 서비스가 비활성화 된 상태입니다.");
     }
 
     permission = await Geolocator.checkPermission();
@@ -43,7 +71,7 @@ class LocationInfo {
       permission = await Geolocator.requestPermission();
 
       if (permission == LocationPermission.denied) {
-        print("사용자에 의해 GPS 접근 권한이 거부되었습니다!");
+        print("사용자에 의해 위치정보 접근 권한이 거부되었습니다!");
       }
     }
 
@@ -63,9 +91,7 @@ class LocationInfo {
         geocoding.Placemark place = placeMarks.first;
         String result = "";
 
-        if (place.subLocality != null && place.subLocality!.isNotEmpty) {
-          result = place.subLocality!;
-        } else if (place.locality != null && place.locality!.isNotEmpty) {
+        if (place.locality != null && place.locality!.isNotEmpty) {
           result = place.locality!;
         } else if (place.subAdministrativeArea != null &&
             place.subAdministrativeArea!.isNotEmpty) {
