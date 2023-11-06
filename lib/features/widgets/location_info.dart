@@ -19,7 +19,7 @@ class LocationInfo {
           lastPosition = position;
         } else if (lastPosition!.latitude != position.latitude ||
             lastPosition!.longitude != position.longitude) {
-          print("위치 정보 업데이트");
+          print("위치 정보 업데이트: $lastPosition");
           lastPosition = position;
         }
       },
