@@ -7,59 +7,6 @@ class LocationInfo {
   Position? lastPosition;
   String? lastCountryCode;
 
-  /// 위치 정보값 (국가 단위) Update
-  void getStreaming() {
-    const locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 100,
-    );
-
-    Geolocator.getPositionStream(locationSettings: locationSettings).listen(
-      (Position position) async {
-        if (lastPosition == null) {
-          lastPosition = position;
-          lastCountryCode = await _getCountryCode(position);
-        } else {
-          if (_hasLocationChanged(position)) {
-            String? currentCountryCode = await _getCountryCode(position);
-
-            /// Send Push 로직 추후 구성
-            if (lastCountryCode != currentCountryCode) {
-              print("현재 국가 위치 변경: $currentCountryCode");
-              lastCountryCode = currentCountryCode;
-            }
-
-            print("위치 정보 업데이트: ${position.toString()}");
-            lastPosition = position;
-          }
-        }
-      },
-    );
-  }
-
-  /// 위치 변경 여부 Check
-  bool _hasLocationChanged(Position position) {
-    return lastPosition!.latitude != position.latitude ||
-        lastPosition!.longitude != position.longitude;
-  }
-
-  /// 해당 국가 ISO Code GET
-  Future<String?> _getCountryCode(Position position) async {
-    try {
-      List<geocoding.Placemark> placeMarks = await geocoding.placemarkFromCoordinates(position.latitude, position.longitude);
-
-      var country = placeMarks.first.isoCountryCode;
-
-      print("현재 위치 국가 ISO Code: $country");
-
-      return country;
-    } catch (e) {
-      print("Fail to get National Code: $e");
-
-      return null;
-    }
-  }
-
   /// 위도 및 경도값 GET
   Future<Position> determinePermission() async {
     bool serviceEnabled;
@@ -116,5 +63,58 @@ class LocationInfo {
       print(e);
       return "주소 변환 중 오류가 발생하였습니다!";
     }
+  }
+
+  /// 해당 국가 ISO Code GET
+  Future<String?> _getCountryCode(Position position) async {
+    try {
+      List<geocoding.Placemark> placeMarks = await geocoding.placemarkFromCoordinates(position.latitude, position.longitude);
+
+      var country = placeMarks.first.isoCountryCode;
+
+      print("현재 위치 국가 ISO Code: $country");
+
+      return country;
+    } catch (e) {
+      print("Fail to get National Code: $e");
+
+      return null;
+    }
+  }
+
+  /// 위치 변경 여부 Check
+  bool _hasLocationChanged(Position position) {
+    return lastPosition!.latitude != position.latitude ||
+        lastPosition!.longitude != position.longitude;
+  }
+
+  /// 위치 정보값 (국가 단위) Update
+  void getStreaming() {
+    const locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 100,
+    );
+
+    Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+          (Position position) async {
+        if (lastPosition == null) {
+          lastPosition = position;
+          lastCountryCode = await _getCountryCode(position);
+        } else {
+          if (_hasLocationChanged(position)) {
+            String? currentCountryCode = await _getCountryCode(position);
+
+            /// Send Push 로직 추후 구성
+            if (lastCountryCode != currentCountryCode) {
+              print("현재 국가 위치 변경: $currentCountryCode");
+              lastCountryCode = currentCountryCode;
+            }
+
+            print("위치 정보 업데이트: ${position.toString()}");
+            lastPosition = position;
+          }
+        }
+      },
+    );
   }
 }
