@@ -4,6 +4,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:walker/constants/sizes.dart';
+import 'package:walker/features/widgets/health_info.dart';
+import 'package:walker/features/widgets/health_permission_handler.dart';
 import 'package:walker/features/widgets/location_info.dart';
 import 'package:walker/features/widgets/location_permission_handler.dart';
 
@@ -26,6 +28,10 @@ class _MainScreenState extends State<MainScreen> {
   /// Initialize Address
   String? currentAddress;
 
+  final StreamController<int> _stepsStreamController = StreamController<int>();
+
+  final HealthDataFetcher _healthDataFetcher = HealthDataFetcher();
+
   /// Get Current Location Values
   Future<void> _determinePosition() async {
     try {
@@ -47,7 +53,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   /// Request Location Access Permission & Get Current Place
-  Future<void> _requestAndDetermine() async {
+  Future<void> _requestAndDetermineLocation() async {
     AccessLocationPermissionHandler permissionHandler =
         AccessLocationPermissionHandler(context);
     bool hasLocPermission = await permissionHandler.requestLocationPermission();
@@ -61,11 +67,50 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  void _fetchStepsPeriodically() {
+    Timer.periodic(
+      const Duration(seconds: 15),
+      (timer) async {
+        print('타이머 작동');
+        try {
+          int steps = await _healthDataFetcher.fetchSteps();
+          print('가져온 걸음 수: $steps');
+          _stepsStreamController.add(steps);
+        } catch (error) {
+          print('걸음 수 가져오기 에러: $error');
+        }
+      },
+    );
+  }
+
+  Future<void> _requestAndDetermineHealth() async {
+    AccessHealthPermissionHandler permissionHandler =
+        AccessHealthPermissionHandler(context);
+
+    bool hasHealthPermission =
+        await permissionHandler.requestHealthPermission();
+
+    if (hasHealthPermission) {
+      print("Access to health data has submitted by user.");
+      _requestAndDetermineLocation();
+      _fetchStepsPeriodically();
+    } else {
+      print("Access to health data has denied by user.");
+    }
+  }
+
   @override
   void initState() {
     super.initState();
 
-    _requestAndDetermine();
+    _requestAndDetermineHealth();
+  }
+
+  @override
+  void dispose() {
+    _stepsStreamController.close();
+
+    super.dispose();
   }
 
   @override
@@ -174,12 +219,29 @@ class _MainScreenState extends State<MainScreen> {
                   top: Sizes.size10,
                   bottom: Sizes.size24,
                 ),
-                child: const Text(
-                  "현재까지 500걸음 걸으셨네요!",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: Sizes.size16,
-                  ),
+                child: StreamBuilder<int>(
+                  stream: _stepsStreamController.stream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Text(
+                        "현재까지 ${snapshot.data}걸음 걸으셨네요!",
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: Sizes.size16,
+                        ),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text(
+                        "걸음 수를 가져오는데 문제가 발생했습니다: ${snapshot.error}",
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: Sizes.size16,
+                        ),
+                      );
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
+                  },
                 ),
               ),
             ],
