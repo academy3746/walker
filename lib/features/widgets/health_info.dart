@@ -21,8 +21,7 @@ class HealthDataFetcher {
   }
 
   Future<bool> hasHealthDataAccess() async {
-    bool? hasAccess = await health.hasPermissions(types);
-    return hasAccess ?? false;
+    return await health.hasPermissions(types) ?? false;
   }
 
 
