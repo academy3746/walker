@@ -3,7 +3,7 @@
 import 'package:health/health.dart';
 
 class HealthDataFetcher {
-  HealthFactory health = HealthFactory(useHealthConnectIfAvailable: true);
+  HealthFactory health = HealthFactory();
 
   List<HealthDataType> types = [
     HealthDataType.STEPS,
