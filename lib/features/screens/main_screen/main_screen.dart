@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:walker/constants/sizes.dart';
@@ -40,14 +41,15 @@ class _MainScreenState extends State<MainScreen> {
         print("현재 위치 값: $currentPosition");
         print("현재 주소: $currentAddress");
       });
-    } catch(e) {
+    } catch (e) {
       print(e);
     }
   }
 
   /// Request Location Access Permission & Get Current Place
   Future<void> _requestAndDetermine() async {
-    AccessLocationPermissionHandler permissionHandler = AccessLocationPermissionHandler(context);
+    AccessLocationPermissionHandler permissionHandler =
+        AccessLocationPermissionHandler(context);
     bool hasLocPermission = await permissionHandler.requestLocationPermission();
 
     if (hasLocPermission) {
@@ -58,7 +60,6 @@ class _MainScreenState extends State<MainScreen> {
       print("위치정보 서비스 권한이 거부되었습니다.");
     }
   }
-
 
   @override
   void initState() {

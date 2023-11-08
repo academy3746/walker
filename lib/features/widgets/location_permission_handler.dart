@@ -28,7 +28,7 @@ class AccessLocationPermissionHandler {
         return false;
       }
     } else if (status.isPermanentlyDenied) {
-      print("Location permission has permanently denied by user");
+      print("Location permission has permanently denied by user.");
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
