@@ -11,7 +11,6 @@ class HealthDataFetcher {
 
   var permissions = [
     HealthDataAccess.READ_WRITE,
-    HealthDataAccess.READ_WRITE,
   ];
 
   Future<bool> requestHealthDataAuthorization() async {
