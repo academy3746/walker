@@ -74,10 +74,10 @@ class _MainScreenState extends State<MainScreen> {
         print('타이머 작동');
         try {
           int steps = await _healthDataFetcher.fetchSteps();
-          print("가져온 걸음 수: $steps");
 
           if (!_stepsStreamController.isClosed) {
             _stepsStreamController.add(steps);
+            print("가져온 걸음 수: $steps");
           }
         } catch (error, stackTrace) {
           print("걸음 수 가져오기 에러: $error");
