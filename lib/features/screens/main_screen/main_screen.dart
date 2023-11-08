@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:walker/constants/sizes.dart';
 import 'package:walker/features/widgets/location_info.dart';
-import 'package:walker/features/widgets/permission_handler.dart';
+import 'package:walker/features/widgets/location_permission_handler.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -47,10 +47,10 @@ class _MainScreenState extends State<MainScreen> {
 
   /// Request Location Access Permission & Get Current Place
   Future<void> _requestAndDetermine() async {
-    AccessPermissionHandler permissionHandler = AccessPermissionHandler(context);
-    bool hasPermission = await permissionHandler.requestLocationPermission();
+    AccessLocationPermissionHandler permissionHandler = AccessLocationPermissionHandler(context);
+    bool hasLocPermission = await permissionHandler.requestLocationPermission();
 
-    if (hasPermission) {
+    if (hasLocPermission) {
       await _determinePosition();
 
       locationInfo.getStreaming();
@@ -173,7 +173,7 @@ class _MainScreenState extends State<MainScreen> {
                   bottom: Sizes.size24,
                 ),
                 child: const Text(
-                  "현재까지 500보 걸으셨네요!",
+                  "현재까지 500걸음 걸으셨네요!",
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: Sizes.size16,

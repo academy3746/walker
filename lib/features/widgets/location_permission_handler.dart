@@ -3,10 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class AccessPermissionHandler {
+class AccessLocationPermissionHandler {
   final BuildContext context;
 
-  AccessPermissionHandler(this.context);
+  AccessLocationPermissionHandler(this.context);
 
   Future<bool> requestLocationPermission() async {
     PermissionStatus status = await Permission.location.status;

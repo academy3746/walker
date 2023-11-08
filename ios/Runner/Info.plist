@@ -6,6 +6,10 @@
     <string>앱이 현재 위치에 대한 정보를 수집하기 위한 권한을 요청합니다.</string>
     <key>NSLocationAlwaysUsageDescription</key>
     <string>앱이 백그라운드에서 현재 위치에 대한 정보를 수집하기 위한 권한을 요청합니다.</string>
+    <key>NSHealthShareUsageDescription</key>
+    <string>귀하의 걸음 수를 측정 / 기록 하기 위하여 Apple Health App이 귀하의 데이터와 동기화 됩니다</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>귀하의 걸음 수를 측정 / 기록 하기 위하여 Apple Health App이 귀하의 데이터와 동기화 됩니다</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
