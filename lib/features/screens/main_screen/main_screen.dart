@@ -67,17 +67,24 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  void _fetchStepsPeriodically() {
+  Future<void> _fetchStepsPeriodically() async {
     Timer.periodic(
       const Duration(seconds: 15),
-      (timer) async {
+          (timer) async {
         print('타이머 작동');
         try {
           int steps = await _healthDataFetcher.fetchSteps();
-          print('가져온 걸음 수: $steps');
-          _stepsStreamController.add(steps);
-        } catch (error) {
-          print('걸음 수 가져오기 에러: $error');
+          print("가져온 걸음 수: $steps");
+
+          if (!_stepsStreamController.isClosed) {
+            _stepsStreamController.add(steps);
+          }
+        } catch (error, stackTrace) {
+          print("걸음 수 가져오기 에러: $error");
+
+          if (!_stepsStreamController.isClosed) {
+            _stepsStreamController.addError(error, stackTrace);
+          }
         }
       },
     );
@@ -92,8 +99,8 @@ class _MainScreenState extends State<MainScreen> {
 
     if (hasHealthPermission) {
       print("Access to health data has submitted by user.");
-      _requestAndDetermineLocation();
-      _fetchStepsPeriodically();
+      await _requestAndDetermineLocation();
+      await _fetchStepsPeriodically();
     } else {
       print("Access to health data has denied by user.");
     }
@@ -239,7 +246,7 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                       );
                     } else {
-                      return const CircularProgressIndicator();
+                      return const CircularProgressIndicator.adaptive();
                     }
                   },
                 ),
