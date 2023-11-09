@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:walker/constants/sizes.dart';
+import 'package:walker/features/widgets/health_info.dart';
 import 'package:walker/features/widgets/health_permission_handler.dart';
 import 'package:walker/features/widgets/location_info.dart';
 import 'package:walker/features/widgets/location_permission_handler.dart';
@@ -26,6 +27,10 @@ class _MainScreenState extends State<MainScreen> {
 
   /// Initialize Address
   String? currentAddress;
+
+  int _steps = 0;
+
+  HealthInfo healthInfo = HealthInfo();
 
   /// Get Current Location Values
   Future<void> _determinePosition() async {
@@ -58,6 +63,7 @@ class _MainScreenState extends State<MainScreen> {
 
       await _determinePosition();
       locationInfo.getStreaming();
+      await _determineHealthData();
     } else {
       print("위치정보 접근 권한이 거부되었습니다.");
     }
@@ -69,6 +75,10 @@ class _MainScreenState extends State<MainScreen> {
 
     if (hasPermission) {
       print("신체 활동 접근 권한이 허용되었습니다.");
+      int steps = await healthInfo.stepCount();
+      setState(() {
+        _steps = steps;
+      });
     } else {
       print("신체 활동 접근 권한이 거부되었습니다.");
     }
@@ -188,9 +198,9 @@ class _MainScreenState extends State<MainScreen> {
                   top: Sizes.size10,
                   bottom: Sizes.size24,
                 ),
-                child: const Text(
-                  "현재까지 500걸음 걸으셨네요!",
-                  style: TextStyle(
+                child: Text(
+                  "현재까지 $_steps걸음 걸으셨네요!",
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: Sizes.size16,
                   ),
