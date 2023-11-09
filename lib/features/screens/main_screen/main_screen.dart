@@ -1,9 +1,14 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, prefer_collection_literals
 
 import 'dart:async';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_webview_pro/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:walker/constants/sizes.dart';
+import 'package:walker/features/widgets/app_cookie_handler.dart';
+import 'package:walker/features/widgets/back_handler_button.dart';
 import 'package:walker/features/widgets/health_info.dart';
 import 'package:walker/features/widgets/health_permission_handler.dart';
 import 'package:walker/features/widgets/location_info.dart';
@@ -19,6 +24,23 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  /// Initialize WebView Controller
+  final Completer<WebViewController> _controller =
+      Completer<WebViewController>();
+  WebViewController? viewController;
+
+  /// Initialize Main URL
+  final String url = "https://boolub.com/";
+
+  /// Import Back Action Handler
+  BackHandlerButton? backHandlerButton;
+
+  /// Import App Cookie Manager
+  AppCookieHandler? cookieHandler;
+
+  /// Initialize Loading Indicator
+  bool isLoading = false;
+
   /// Import Location Info
   LocationInfo locationInfo = LocationInfo();
 
@@ -27,9 +49,6 @@ class _MainScreenState extends State<MainScreen> {
 
   /// Initialize Address
   String? currentAddress;
-
-  /// Initialize Steps counts
-  int _steps = 0;
 
   /// Import Health Data Info
   HealthInfo healthInfo = HealthInfo();
@@ -71,16 +90,14 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  /// Request Health Access Permission & Get Current Steps (~ing)
   Future<void> _determineHealthData() async {
-    AccessHealthPermissionHandler permissionHandler = AccessHealthPermissionHandler();
+    AccessHealthPermissionHandler permissionHandler =
+        AccessHealthPermissionHandler();
     bool hasPermission = await permissionHandler.requestHealthPermission();
 
     if (hasPermission) {
       print("신체 활동 접근 권한이 허용되었습니다.");
-      //int steps = await healthInfo.stepCount();
-      setState(() {
-        //_steps = steps;
-      });
     } else {
       print("신체 활동 접근 권한이 거부되었습니다.");
     }
@@ -90,125 +107,96 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
 
+    /// Improve Android Performance
+    if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
+
+    /// Exit Application with double touch
+    _controller.future.then(
+      (WebViewController webViewController) {
+        viewController = webViewController;
+        backHandlerButton = BackHandlerButton(
+          context: context,
+          controller: webViewController,
+          mainUrl: url,
+        );
+      },
+    );
+
+    /// Initialize Cookie Settings
+    cookieHandler = AppCookieHandler(url, url);
+
     _requestAndDetermineLocation();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          "Demo Application",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: Sizes.size24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        elevation: 0,
+    return WillPopScope(
+      onWillPop: () async {
+        if (backHandlerButton != null) {
+          return backHandlerButton!.onWillPop();
+        }
+        return false;
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
-      ),
-      body: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        scrollDirection: Axis.vertical,
-        child: Padding(
-          padding: const EdgeInsets.all(
-            Sizes.size24,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              /// 위도 값
-              const Text(
-                "위도",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: Sizes.size20,
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(
-                  top: Sizes.size10,
-                  bottom: Sizes.size24,
-                ),
-                child: Text(
-                  currentPosition?.latitude.toString() ?? "위도 값 갱신중",
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: Sizes.size16,
-                  ),
-                ),
-              ),
+        body: Stack(
+          children: [
+            LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                return SizedBox(
+                  height: constraints.maxHeight,
+                  child: SafeArea(
+                    child: WebView(
+                      initialUrl: url,
+                      javascriptMode: JavascriptMode.unrestricted,
+                      onWebViewCreated:
+                          (WebViewController webViewController) async {
+                        _controller.complete(webViewController);
+                        viewController = webViewController;
 
-              /// 경도 값
-              const Text(
-                "경도",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: Sizes.size20,
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(
-                  top: Sizes.size10,
-                  bottom: Sizes.size24,
-                ),
-                child: Text(
-                  currentPosition?.longitude.toString() ?? "경도 값 갱신중",
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: Sizes.size16,
+                        /// Get Cookie Statement
+                        await cookieHandler?.setCookies(
+                          cookieHandler!.cookieValue,
+                          cookieHandler!.domain,
+                          cookieHandler!.cookieName,
+                          cookieHandler!.url,
+                        );
+                      },
+                      onPageStarted: (String url) async {
+                        print("현재 주소: $url");
+                        setState(() {
+                          isLoading = true;
+                        });
+                      },
+                      onPageFinished: (String url) async {
+                        setState(() {
+                          isLoading = false;
+                        });
+                      },
+                      onWebResourceError: (error) {
+                        print("Error Code: ${error.errorCode}");
+                        print("Error Description: ${error.description}");
+                      },
+                      zoomEnabled: false,
+                      gestureRecognizers: Set()
+                        ..add(
+                          Factory<EagerGestureRecognizer>(
+                            () => EagerGestureRecognizer(),
+                          ),
+                        ),
+                      gestureNavigationEnabled: true,
+                    ),
                   ),
-                ),
-              ),
-
-              /// 주소 값
-              const Text(
-                "현재 위치",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: Sizes.size20,
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(
-                  top: Sizes.size10,
-                  bottom: Sizes.size24,
-                ),
-                child: Text(
-                  "현재 위치는 $currentAddress 입니다.",
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: Sizes.size16,
-                  ),
-                ),
-              ),
-
-              /// 현재 걸음 수
-              const Text(
-                "현재 걸음 수",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: Sizes.size20,
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(
-                  top: Sizes.size10,
-                  bottom: Sizes.size24,
-                ),
-                child: Text(
-                  "현재까지 $_steps걸음 걸으셨네요!",
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: Sizes.size16,
-                  ),
-                ),
-              ),
-            ],
-          ),
+                );
+              },
+            ),
+            isLoading
+                ? const Center(
+                    child: CircularProgressIndicator.adaptive(),
+                  )
+                : Container(),
+          ],
         ),
       ),
     );

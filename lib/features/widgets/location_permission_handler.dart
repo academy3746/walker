@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 
 class AccessLocationPermissionHandler {
@@ -17,9 +16,7 @@ class AccessLocationPermissionHandler {
       if (result.isGranted) {
         print("Access to location data has submitted by user.");
 
-        if (Platform.isAndroid) {
-          openAppSettings();
-        }
+        openAppSettings();
 
         return true;
       } else {
