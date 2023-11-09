@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:walker/constants/sizes.dart';
+import 'package:walker/features/widgets/health_permission_handler.dart';
 import 'package:walker/features/widgets/location_info.dart';
 import 'package:walker/features/widgets/location_permission_handler.dart';
 
@@ -25,8 +26,6 @@ class _MainScreenState extends State<MainScreen> {
 
   /// Initialize Address
   String? currentAddress;
-
-  final StreamController<int> _stepsStreamController = StreamController<int>();
 
   /// Get Current Location Values
   Future<void> _determinePosition() async {
@@ -51,31 +50,36 @@ class _MainScreenState extends State<MainScreen> {
   /// Request Location Access Permission & Get Current Place
   Future<void> _requestAndDetermineLocation() async {
     AccessLocationPermissionHandler permissionHandler =
-        AccessLocationPermissionHandler(context);
+        AccessLocationPermissionHandler();
     bool hasLocPermission = await permissionHandler.requestLocationPermission();
 
     if (hasLocPermission) {
-      await _determinePosition();
+      print("위치정보 접근 권한이 허용되었습니다.");
 
+      await _determinePosition();
       locationInfo.getStreaming();
     } else {
-      print("위치정보 서비스 권한이 거부되었습니다.");
+      print("위치정보 접근 권한이 거부되었습니다.");
     }
   }
 
+  Future<void> _determineHealthData() async {
+    AccessHealthPermissionHandler permissionHandler = AccessHealthPermissionHandler();
+    bool hasPermission = await permissionHandler.requestHealthPermission();
+
+    if (hasPermission) {
+      print("신체 활동 접근 권한이 허용되었습니다.");
+    } else {
+      print("신체 활동 접근 권한이 거부되었습니다.");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
 
     _requestAndDetermineLocation();
-  }
-
-  @override
-  void dispose() {
-    _stepsStreamController.close();
-
-    super.dispose();
+    //_determineHealthData();
   }
 
   @override
