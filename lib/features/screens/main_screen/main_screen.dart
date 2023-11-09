@@ -28,8 +28,10 @@ class _MainScreenState extends State<MainScreen> {
   /// Initialize Address
   String? currentAddress;
 
+  /// Initialize Steps counts
   int _steps = 0;
 
+  /// Import Health Data Info
   HealthInfo healthInfo = HealthInfo();
 
   /// Get Current Location Values
@@ -75,9 +77,9 @@ class _MainScreenState extends State<MainScreen> {
 
     if (hasPermission) {
       print("신체 활동 접근 권한이 허용되었습니다.");
-      int steps = await healthInfo.stepCount();
+      //int steps = await healthInfo.stepCount();
       setState(() {
-        _steps = steps;
+        //_steps = steps;
       });
     } else {
       print("신체 활동 접근 권한이 거부되었습니다.");
@@ -89,7 +91,6 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
 
     _requestAndDetermineLocation();
-    //_determineHealthData();
   }
 
   @override

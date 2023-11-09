@@ -3,44 +3,30 @@
 import 'package:health/health.dart';
 
 class HealthInfo {
-  HealthFactory health = HealthFactory();
+  int steps = 0;
 
-  List<HealthDataType> types = [HealthDataType.STEPS];
+  HealthFactory health = HealthFactory(useHealthConnectIfAvailable: true);
 
-  var permissions = [HealthDataAccess.READ_WRITE];
+  var now = DateTime.now();
 
-  Future<bool> hasHealthDataAccess() async {
-    return await health.hasPermissions(types, permissions: permissions) ??
-        false;
-  }
+  var types = [HealthDataType.STEPS];
 
-  Future<int> stepCount() async {
-    int steps = 0;
-    bool hasPermission = await hasHealthDataAccess();
+  Future<void> _setHealthPermission() async {
+    bool requested = await health.requestAuthorization(types);
 
-    if (hasPermission) {
-      try {
-        List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-          DateTime.now().subtract(const Duration(days: 1)),
-          DateTime.now(),
-          types,
-        );
+    List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
+      now.subtract(const Duration(days: 1)),
+      now,
+      types,
+    );
 
-        for (var data in healthData) {
-          if (data.type == HealthDataType.STEPS) {
-            var value = data.value as num;
-            steps += value.toInt();
-          }
-        }
+    types = [HealthDataType.STEPS];
 
-        print("걸음 수: $steps");
-      } catch (e) {
-        print(e);
-      }
-    } else {
-      print("Steps count measurement has denied by user.");
-    }
+    var permissions = [HealthDataAccess.READ_WRITE];
 
-    return steps;
+    await health.requestAuthorization(
+      types,
+      permissions: permissions,
+    );
   }
 }
