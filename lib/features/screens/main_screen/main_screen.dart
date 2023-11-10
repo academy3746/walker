@@ -169,7 +169,7 @@ class _MainScreenState extends State<MainScreen> {
                         );
                       },
                       onPageStarted: (String url) async {
-                        print("현재 주소: $url");
+                        print("현재 페이지 주소: $url");
                         setState(() {
                           isLoading = true;
                         });
