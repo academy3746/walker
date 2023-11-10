@@ -32,7 +32,7 @@ class _MainScreenState extends State<MainScreen> {
 
   /// Initialize Main URL
   final String url = "https://boolub.com/";
-  //final String url = "https://albup.co.kr/";
+  //final String url = "https://boolub.com?is_app=y/";
 
   /// Import Back Action Handler
   BackHandlerButton? backHandlerButton;
@@ -186,7 +186,7 @@ class _MainScreenState extends State<MainScreen> {
                         print("RESOURCE ERROR Failing URL ${error.domain}");
                         print("Error Description: ${error.description}");
                       },
-                      zoomEnabled: false,
+                      zoomEnabled: true,
                       gestureRecognizers: Set()
                         ..add(
                           Factory<EagerGestureRecognizer>(
@@ -194,6 +194,7 @@ class _MainScreenState extends State<MainScreen> {
                           ),
                         ),
                       gestureNavigationEnabled: true,
+                      userAgent: "random",
                     ),
                   ),
                 );
