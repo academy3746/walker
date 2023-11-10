@@ -31,8 +31,7 @@ class _MainScreenState extends State<MainScreen> {
   WebViewController? viewController;
 
   /// Initialize Main URL
-  final String url = "https://boolub.com/";
-  //final String url = "https://boolub.com?is_app=y/";
+  final String url = "https://boolub.com/?is_app=y";
 
   /// Import Back Action Handler
   BackHandlerButton? backHandlerButton;
@@ -179,6 +178,24 @@ class _MainScreenState extends State<MainScreen> {
                         setState(() {
                           isLoading = false;
                         });
+
+                        if (Platform.isAndroid) {
+                          if (url.contains(url) && viewController != null) {
+                            await viewController!.runJavascript("""
+                              (function() {
+                              function scrollToFocusedInput(event) {
+                                const focusedElement = document.activeElement;
+                                if (focusedElement.tagName.toLowerCase() === 'input' || focusedElement.tagName.toLowerCase() === 'textarea') {
+                                  setTimeout(() => {
+                                    focusedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                  }, 500);
+                                }
+                              }
+                              document.addEventListener('focus', scrollToFocusedInput, true);
+                            })();
+                            """);
+                          }
+                        }
                       },
                       onWebResourceError: (error) {
                         print("Error Code: ${error.errorCode}");
