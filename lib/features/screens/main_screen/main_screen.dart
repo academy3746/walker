@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webview_pro/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:walker/features/widgets/app_cookie_handler.dart';
+import 'package:walker/features/widgets/app_version_check_handler.dart';
 import 'package:walker/features/widgets/back_handler_button.dart';
 import 'package:walker/features/widgets/health_info.dart';
 import 'package:walker/features/widgets/health_permission_handler.dart';
@@ -30,7 +31,7 @@ class _MainScreenState extends State<MainScreen> {
   WebViewController? viewController;
 
   /// Initialize Main URL
-  final String url = "https://boolub.com/";
+  final String url = "https://boolub.com?is_app=y/";
 
   /// Import Back Action Handler
   BackHandlerButton? backHandlerButton;
@@ -124,6 +125,10 @@ class _MainScreenState extends State<MainScreen> {
 
     /// Initialize Cookie Settings
     cookieHandler = AppCookieHandler(url, url);
+
+    /// App Version Handling (Manually)
+    AppVersionHandler appVersionHandler = AppVersionHandler(context);
+    appVersionHandler.getAppVersionStatus();
 
     _requestAndDetermineLocation();
   }
