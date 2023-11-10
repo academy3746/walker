@@ -16,7 +16,7 @@ class AccessLocationPermissionHandler {
       if (result.isGranted) {
         print("Access to location data has submitted by user.");
 
-        openAppSettings();
+        //openAppSettings();
 
         return true;
       } else {

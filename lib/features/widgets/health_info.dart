@@ -2,6 +2,7 @@
 
 import 'package:health/health.dart';
 
+/// 미완성
 class HealthInfo {
   int steps = 0;
 
