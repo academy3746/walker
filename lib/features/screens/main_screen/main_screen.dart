@@ -31,7 +31,8 @@ class _MainScreenState extends State<MainScreen> {
   WebViewController? viewController;
 
   /// Initialize Main URL
-  final String url = "https://boolub.com?is_app=y/";
+  final String url = "https://boolub.com/";
+  //final String url = "https://albup.co.kr/";
 
   /// Import Back Action Handler
   BackHandlerButton? backHandlerButton;
@@ -181,6 +182,8 @@ class _MainScreenState extends State<MainScreen> {
                       },
                       onWebResourceError: (error) {
                         print("Error Code: ${error.errorCode}");
+                        print("RESOURCE ERROR Error Type ${error.errorType}");
+                        print("RESOURCE ERROR Failing URL ${error.domain}");
                         print("Error Description: ${error.description}");
                       },
                       zoomEnabled: false,

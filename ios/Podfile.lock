@@ -1,0 +1,77 @@
+PODS:
+  - device_info_plus (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - geocoding_ios (1.0.5):
+    - Flutter
+  - geolocator_apple (1.2.0):
+    - Flutter
+  - health (1.0.4):
+    - Flutter
+  - package_info (0.0.1):
+    - Flutter
+  - permission_handler_apple (9.1.1):
+    - Flutter
+  - shared_preferences_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - url_launcher_ios (0.0.1):
+    - Flutter
+  - webview_cookie_manager (0.0.1):
+    - Flutter
+  - "webview_pro_wkwebview (2.7.1+1)":
+    - Flutter
+
+DEPENDENCIES:
+  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
+  - Flutter (from `Flutter`)
+  - geocoding_ios (from `.symlinks/plugins/geocoding_ios/ios`)
+  - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
+  - health (from `.symlinks/plugins/health/ios`)
+  - package_info (from `.symlinks/plugins/package_info/ios`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
+  - webview_cookie_manager (from `.symlinks/plugins/webview_cookie_manager/ios`)
+  - webview_pro_wkwebview (from `.symlinks/plugins/webview_pro_wkwebview/ios`)
+
+EXTERNAL SOURCES:
+  device_info_plus:
+    :path: ".symlinks/plugins/device_info_plus/ios"
+  Flutter:
+    :path: Flutter
+  geocoding_ios:
+    :path: ".symlinks/plugins/geocoding_ios/ios"
+  geolocator_apple:
+    :path: ".symlinks/plugins/geolocator_apple/ios"
+  health:
+    :path: ".symlinks/plugins/health/ios"
+  package_info:
+    :path: ".symlinks/plugins/package_info/ios"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
+  shared_preferences_foundation:
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
+  url_launcher_ios:
+    :path: ".symlinks/plugins/url_launcher_ios/ios"
+  webview_cookie_manager:
+    :path: ".symlinks/plugins/webview_cookie_manager/ios"
+  webview_pro_wkwebview:
+    :path: ".symlinks/plugins/webview_pro_wkwebview/ios"
+
+SPEC CHECKSUMS:
+  device_info_plus: c6fb39579d0f423935b0c9ce7ee2f44b71b9fce6
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  geocoding_ios: a389ea40f6f548de6e63006a2e31bf66ff80769a
+  geolocator_apple: cc556e6844d508c95df1e87e3ea6fa4e58c50401
+  health: 5a380c0f6c4f619535845992993964293962e99e
+  package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
+  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
+  shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
+  url_launcher_ios: 68d46cc9766d0c41dbdc884310529557e3cd7a86
+  webview_cookie_manager: eaf920722b493bd0f7611b5484771ca53fed03f7
+  webview_pro_wkwebview: 38019db9fcfb544f91e1b0e46b11af71a42b6d2c
+
+PODFILE CHECKSUM: 9dd662307c7fea1725195b230c475b2c3493bcc9
+
+COCOAPODS: 1.14.2

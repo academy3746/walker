@@ -19,10 +19,7 @@ dependencies:
   health: ^8.0.0
   shared_preferences: ^2.2.2
   url_launcher: ^6.2.1
-  get: ^4.6.6
-  get_storage: ^2.1.1
   package_info: ^2.0.2
-  http: ^1.1.0
   flutter_webview_pro: ^3.0.1+4
   webview_cookie_manager: ^2.0.6
 
