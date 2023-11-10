@@ -41,7 +41,7 @@ class AppCookieHandler {
       ],
     );
 
-    var printCookie = _cookieManager.getCookies(url);
+    var printCookie = await _cookieManager.getCookies(url);
     print("Debug Cookie Values: $printCookie");
   }
 }

@@ -2,23 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-        <key>NSAllowsArbitraryLoadsInWebContent</key>
-        <true/>
-        <key>NSAllowsLocalNetworking</key>
-        </true>
-    </dict>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>앱이 현재 위치에 대한 정보를 수집하기 위한 권한을 요청합니다.</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>앱이 백그라운드에서 현재 위치에 대한 정보를 수집하기 위한 권한을 요청합니다.</string>
-    <key>NSHealthShareUsageDescription</key>
-    <string>귀하의 걸음 수를 측정 / 기록 하기 위하여 Apple Health App이 귀하의 데이터와 동기화 됩니다</string>
-    <key>NSHealthUpdateUsageDescription</key>
-    <string>귀하의 걸음 수를 측정 / 기록 하기 위하여 Apple Health App이 귀하의 데이터와 동기화 됩니다</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -41,6 +24,22 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>앱이 현재 위치에 대한 정보를 수집하기 위한 권한을 요청합니다.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>앱이 백그라운드에서 현재 위치에 대한 정보를 수집하기 위한 권한을 요청합니다.</string>
+    <key>NSHealthShareUsageDescription</key>
+    <string>귀하의 걸음 수를 측정 / 기록 하기 위하여 Apple Health App이 귀하의 데이터와 동기화 됩니다</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>귀하의 걸음 수를 측정 / 기록 하기 위하여 Apple Health App이 귀하의 데이터와 동기화 됩니다</string>
+    <key>NSAppleMusicUsageDescription</key>
+    <string>Apple Music에 대한 접근 권한을 허용하시겠습니까?</string>
+    <key>NSCameraUsageDescription</key>
+    <string>인앱 사진 촬영을 통해 사진을 해당 게시판에 등록하기 원하신다면 해당 앱에 대한 사진촬영 권한을 허용해주셔야 합니다.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>인앱 비디오 촬영을 통해 비디오 파일을 해당 게시판에 등록하기 원하신다면 마이크 접근 권한이 필요합니다.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>기기 갤러리에 저장된 사진을 해당 게시판에 등록하기 원하신다면 해당 앱에 대한 저장매체 접근 권한을 허용해주셔야 합니다.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
