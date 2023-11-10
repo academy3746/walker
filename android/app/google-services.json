@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "69890940954",
+    "project_id": "boolub",
+    "storage_bucket": "boolub.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:69890940954:android:ac3eb865ab5aaa7cb0b1a3",
+        "android_client_info": {
+          "package_name": "kr.sogeum.walker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "69890940954-f5o3265n1ms2i62b47g63au5cs00rshe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "kr.sogeum.walker",
+            "certificate_hash": "37686d1d367a66111bb81392e577fd7a8a8d9dc0"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2mDiDh8PZy0mXby4FrhjVyCA0xddkOPI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

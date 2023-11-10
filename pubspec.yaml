@@ -22,6 +22,14 @@ dependencies:
   package_info: ^2.0.2
   flutter_webview_pro: ^3.0.1+4
   webview_cookie_manager: ^2.0.6
+  firebase_core: ^2.22.0
+  firebase_crashlytics: ^3.4.4
+  firebase_analytics: ^10.6.4
+  firebase_messaging: ^14.7.4
+  flutter_local_notifications: ^9.1.5
+  get: ^4.6.6
+  get_storage: ^2.1.1
+  http: ^1.1.0
 
 
 
