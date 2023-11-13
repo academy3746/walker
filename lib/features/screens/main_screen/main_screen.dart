@@ -7,14 +7,15 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_pro/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:walker/common/widgets/app_cookie_handler.dart';
 import 'package:walker/common/widgets/app_version_check_handler.dart';
 import 'package:walker/common/widgets/back_handler_button.dart';
+import 'package:walker/common/widgets/fcm_controller.dart';
 import 'package:walker/common/widgets/health_info.dart';
 import 'package:walker/common/widgets/health_permission_handler.dart';
 import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/location_permission_handler.dart';
-
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -46,6 +47,9 @@ class _MainScreenState extends State<MainScreen> {
   /// Import Location Info
   LocationInfo locationInfo = LocationInfo();
 
+  /// Import FCM Controller
+  MsgController msgController = Get.put(MsgController());
+
   /// GPS Initialize
   Position? currentPosition;
 
@@ -54,26 +58,6 @@ class _MainScreenState extends State<MainScreen> {
 
   /// Import Health Data Info
   HealthInfo healthInfo = HealthInfo();
-
-  /// Get Current Location Values
-  Future<void> _determinePosition() async {
-    try {
-      Position position = await locationInfo.determinePermission();
-      String address = await locationInfo.getCurrentAddress(
-        position.latitude,
-        position.longitude,
-      );
-      setState(() {
-        currentPosition = position;
-        currentAddress = address;
-
-        print("현재 위치 값: $currentPosition");
-        print("현재 주소: $currentAddress");
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
 
   /// Request Location Access Permission & Get Current Place
   Future<void> _requestAndDetermineLocation() async {
@@ -84,9 +68,34 @@ class _MainScreenState extends State<MainScreen> {
     if (hasLocPermission) {
       print("위치정보 접근 권한이 허용되었습니다.");
 
-      await _determinePosition();
-      locationInfo.getStreaming();
-      await _determineHealthData();
+      try {
+        Position position = await locationInfo.determinePermission();
+        String? countryCode = await locationInfo.getCountryCode(position);
+
+        locationInfo.lastPosition = position;
+        locationInfo.lastCountryCode = countryCode;
+
+        String address = await locationInfo.getCurrentAddress(
+          position.latitude,
+          position.longitude,
+        );
+
+        setState(() {
+          currentPosition = position;
+          currentAddress = address;
+
+          print("현재 위치 값: $currentPosition");
+          print("현재 주소: $currentAddress");
+
+          _determineHealthData();
+          _getUserToken();
+        });
+
+        locationInfo.debugStreaming();
+        //locationInfo.getStreaming();
+      } catch (e) {
+        print(e);
+      }
     } else {
       print("위치정보 접근 권한이 거부되었습니다.");
     }
@@ -103,6 +112,11 @@ class _MainScreenState extends State<MainScreen> {
     } else {
       print("신체 활동 접근 권한이 거부되었습니다.");
     }
+  }
+
+  /// Get User Token Value from Firebase Server
+  Future<String?> _getUserToken() async {
+    return await msgController.getToken();
   }
 
   @override
@@ -131,6 +145,7 @@ class _MainScreenState extends State<MainScreen> {
     AppVersionHandler appVersionHandler = AppVersionHandler(context);
     appVersionHandler.getAppVersionStatus();
 
+    /// Get User Location
     _requestAndDetermineLocation();
   }
 

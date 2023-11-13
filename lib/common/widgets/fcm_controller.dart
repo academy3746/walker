@@ -33,7 +33,7 @@ class MsgController extends GetxController {
   /// Android Push Alarm Setting: Channel only for performing messaging service
   final AndroidNotificationChannel channel = const AndroidNotificationChannel(
     'high_importance_channel',
-    'High Importance Notifications',
+    '중요한 알림 수신',
     description: 'This channel is used for important notifications.',
     importance: Importance.max,
   );

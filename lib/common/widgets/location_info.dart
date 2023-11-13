@@ -29,7 +29,7 @@ class LocationInfo {
     }
 
     return await Geolocator.getCurrentPosition(
-      timeLimit: const Duration(seconds: 30),
+      timeLimit: const Duration(seconds: 10),
       desiredAccuracy: LocationAccuracy.best,
     );
   }
@@ -66,9 +66,10 @@ class LocationInfo {
   }
 
   /// 해당 국가 ISO Code GET
-  Future<String?> _getCountryCode(Position position) async {
+  Future<String?> getCountryCode(Position position) async {
     try {
-      List<geocoding.Placemark> placeMarks = await geocoding.placemarkFromCoordinates(position.latitude, position.longitude);
+      List<geocoding.Placemark> placeMarks = await geocoding
+          .placemarkFromCoordinates(position.latitude, position.longitude);
 
       var country = placeMarks.first.isoCountryCode;
 
@@ -83,36 +84,95 @@ class LocationInfo {
   }
 
   /// 위치 변경 여부 Check
-  bool _hasLocationChanged(Position position) {
-    return lastPosition!.latitude != position.latitude ||
-        lastPosition!.longitude != position.longitude;
+  bool hasLocationChanged(Position position) {
+    if (lastPosition == null) {
+      lastPosition = position;
+
+      return false;
+    }
+
+    double distance = Geolocator.distanceBetween(
+      lastPosition!.latitude,
+      lastPosition!.longitude,
+      position.latitude,
+      position.longitude,
+    );
+
+    if (distance >= 500) {
+      lastPosition = position;
+
+      return true;
+    }
+
+    return false;
   }
 
-  /// 위치 정보값 (국가 단위) Update
-  void getStreaming() {
+  /// Location Changed (국가 단위)
+  Future<void> getStreaming() async {
     const locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 100,
+      accuracy: LocationAccuracy.best,
+      distanceFilter: 500,
     );
 
     Geolocator.getPositionStream(locationSettings: locationSettings).listen(
-          (Position position) async {
-        if (lastPosition == null) {
+      (Position position) async {
+        if (hasLocationChanged(position)) {
           lastPosition = position;
-          lastCountryCode = await _getCountryCode(position);
-        } else {
-          if (_hasLocationChanged(position)) {
-            String? currentCountryCode = await _getCountryCode(position);
 
-            /// Send Push 로직 추후 구성
-            if (lastCountryCode != currentCountryCode) {
-              print("현재 국가 위치 변경: $currentCountryCode");
-              lastCountryCode = currentCountryCode;
-            }
+          String? currentCountryCode = await getCountryCode(position);
 
-            print("위치 정보 업데이트: ${position.toString()}");
-            lastPosition = position;
+          if (lastCountryCode != currentCountryCode) {
+            print("국가 정보 업데이트: $currentCountryCode");
+            lastCountryCode = currentCountryCode;
+
+            String currentAddress =
+                await getCurrentAddress(position.latitude, position.longitude);
+
+            print("도시 정보 업데이트: $currentAddress");
           }
+
+          print("위치 정보 업데이트: ${position.toString()}");
+        }
+      },
+    );
+  }
+
+  /// Debug Location Changed
+  Future<void> debugStreaming() async {
+    const double debugLatitude = 37.3316756;
+    const double debugLongitude = -122.030189;
+
+    Future.delayed(
+      const Duration(seconds: 5),
+      () async {
+        Position debugPosition = Position(
+          latitude: debugLatitude,
+          longitude: debugLongitude,
+          timestamp: DateTime.now(),
+          accuracy: 100.0,
+          altitude: 0.0,
+          heading: 0.0,
+          speed: 0.0,
+          speedAccuracy: 100.0,
+          altitudeAccuracy: 100.0,
+          headingAccuracy: 100.0,
+        );
+
+        if (hasLocationChanged(debugPosition)) {
+          String? currentCountryCode = await getCountryCode(debugPosition);
+
+          /// Send Push 로직 추후 구성
+          if (lastCountryCode != currentCountryCode) {
+            print("국가 정보 업데이트: $currentCountryCode");
+            lastCountryCode = currentCountryCode;
+
+            String currentAddress = await getCurrentAddress(
+                debugPosition.latitude, debugPosition.longitude);
+            print("도시 정보 업데이트: $currentAddress");
+          }
+
+          print("위치 정보 업데이트: ${debugPosition.toString()}");
+          lastPosition = debugPosition;
         }
       },
     );
