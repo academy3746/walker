@@ -223,7 +223,6 @@ class _MainScreenState extends State<MainScreen> {
                           ),
                         ),
                       gestureNavigationEnabled: true,
-                      userAgent: "random",
                     ),
                   ),
                 );
