@@ -7,15 +7,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_pro/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:get/instance_manager.dart';
-import 'package:walker/features/widgets/app_cookie_handler.dart';
-import 'package:walker/features/widgets/app_version_check_handler.dart';
-import 'package:walker/features/widgets/back_handler_button.dart';
-import 'package:walker/features/widgets/fcm_controller.dart';
-import 'package:walker/features/widgets/health_info.dart';
-import 'package:walker/features/widgets/health_permission_handler.dart';
-import 'package:walker/features/widgets/location_info.dart';
-import 'package:walker/features/widgets/location_permission_handler.dart';
+import 'package:walker/common/widgets/app_cookie_handler.dart';
+import 'package:walker/common/widgets/app_version_check_handler.dart';
+import 'package:walker/common/widgets/back_handler_button.dart';
+import 'package:walker/common/widgets/health_info.dart';
+import 'package:walker/common/widgets/health_permission_handler.dart';
+import 'package:walker/common/widgets/location_info.dart';
+import 'package:walker/common/widgets/location_permission_handler.dart';
+
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -46,9 +45,6 @@ class _MainScreenState extends State<MainScreen> {
 
   /// Import Location Info
   LocationInfo locationInfo = LocationInfo();
-
-  /// Import FCM Controller
-  final MsgController msgController = Get.put(MsgController());
 
   /// GPS Initialize
   Position? currentPosition;
@@ -109,19 +105,12 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  Future<String?> _getPushToken() async {
-    return await msgController.getToken();
-  }
-
   @override
   void initState() {
     super.initState();
 
     /// Improve Android Performance
     if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
-
-    /// Initialize User Token
-    _getPushToken();
 
     /// Exit Application with double touch
     _controller.future.then(
