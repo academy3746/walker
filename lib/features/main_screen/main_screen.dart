@@ -7,14 +7,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_pro/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:walker/common/widgets/app_cookie_handler.dart';
 import 'package:walker/common/widgets/app_version_check_handler.dart';
 import 'package:walker/common/widgets/back_handler_button.dart';
 import 'package:walker/common/widgets/fcm_controller.dart';
-import 'package:walker/common/widgets/health_info.dart';
-import 'package:walker/common/widgets/health_permission_handler.dart';
 import 'package:walker/common/widgets/location_info.dart';
-import 'package:walker/common/widgets/location_permission_handler.dart';
+import 'package:walker/common/widgets/permission_controller.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -52,20 +51,17 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Initialize Address
   String? currentAddress;
 
-  /// Import Health Data Info
-  HealthInfo healthInfo = HealthInfo();
-
-  /// Import FCM Controller
-  MsgController msgController = MsgController();
+  /// Get Unique Token Value from Firebase Server
+  MsgController msgController = Get.put(MsgController());
 
   /// Request Location Access Permission & Get Current Place
   Future<void> _requestAndDetermineLocation() async {
-    AccessLocationPermissionHandler permissionHandler =
-        AccessLocationPermissionHandler();
-    bool hasLocPermission = await permissionHandler.requestLocationPermission();
+    AccessPermission permissionHandler = AccessPermission();
+    bool hasPermission = await permissionHandler.initPermission();
 
-    if (hasLocPermission) {
+    if (hasPermission) {
       print("위치정보 접근 권한이 허용되었습니다.");
+      print("신체 활동 접근 권한이 허용되었습니다.");
 
       try {
         Position position = await locationInfo.determinePermission();
@@ -85,8 +81,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
           print("현재 위치 값: $currentPosition");
           print("현재 주소: $currentAddress");
-
-          _determineHealthData();
         });
 
         locationInfo.debugStreaming();
@@ -96,25 +90,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       }
     } else {
       print("위치정보 접근 권한이 거부되었습니다.");
-    }
-  }
-
-  /// Request Health Access Permission & Get Current Steps (~ing)
-  Future<void> _determineHealthData() async {
-    AccessHealthPermissionHandler permissionHandler =
-        AccessHealthPermissionHandler();
-    bool hasPermission = await permissionHandler.requestHealthPermission();
-
-    if (hasPermission) {
-      print("신체 활동 접근 권한이 허용되었습니다.");
-    } else {
       print("신체 활동 접근 권한이 거부되었습니다.");
     }
-  }
-
-  /// Get Unique Token Value from Firebase Server
-  Future<String?> _getUserToken() async {
-    return msgController.getToken();
   }
 
   @override
@@ -136,9 +113,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     /// Improve Android Performance
     if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
-
-    /// Get User Token Value
-    _getUserToken();
 
     /// Exit Application with double touch
     _controller.future.then(
