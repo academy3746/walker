@@ -1,11 +1,13 @@
 // ignore_for_file: avoid_print
 
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
 
 class LocationInfo {
   Position? lastPosition;
   String? lastCountryCode;
+  late LocationSettings locationSettings;
 
   /// 위도 및 경도값 GET
   Future<Position> determinePermission() async {
@@ -109,10 +111,30 @@ class LocationInfo {
 
   /// Location Changed (국가 단위)
   Future<void> getStreaming() async {
-    const locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.best,
-      distanceFilter: 500,
-    );
+    var androidPlatform = TargetPlatform.android;
+
+    var iosPlatform = TargetPlatform.iOS;
+
+    if (defaultTargetPlatform == androidPlatform) {
+      locationSettings = AndroidSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 500,
+        forceLocationManager: true,
+        intervalDuration: const Duration(seconds: 10),
+      );
+    } else if (defaultTargetPlatform == iosPlatform) {
+      locationSettings = AppleSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 500,
+        pauseLocationUpdatesAutomatically: true,
+        showBackgroundLocationIndicator: true,
+      );
+    } else {
+      locationSettings = const LocationSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 500,
+      );
+    }
 
     Geolocator.getPositionStream(locationSettings: locationSettings).listen(
       (Position position) async {

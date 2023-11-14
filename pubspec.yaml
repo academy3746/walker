@@ -30,6 +30,8 @@ dependencies:
   get: ^4.6.6
   get_storage: ^2.1.1
   http: ^1.1.0
+  geolocator_android: ^4.4.0
+  geolocator_apple: ^2.3.2
 
 
 
