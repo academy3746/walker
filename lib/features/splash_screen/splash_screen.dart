@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:walker/constants/sizes.dart';
-import 'package:walker/features/screens/main_screen/main_screen.dart';
+import 'package:walker/features/main_screen/main_screen.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
