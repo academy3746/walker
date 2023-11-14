@@ -121,10 +121,16 @@ class LocationInfo {
         distanceFilter: 500,
         forceLocationManager: true,
         intervalDuration: const Duration(seconds: 10),
+        foregroundNotificationConfig: const ForegroundNotificationConfig(
+          notificationTitle: "앱이 백그라운드에서 실행중입니다.",
+          notificationText: "앱을 사용하지 않을 때에도 위치 정보를 꾸준히 업데이트 합니다.",
+          enableWakeLock: true,
+        ),
       );
     } else if (defaultTargetPlatform == iosPlatform) {
       locationSettings = AppleSettings(
         accuracy: LocationAccuracy.best,
+        activityType: ActivityType.fitness,
         distanceFilter: 500,
         pauseLocationUpdatesAutomatically: true,
         showBackgroundLocationIndicator: true,
