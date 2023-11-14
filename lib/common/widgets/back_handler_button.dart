@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_pro/webview_flutter.dart';
 
@@ -7,6 +6,7 @@ class BackHandlerButton {
   DateTime? lastPressed;
   String? mainUrl;
   WebViewController? controller;
+  bool isAppForeground = false;
 
   BackHandlerButton({
     required this.context,
@@ -39,10 +39,9 @@ class BackHandlerButton {
         controller?.goBack();
         return Future.value(false);
       }
-    } else {
-      if (context.mounted) {
-        exit(0);
-      }
+    } else if (isAppForeground) {
+      Navigator.of(context).pop();
+      return Future.value(false);
     }
 
     return Future.value(true);

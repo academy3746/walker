@@ -46,10 +46,9 @@ class MsgController extends GetxController {
     String? token = await messaging.getToken();
     /// Throw & Catch Exception
     try {
-      print(token);
+      print("Unique Token Value: $token");
       return token;
     } catch (e) {
-      // Comment line
       throw Error();
     }
   }

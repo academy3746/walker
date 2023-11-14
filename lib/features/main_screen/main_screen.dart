@@ -7,7 +7,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_pro/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
 import 'package:walker/common/widgets/app_cookie_handler.dart';
 import 'package:walker/common/widgets/app_version_check_handler.dart';
 import 'package:walker/common/widgets/back_handler_button.dart';
@@ -26,7 +25,7 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Initialize WebView Controller
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
@@ -47,9 +46,6 @@ class _MainScreenState extends State<MainScreen> {
   /// Import Location Info
   LocationInfo locationInfo = LocationInfo();
 
-  /// Import FCM Controller
-  MsgController msgController = Get.put(MsgController());
-
   /// GPS Initialize
   Position? currentPosition;
 
@@ -58,6 +54,9 @@ class _MainScreenState extends State<MainScreen> {
 
   /// Import Health Data Info
   HealthInfo healthInfo = HealthInfo();
+
+  /// Import FCM Controller
+  MsgController msgController = MsgController();
 
   /// Request Location Access Permission & Get Current Place
   Future<void> _requestAndDetermineLocation() async {
@@ -88,7 +87,6 @@ class _MainScreenState extends State<MainScreen> {
           print("현재 주소: $currentAddress");
 
           _determineHealthData();
-          _getUserToken();
         });
 
         locationInfo.debugStreaming();
@@ -114,17 +112,33 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  /// Get User Token Value from Firebase Server
+  /// Get Unique Token Value from Firebase Server
   Future<String?> _getUserToken() async {
-    return await msgController.getToken();
+    return msgController.getToken();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      backHandlerButton?.isAppForeground = true;
+    } else {
+      backHandlerButton?.isAppForeground = false;
+    }
   }
 
   @override
   void initState() {
     super.initState();
 
+    WidgetsBinding.instance.addObserver(this);
+
     /// Improve Android Performance
     if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
+
+    /// Get User Token Value
+    _getUserToken();
 
     /// Exit Application with double touch
     _controller.future.then(
@@ -147,6 +161,13 @@ class _MainScreenState extends State<MainScreen> {
 
     /// Get User Location
     _requestAndDetermineLocation();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+
+    super.dispose();
   }
 
   @override
