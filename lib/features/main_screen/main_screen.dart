@@ -83,8 +83,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           print("현재 주소: $currentAddress");
         });
 
-        locationInfo.debugStreaming();
-        //locationInfo.getStreaming();
+        //await locationInfo.getStreaming();
+        await locationInfo.debugStreaming();
       } catch (e) {
         print(e);
       }
