@@ -1,4 +1,3 @@
-// Performing Firebase Messaging service CONTROLLER
 // ignore_for_file: avoid_print
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -21,6 +20,7 @@ class MsgController extends GetxController {
       provisional: false,
       sound: true,
     );
+
     /// Debugging Code
     print(settings.authorizationStatus);
 
@@ -39,11 +39,12 @@ class MsgController extends GetxController {
   );
 
   final FlutterLocalNotificationsPlugin plugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   /// Firebase 서버에 등록된 유저의 고유 토큰값 Get
   Future<String?> getToken() async {
     String? token = await messaging.getToken();
+
     /// Throw & Catch Exception
     try {
       print("Unique Token Value: $token");
@@ -57,7 +58,7 @@ class MsgController extends GetxController {
   Future<String?> onMessage() async {
     await plugin
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
     await plugin.initialize(
@@ -78,6 +79,7 @@ class MsgController extends GetxController {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification!.android;
       AppleNotification? apple = message.notification!.apple;
+
       /// android 일 때에만 flutterNotification 노출 조건 분기문
       if (notification != null && android != null) {
         plugin.show(
@@ -92,12 +94,14 @@ class MsgController extends GetxController {
             ),
           ),
         );
+
         /// For Debugging Area
         print("Data Receive: ${message.data}");
 
         /// Check Notification whether is or not
         if (message.notification != null) {
-          print("Message also contained a notification: ${message.notification!.body}");
+          print(
+              "Message also contained a notification: ${message.notification!.body}");
         }
       } else if (notification != null && apple != null) {
         plugin.show(
@@ -112,8 +116,6 @@ class MsgController extends GetxController {
               sound: "default",
             ),
           ),
-          // [Data Transfer Debugging]
-          // payload: message.data['argument']
         );
       }
 
@@ -122,9 +124,39 @@ class MsgController extends GetxController {
 
       /// Check Notification whether is or not
       if (message.notification != null) {
-        print("Message also contained a notification: ${message.notification!.body}");
+        print(
+            "Message also contained a notification: ${message.notification!.body}");
       }
     });
     return null;
+  }
+
+  /// Send Push to Specified Users
+  Future<void> sendPush(String title, String body) async {
+    try {
+      await plugin.show(
+        0,
+        title,
+        body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            channel.id,
+            channel.name,
+            channelDescription: channel.description,
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
+          iOS: const IOSNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+            sound: "default",
+            badgeNumber: 1,
+          ),
+        ),
+      );
+    } catch (e) {
+      print("푸시 전송 실패: $e");
+    }
   }
 }

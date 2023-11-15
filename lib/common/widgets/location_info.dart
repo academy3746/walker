@@ -3,11 +3,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
+import 'package:walker/common/widgets/fcm_controller.dart';
 
 class LocationInfo {
   Position? lastPosition;
   String? lastCountryCode;
   late LocationSettings locationSettings;
+  MsgController msgController = MsgController();
 
   /// 위도 및 경도값 GET
   Future<Position> determinePermission() async {
@@ -160,6 +162,11 @@ class LocationInfo {
                 await getCurrentAddress(position.latitude, position.longitude);
 
             print("도시 정보 업데이트: $currentAddress");
+
+            msgController.sendPush(
+              "$currentAddress에서 여행중이시네요!",
+              "주변 맛집을 알려드릴게요!",
+            );
           }
 
           print("위치 정보 업데이트: ${position.toString()}");
@@ -200,6 +207,11 @@ class LocationInfo {
             String currentAddress = await getCurrentAddress(
                 debugPosition.latitude, debugPosition.longitude);
             print("도시 정보 업데이트: $currentAddress");
+
+            msgController.sendPush(
+              "$currentAddress를 여행중이시네요!",
+              "주변 맛집을 알려드릴게요!",
+            );
           }
 
           print("위치 정보 업데이트: ${debugPosition.toString()}");
