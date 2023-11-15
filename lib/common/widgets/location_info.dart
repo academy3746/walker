@@ -7,8 +7,11 @@ import 'package:walker/common/widgets/fcm_controller.dart';
 
 class LocationInfo {
   Position? lastPosition;
+
   String? lastCountryCode;
+
   late LocationSettings locationSettings;
+
   MsgController msgController = MsgController();
 
   /// 위도 및 경도값 GET
@@ -163,7 +166,7 @@ class LocationInfo {
 
             print("도시 정보 업데이트: $currentAddress");
 
-            msgController.sendPush(
+            msgController.sendInternalPush(
               "$currentAddress에서 여행중이시네요!",
               "주변 맛집을 알려드릴게요!",
             );
@@ -177,8 +180,8 @@ class LocationInfo {
 
   /// Debug Location Changed
   Future<void> debugStreaming() async {
-    const double debugLatitude = 37.3316756;
-    const double debugLongitude = -122.030189;
+    const double debugLatitude = 40.7128;
+    const double debugLongitude = -74.0060;
 
     Future.delayed(
       const Duration(seconds: 5),
@@ -208,7 +211,7 @@ class LocationInfo {
                 debugPosition.latitude, debugPosition.longitude);
             print("도시 정보 업데이트: $currentAddress");
 
-            msgController.sendPush(
+            msgController.sendInternalPush(
               "$currentAddress를 여행중이시네요!",
               "주변 맛집을 알려드릴게요!",
             );

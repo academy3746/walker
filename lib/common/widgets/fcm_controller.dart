@@ -132,7 +132,7 @@ class MsgController extends GetxController {
   }
 
   /// Send Push to Specified Users
-  Future<void> sendPush(String title, String body) async {
+  Future<void> sendInternalPush(String title, String body) async {
     try {
       await plugin.show(
         0,
