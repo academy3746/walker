@@ -158,11 +158,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
               return WillPopScope(
-                onWillPop: () {
+                onWillPop: () async {
                   if (backHandlerButton != null) {
                     return backHandlerButton!.onWillPop();
                   }
-                  return Future.value(false);
+                  return false;
                 },
                 child: SizedBox(
                   height: constraints.maxHeight,
