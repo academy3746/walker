@@ -5,12 +5,14 @@ class BackHandlerButton {
   BuildContext context;
   DateTime? lastPressed;
   String? mainUrl;
+  String? homeUrl;
   WebViewController? controller;
   bool isAppForeground = false;
 
   BackHandlerButton({
     required this.context,
     this.mainUrl,
+    this.homeUrl,
     this.controller,
   });
 
@@ -22,11 +24,11 @@ class BackHandlerButton {
     if (interval) {
       String? currentUrl = await controller?.currentUrl();
 
-      if (currentUrl != null && currentUrl == mainUrl) {
+      if ((currentUrl != null && currentUrl == mainUrl) || (currentUrl != null && currentUrl == homeUrl)) {
         lastPressed = now;
         const snackBar = SnackBar(
           content: Text("뒤로가기 버튼을 한 번 더 누르면 앱이 종료됩니다!"),
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 3),
         );
 
         if (context.mounted) {
@@ -40,7 +42,6 @@ class BackHandlerButton {
         return Future.value(false);
       }
     } else if (isAppForeground) {
-      Navigator.of(context).pop();
       return Future.value(false);
     }
 

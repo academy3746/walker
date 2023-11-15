@@ -33,6 +33,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Initialize Main URL
   final String url = "https://boolub.com/?is_app=y";
 
+  final String homeUrl = "https://boolub.com/";
+
   /// Import Back Action Handler
   BackHandlerButton? backHandlerButton;
 
@@ -51,7 +53,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Initialize Address
   String? currentAddress;
 
-  /// Get Unique Token Value from Firebase Server
+  /// Request Push Permission & Get Unique Token Value from Firebase Server
   MsgController msgController = Get.put(MsgController());
 
   /// Request Location Access Permission & Get Current Place
@@ -122,12 +124,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           context: context,
           controller: webViewController,
           mainUrl: url,
+          homeUrl: homeUrl,
         );
       },
     );
 
     /// Initialize Cookie Settings
-    cookieHandler = AppCookieHandler(url, url);
+    cookieHandler = AppCookieHandler(homeUrl, url);
 
     /// App Version Handling (Manually)
     AppVersionHandler appVersionHandler = AppVersionHandler(context);
@@ -146,21 +149,21 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (backHandlerButton != null) {
-          return backHandlerButton!.onWillPop();
-        }
-        return false;
-      },
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.white,
-        body: Stack(
-          children: [
-            LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                return SizedBox(
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              return WillPopScope(
+                onWillPop: () {
+                  if (backHandlerButton != null) {
+                    return backHandlerButton!.onWillPop();
+                  }
+                  return Future.value(false);
+                },
+                child: SizedBox(
                   height: constraints.maxHeight,
                   child: SafeArea(
                     child: WebView(
@@ -191,7 +194,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                         });
 
                         if (Platform.isAndroid) {
-                          if (url.contains(url) && viewController != null) {
+                          if (url.contains(homeUrl) && viewController != null) {
                             await viewController!.runJavascript("""
                               (function() {
                               function scrollToFocusedInput(event) {
@@ -224,16 +227,16 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                       gestureNavigationEnabled: true,
                     ),
                   ),
-                );
-              },
-            ),
-            isLoading
-                ? const Center(
-                    child: CircularProgressIndicator.adaptive(),
-                  )
-                : Container(),
-          ],
-        ),
+                ),
+              );
+            },
+          ),
+          isLoading
+              ? const Center(
+                  child: CircularProgressIndicator.adaptive(),
+                )
+              : Container(),
+        ],
       ),
     );
   }
