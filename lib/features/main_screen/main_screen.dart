@@ -57,14 +57,17 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Request Push Permission & Get Unique Token Value from Firebase Server
   MsgController msgController = Get.put(MsgController());
 
-  /// Request Location Access Permission & Get Current Place
+  /// Request Permission & Get Current Place
   Future<void> _requestAndDetermineLocation() async {
     AccessPermission permissionHandler = AccessPermission();
+
     bool hasPermission = await permissionHandler.initPermission();
+
 
     if (hasPermission) {
       print("위치정보 접근 권한이 허용되었습니다.");
       print("신체 활동 접근 권한이 허용되었습니다.");
+
 
       try {
         Position position = await locationInfo.determinePermission();
