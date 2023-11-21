@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, prefer_collection_literals
+// ignore_for_file: avoid_print, prefer_collection_literals, deprecated_member_use
 
 import 'dart:async';
 import 'dart:io';
@@ -60,7 +60,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Request Location Access Permission & Get Current Place
   Future<void> _requestAndDetermineLocation() async {
     AccessPermission permissionHandler = AccessPermission();
-    bool hasPermission = await permissionHandler.initPermission(context);
+    bool hasPermission = await permissionHandler.initPermission();
 
     if (hasPermission) {
       print("위치정보 접근 권한이 허용되었습니다.");
@@ -218,7 +218,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                         print("RESOURCE ERROR Failing URL ${error.domain}");
                         print("Error Description: ${error.description}");
                       },
-                      zoomEnabled: true,
+                      zoomEnabled: false,
                       gestureRecognizers: Set()
                         ..add(
                           Factory<EagerGestureRecognizer>(
