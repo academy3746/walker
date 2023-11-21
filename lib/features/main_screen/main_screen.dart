@@ -60,7 +60,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Request Location Access Permission & Get Current Place
   Future<void> _requestAndDetermineLocation() async {
     AccessPermission permissionHandler = AccessPermission();
-    bool hasPermission = await permissionHandler.initPermission();
+    bool hasPermission = await permissionHandler.initPermission(context);
 
     if (hasPermission) {
       print("위치정보 접근 권한이 허용되었습니다.");
@@ -86,8 +86,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           print("현재 주소: $currentAddress");
         });
 
-        //await locationInfo.getStreaming();
-        await locationInfo.debugStreaming();
+        await locationInfo.getStreaming();
+        //await locationInfo.debugStreaming();
       } catch (e) {
         print(e);
       }

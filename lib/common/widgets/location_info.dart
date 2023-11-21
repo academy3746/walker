@@ -128,7 +128,7 @@ class LocationInfo {
         intervalDuration: const Duration(seconds: 10),
         foregroundNotificationConfig: const ForegroundNotificationConfig(
           notificationTitle: "앱이 백그라운드에서 실행중입니다.",
-          notificationText: "앱을 사용하지 않을 때에도 위치 정보를 꾸준히 업데이트 합니다.",
+          notificationText: "앱을 사용하지 않을 때에도 위치 정보를 지속적으로 업데이트 합니다.",
           enableWakeLock: true,
           enableWifiLock: true,
         ),

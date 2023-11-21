@@ -33,9 +33,9 @@
 	<key>NSCameraUsageDescription</key>
 	<string>인앱 사진 촬영을 통해 사진을 해당 게시판에 등록하기 원하신다면 해당 앱에 대한 사진촬영 권한을 허용해주셔야 합니다.</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>귀하의 걸음 수를 측정 / 기록 하기 위하여 Apple Health App이 귀하의 데이터와 동기화 됩니다</string>
+	<string>귀하의 걸음 수를 측정 / 기록 하기 위하여 Apple Health App이 해당 데이터와 동기화 됩니다</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>귀하의 걸음 수를 측정 / 기록 하기 위하여 Apple Health App이 귀하의 데이터와 동기화 됩니다</string>
+	<string>귀하의 걸음 수를 측정 / 기록 하기 위하여 Apple Health App이 해당 데이터와 동기화 됩니다</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>앱이 백그라운드에서 현재 위치에 대한 정보를 수집하기 위한 권한을 요청합니다.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
