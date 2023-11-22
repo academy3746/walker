@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webview_pro/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:health/health.dart';
 import 'package:walker/common/widgets/app_cookie_handler.dart';
 import 'package:walker/common/widgets/app_version_check_handler.dart';
 import 'package:walker/common/widgets/back_handler_button.dart';
@@ -57,17 +58,21 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Request Push Permission & Get Unique Token Value from Firebase Server
   MsgController msgController = Get.put(MsgController());
 
+  /// Initialize Today Steps
+  int _getSteps = 0;
+
+  /// Import Health Package
+  HealthFactory health = HealthFactory(useHealthConnectIfAvailable: true);
+
   /// Request Permission & Get Current Place
   Future<void> _requestAndDetermineLocation() async {
     AccessPermission permissionHandler = AccessPermission();
 
     bool hasPermission = await permissionHandler.initPermission();
 
-
     if (hasPermission) {
       print("위치정보 접근 권한이 허용되었습니다.");
       print("신체 활동 접근 권한이 허용되었습니다.");
-
 
       try {
         Position position = await locationInfo.determinePermission();
@@ -97,6 +102,48 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     } else {
       print("위치정보 접근 권한이 거부되었습니다.");
       print("신체 활동 접근 권한이 거부되었습니다.");
+    }
+  }
+
+  /// Fetch Today Steps Count
+  Future<void> _fetchStepsData() async {
+    int? steps;
+
+    var types = [HealthDataType.STEPS];
+
+    var permission = [HealthDataAccess.READ];
+
+    final now = DateTime.now();
+
+    final midnight = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    );
+
+    bool request = await health.requestAuthorization(
+      types,
+      permissions: permission,
+    );
+
+    if (request) {
+      print("Access to collect health data has submitted.");
+      print("건강 데이터 수집 권한이 허용되었습니다.");
+
+      try {
+        steps = await health.getTotalStepsInInterval(midnight, now);
+      } catch (e) {
+        print("Fail to fetch health data: $e");
+      }
+
+      print("지금까지 $steps걸음 걸으셨네요!");
+
+      setState(() {
+        _getSteps = (steps == null) ? 0 : steps;
+      });
+    } else {
+      print("Access to collect health data has denied by user.");
+      print("건강 데이터 수집 권한이 거부되었습니다.");
     }
   }
 
@@ -142,6 +189,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     /// Get User Location
     _requestAndDetermineLocation();
+
+    /// Fetch User Steps Count
+    _fetchStepsData();
   }
 
   @override
