@@ -1,5 +1,4 @@
 // ignore_for_file: avoid_print, prefer_collection_literals, deprecated_member_use
-
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -15,6 +14,7 @@ import 'package:walker/common/widgets/back_handler_button.dart';
 import 'package:walker/common/widgets/fcm_controller.dart';
 import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
+import 'package:walker/constants/sizes.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -58,11 +58,62 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Request Push Permission & Get Unique Token Value from Firebase Server
   MsgController msgController = Get.put(MsgController());
 
-  /// Initialize Today Steps
+  /// Initialize Steps count
   int _getSteps = 0;
 
-  /// Import Health Package
+  /// Import Health Kit
   HealthFactory health = HealthFactory(useHealthConnectIfAvailable: true);
+
+  /// Count Daily Steps
+  Future<void> _fetchStepData() async {
+    int? steps;
+
+    var types = [
+      HealthDataType.STEPS,
+      HealthDataType.DISTANCE_WALKING_RUNNING,
+    ];
+
+    var permissions = [
+      HealthDataAccess.READ,
+      HealthDataAccess.READ,
+    ];
+
+    final now = DateTime.now();
+
+    final midnight = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    );
+
+    bool request = await health.requestAuthorization(
+      types,
+      permissions: permissions,
+    );
+
+    if (request) {
+      print("Access to collect health data has submitted by user.");
+      print("건강 데이터 수집 권한이 허용되었습니다.");
+
+      try {
+        steps = await health.getTotalStepsInInterval(
+          midnight,
+          now,
+        );
+      } catch (e) {
+        print("Fail to fetch steps count: $e");
+      }
+
+      print("Total Count of Steps: $steps");
+
+      setState(() {
+        _getSteps = (steps == null) ? 0 : steps;
+      });
+    } else {
+      print("Access to collect health data has denied by user.");
+      print("건강 데이터 수집 권한이 거부되었습니다.");
+    }
+  }
 
   /// Request Permission & Get Current Place
   Future<void> _requestAndDetermineLocation() async {
@@ -105,56 +156,14 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     }
   }
 
-  /// Fetch Today Steps Count
-  Future<void> _fetchStepsData() async {
-    int? steps;
-
-    var types = [HealthDataType.STEPS];
-
-    var permission = [HealthDataAccess.READ];
-
-    final now = DateTime.now();
-
-    final midnight = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    );
-
-    bool request = await health.requestAuthorization(
-      types,
-      permissions: permission,
-    );
-
-    if (request) {
-      print("Access to collect health data has submitted.");
-      print("건강 데이터 수집 권한이 허용되었습니다.");
-
-      try {
-        steps = await health.getTotalStepsInInterval(midnight, now);
-      } catch (e) {
-        print("Fail to fetch health data: $e");
-      }
-
-      print("지금까지 $steps걸음 걸으셨네요!");
-
-      setState(() {
-        _getSteps = (steps == null) ? 0 : steps;
-      });
-    } else {
-      print("Access to collect health data has denied by user.");
-      print("건강 데이터 수집 권한이 거부되었습니다.");
-    }
-  }
-
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
 
     if (state == AppLifecycleState.resumed) {
-      backHandlerButton?.isAppForeground = true;
-    } else {
-      backHandlerButton?.isAppForeground = false;
+      print("앱이 포그라운드에서 실행중입니다.");
+    } else if (state == AppLifecycleState.paused) {
+      print("앱이 백그라운드에서 실행중입니다.");
     }
   }
 
@@ -190,8 +199,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     /// Get User Location
     _requestAndDetermineLocation();
 
-    /// Fetch User Steps Count
-    _fetchStepsData();
+    /// Get Daily Steps Count
+    _fetchStepData();
   }
 
   @override
@@ -204,6 +213,18 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: Text(
+          "오늘의 걸음 수: $_getSteps",
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: Sizes.size20,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: Stack(
