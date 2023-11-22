@@ -70,11 +70,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     var types = [
       HealthDataType.STEPS,
-      HealthDataType.DISTANCE_WALKING_RUNNING,
     ];
 
     var permissions = [
-      HealthDataAccess.READ,
       HealthDataAccess.READ,
     ];
 
