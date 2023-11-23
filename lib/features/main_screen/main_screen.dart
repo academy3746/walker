@@ -7,12 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webview_pro/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:health/health.dart';
+import 'package:pedometer/pedometer.dart';
 import 'package:walker/common/widgets/app_cookie_handler.dart';
 import 'package:walker/common/widgets/app_version_check_handler.dart';
 import 'package:walker/common/widgets/back_handler_button.dart';
 import 'package:walker/common/widgets/fcm_controller.dart';
 import 'package:walker/common/widgets/location_info.dart';
+import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
 import 'package:walker/constants/sizes.dart';
 
@@ -58,59 +59,50 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Request Push Permission & Get Unique Token Value from Firebase Server
   MsgController msgController = Get.put(MsgController());
 
-  /// Initialize Steps count
-  int _getSteps = 0;
+  /// Initialize Pedometer Required Variables
+  late Stream<StepCount> _stepCountStream;
 
-  /// Import Health Kit
-  HealthFactory health = HealthFactory(useHealthConnectIfAvailable: true);
+  late Stream<PedestrianStatus> _pedestrianStatusStream;
 
-  /// Count Daily Steps
-  Future<void> _fetchStepData() async {
-    int? steps;
+  String _status = "멈춤";
 
-    var types = [
-      HealthDataType.STEPS,
-    ];
+  String _steps = "0";
 
-    var permissions = [
-      HealthDataAccess.READ,
-    ];
+  DateTime _lastUpdateDate = DateTime.now();
 
-    final now = DateTime.now();
+  /// Handling User Steps Count
+  void _pedometerHandler() {
+    _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
 
-    final midnight = DateTime(
-      now.year,
-      now.month,
-      now.day,
+    _stepCountStream = Pedometer.stepCountStream;
+
+    PedometerController pedometerController = PedometerController(
+      onStepCountUpdate: (newStep) {
+        DateTime now = DateTime.now();
+
+        /// 날짜가 변경 되었을 경우, 걸음 수 초기화
+        if (now.day != _lastUpdateDate.day) {
+          newStep = '0';
+
+          _lastUpdateDate = now;
+        }
+
+        setState(() {
+          _steps = newStep;
+        });
+      },
+      onPedestrianStatusUpdate: (newStatus) {
+        setState(() {
+          _status = newStatus;
+        });
+      },
+      stepCountStream: _stepCountStream,
+      pedestrianStatusStream: _pedestrianStatusStream,
+      status: _status,
+      steps: _steps,
     );
 
-    bool request = await health.requestAuthorization(
-      types,
-      permissions: permissions,
-    );
-
-    if (request) {
-      print("Access to collect health data has submitted by user.");
-      print("건강 데이터 수집 권한이 허용되었습니다.");
-
-      try {
-        steps = await health.getTotalStepsInInterval(
-          midnight,
-          now,
-        );
-      } catch (e) {
-        print("Fail to fetch steps count: $e");
-      }
-
-      print("Total Count of Steps: $steps");
-
-      setState(() {
-        _getSteps = (steps == null) ? 0 : steps;
-      });
-    } else {
-      print("Access to collect health data has denied by user.");
-      print("건강 데이터 수집 권한이 거부되었습니다.");
-    }
+    return pedometerController.initPlatformState(context);
   }
 
   /// Request Permission & Get Current Place
@@ -154,6 +146,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     }
   }
 
+  /// 백그라운드에서 App Process 유지
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
@@ -197,8 +190,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     /// Get User Location
     _requestAndDetermineLocation();
 
-    /// Get Daily Steps Count
-    _fetchStepData();
+    /// Get User Steps Count
+    _pedometerHandler();
   }
 
   @override
@@ -212,14 +205,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
         backgroundColor: Colors.white,
+        elevation: 0,
         title: Text(
-          "오늘의 걸음 수: $_getSteps",
+          "$_steps 걸음",
           style: const TextStyle(
             color: Colors.black,
-            fontSize: Sizes.size20,
-            fontWeight: FontWeight.w700,
+            fontSize: Sizes.size16,
           ),
         ),
       ),
