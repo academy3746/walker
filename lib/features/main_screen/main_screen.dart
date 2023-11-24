@@ -8,6 +8,7 @@ import 'package:flutter_webview_pro/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:pedometer/pedometer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:walker/common/widgets/app_cookie_handler.dart';
 import 'package:walker/common/widgets/app_version_check_handler.dart';
 import 'package:walker/common/widgets/back_handler_button.dart';
@@ -15,6 +16,7 @@ import 'package:walker/common/widgets/fcm_controller.dart';
 import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
+import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
 
 class MainScreen extends StatefulWidget {
@@ -30,6 +32,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Initialize WebView Controller
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
+
   WebViewController? viewController;
 
   /// Initialize App URL
@@ -59,104 +62,18 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Request Push Permission & Get Unique Token Value from Firebase Server
   MsgController msgController = Get.put(MsgController());
 
-  /// Initialize Pedometer Required Variables
+  /// Initialize Pedometer
   late Stream<StepCount> _stepCountStream;
 
   late Stream<PedestrianStatus> _pedestrianStatusStream;
 
-  String _status = "멈춤";
+  String _status = "";
 
   String _steps = "0";
 
+  int _lastTotalSteps = 0;
+
   DateTime _lastUpdateDate = DateTime.now();
-
-  /// Handling User Steps Count
-  void _pedometerHandler() {
-    _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
-
-    _stepCountStream = Pedometer.stepCountStream;
-
-    PedometerController pedometerController = PedometerController(
-      onStepCountUpdate: (newStep) {
-        DateTime now = DateTime.now();
-
-        /// 날짜가 변경 되었을 경우, 걸음 수 초기화
-        if (now.day != _lastUpdateDate.day) {
-          newStep = '0';
-
-          _lastUpdateDate = now;
-        }
-
-        setState(() {
-          _steps = newStep;
-        });
-      },
-      onPedestrianStatusUpdate: (newStatus) {
-        setState(() {
-          _status = newStatus;
-        });
-      },
-      stepCountStream: _stepCountStream,
-      pedestrianStatusStream: _pedestrianStatusStream,
-      status: _status,
-      steps: _steps,
-    );
-
-    return pedometerController.initPlatformState(context);
-  }
-
-  /// Request Permission & Get Current Place
-  Future<void> _requestAndDetermineLocation() async {
-    AccessPermission permissionHandler = AccessPermission();
-
-    bool hasPermission = await permissionHandler.initPermission();
-
-    if (hasPermission) {
-      print("위치정보 접근 권한이 허용되었습니다.");
-      print("신체 활동 접근 권한이 허용되었습니다.");
-
-      try {
-        Position position = await locationInfo.determinePermission();
-        String? countryCode = await locationInfo.getCountryCode(position);
-
-        locationInfo.lastPosition = position;
-        locationInfo.lastCountryCode = countryCode;
-
-        String address = await locationInfo.getCurrentAddress(
-          position.latitude,
-          position.longitude,
-        );
-
-        setState(() {
-          currentPosition = position;
-          currentAddress = address;
-
-          print("현재 위치 값: $currentPosition");
-          print("현재 주소: $currentAddress");
-        });
-
-        await locationInfo.getStreaming();
-        //await locationInfo.debugStreaming();
-      } catch (e) {
-        print(e);
-      }
-    } else {
-      print("위치정보 접근 권한이 거부되었습니다.");
-      print("신체 활동 접근 권한이 거부되었습니다.");
-    }
-  }
-
-  /// 백그라운드에서 App Process 유지
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-
-    if (state == AppLifecycleState.resumed) {
-      print("앱이 포그라운드에서 실행중입니다.");
-    } else if (state == AppLifecycleState.paused) {
-      print("앱이 백그라운드에서 실행중입니다.");
-    }
-  }
 
   @override
   void initState() {
@@ -187,11 +104,140 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     AppVersionHandler appVersionHandler = AppVersionHandler(context);
     appVersionHandler.getAppVersionStatus();
 
-    /// Get User Location
-    _requestAndDetermineLocation();
+    /// Get User Data
+    _fetchUserData();
+  }
 
-    /// Get User Steps Count
-    _pedometerHandler();
+  /// Request Associated Permission & Get Info
+  Future<void> _fetchUserData() async {
+    AccessPermission permissionHandler = AccessPermission();
+
+    bool hasPermission = await permissionHandler.initPermission();
+
+    if (hasPermission) {
+      print("위치정보 접근 권한이 허용되었습니다.");
+      print("신체 활동 접근 권한이 허용되었습니다.");
+
+      try {
+        Position position = await locationInfo.determinePermission();
+
+        String? countryCode = await locationInfo.getCountryCode(position);
+
+        locationInfo.lastPosition = position;
+
+        locationInfo.lastCountryCode = countryCode;
+
+        String address = await locationInfo.getCurrentAddress(
+          position.latitude,
+          position.longitude,
+        );
+
+        setState(() {
+          currentPosition = position;
+
+          currentAddress = address;
+
+          print("현재 위치 값: $currentPosition");
+          print("현재 주소: $currentAddress");
+        });
+
+        await locationInfo.getStreaming();
+        //await locationInfo.debugStreaming();
+
+        /// Get User Steps Count
+        await _loadLastTotalSteps().then((_) => _pedometerHandler());
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      print("위치정보 접근 권한이 거부되었습니다.");
+      print("신체 활동 접근 권한이 거부되었습니다.");
+    }
+  }
+
+  /// Handling User Steps Count
+  void _pedometerHandler() {
+    _stepCountStream = Pedometer.stepCountStream;
+
+    _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
+
+    PedometerController pedometerController = PedometerController(
+      onStepCountUpdate: (newTotalStep) {
+        DateTime now = DateTime.now();
+
+        int newStepCount = int.parse(newTotalStep);
+
+        /// 날짜가 변경 되었을 경우, 걸음 수 초기화
+        if (now.day != _lastUpdateDate.day) {
+          _lastTotalSteps = newStepCount;
+
+          _lastUpdateDate = DateTime(
+            now.year,
+            now.month,
+            now.day,
+          );
+
+          _saveLastTotalSteps();
+        }
+
+        int dailySteps = newStepCount - _lastTotalSteps;
+
+        setState(() {
+          _steps = dailySteps.toString();
+        });
+
+        /// 1만보 이상일 경우, Send Push (Daily)
+        if (dailySteps >= 10000) {
+          msgController.sendInternalPush(
+            "축하드립니다",
+            "🏃‍♀️ 오늘 하루 총 $_steps걸음 걸으셨네요!",
+          );
+        }
+      },
+      onPedestrianStatusUpdate: (newStatus) {
+        setState(() {
+          _status = newStatus;
+        });
+      },
+      stepCountStream: _stepCountStream,
+      pedestrianStatusStream: _pedestrianStatusStream,
+      status: _status,
+      steps: _steps,
+    );
+
+    pedometerController.initPlatformState(context);
+  }
+
+  /// Save Daily Steps Count
+  Future<void> _saveLastTotalSteps() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setInt(
+      "lastTotalSteps",
+      _lastTotalSteps,
+    );
+  }
+
+  /// Load Daily Steps Count
+  Future<void> _loadLastTotalSteps() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    _lastTotalSteps = prefs.getInt("lastTotalSteps") ?? 0;
+
+    /// 현재 날짜로 업데이트
+    _lastUpdateDate = DateTime.now();
+  }
+
+  /// 백그라운드에서 App Process 유지
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      print("앱이 포그라운드에서 실행중입니다.");
+    } else if (state == AppLifecycleState.paused) {
+      print("앱이 백그라운드에서 실행중입니다.");
+    }
   }
 
   @override
@@ -207,12 +253,22 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text(
-          "$_steps 걸음",
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: Sizes.size16,
-          ),
+        title: Row(
+          children: [
+            const Icon(
+              Icons.directions_walk_rounded,
+              size: Sizes.size20,
+              color: Colors.black,
+            ),
+            Gaps.h5,
+            Text(
+              _status == "walking" ? "$_steps걸음 걸으셨네요!" : "조금만 더 걸어 볼까요?",
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: Sizes.size16,
+              ),
+            ),
+          ],
         ),
       ),
       resizeToAvoidBottomInset: false,
