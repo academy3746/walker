@@ -1,10 +1,28 @@
+import 'package:geolocator/geolocator.dart';
+import 'package:walker/common/widgets/fcm_controller.dart';
+
 class WebServerCommunication {
+  MsgController msgController = MsgController();
+
   final String steps;
 
-  final String currentAddress;
+  Position? currentPosition;
+
+  String? currentAddress;
+
+  String? token;
 
   WebServerCommunication({
     required this.steps,
-    required this.currentAddress,
-  });
+    this.currentPosition,
+    this.currentAddress,
+    this.token,
+  }) {
+    _initToken();
+  }
+
+  /// Get User Token Value from Firebase Server (Unique)
+  Future<void> _initToken() async {
+    token = await msgController.getToken();
+  }
 }

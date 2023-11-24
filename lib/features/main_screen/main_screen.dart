@@ -16,6 +16,7 @@ import 'package:walker/common/widgets/fcm_controller.dart';
 import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
+import 'package:walker/common/widgets/web_communication.dart';
 import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
 
@@ -62,6 +63,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Request Push Permission & Get Unique Token Value from Firebase Server
   MsgController msgController = Get.put(MsgController());
 
+  /// Import WebServerCommunication
+  WebServerCommunication? communication;
+
   /// Initialize Pedometer
   late Stream<StepCount> _stepCountStream;
 
@@ -106,6 +110,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     /// Get User Data
     _fetchUserData();
+
+    /// Web Server Communication
+    communication = WebServerCommunication(
+      steps: _steps,
+      currentPosition: currentPosition,
+      currentAddress: currentAddress,
+    );
   }
 
   /// Request Associated Permission & Get Info
