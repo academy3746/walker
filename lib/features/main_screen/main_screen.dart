@@ -77,7 +77,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   int _lastTotalSteps = 0;
 
-  DateTime _lastUpdateDate = DateTime.now();
+  int _lastUpdateDate = DateTime.now().millisecondsSinceEpoch;
 
   @override
   void initState() {
@@ -174,19 +174,18 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     PedometerController pedometerController = PedometerController(
       onStepCountUpdate: (newTotalStep) {
-        DateTime now = DateTime.now();
+        int now = DateTime.now().millisecondsSinceEpoch;
+
+        int lastUpdateDay =
+            DateTime.fromMillisecondsSinceEpoch(_lastUpdateDate).day;
 
         int newStepCount = int.parse(newTotalStep);
 
         /// 날짜가 변경 되었을 경우, 걸음 수 초기화
-        if (now.day != _lastUpdateDate.day) {
+        if (DateTime.fromMillisecondsSinceEpoch(now).day != lastUpdateDay) {
           _lastTotalSteps = newStepCount;
 
-          _lastUpdateDate = DateTime(
-            now.year,
-            now.month,
-            now.day,
-          );
+          _lastUpdateDate = now;
 
           _saveLastTotalSteps();
         }
@@ -227,6 +226,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       "lastTotalSteps",
       _lastTotalSteps,
     );
+
+    await prefs.setInt(
+      "lastUpdateDate",
+      _lastUpdateDate,
+    );
   }
 
   /// Load Daily Steps Count
@@ -236,7 +240,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     _lastTotalSteps = prefs.getInt("lastTotalSteps") ?? 0;
 
     /// 현재 날짜로 업데이트
-    _lastUpdateDate = DateTime.now();
+    _lastUpdateDate = prefs.getInt("lastUpdateDate") ?? DateTime.now().millisecondsSinceEpoch;
   }
 
   /// 백그라운드에서 App Process 유지
@@ -273,7 +277,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             ),
             Gaps.h5,
             Text(
-              _status == "walking" ? "$_steps걸음 걸으셨네요!" : "조금만 더 걸어 볼까요?",
+              _status == "walking" ? "$_steps걸음" : "[$_steps] 조금만 더 걸어 볼까요?",
               style: const TextStyle(
                 color: Colors.black,
                 fontSize: Sizes.size16,
