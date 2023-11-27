@@ -111,13 +111,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     /// Get User Data
     _fetchUserData();
-
-    /// Web Server Communication
-    communication = WebServerCommunication(
-      steps: _steps,
-      currentPosition: currentPosition,
-      currentAddress: currentAddress,
-    );
   }
 
   /// Request Associated Permission & Get Info
@@ -192,7 +185,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           "🏃‍♀️ 오늘 하루 총 $_steps걸음 걸으셨네요!",
         );
       }
-    } else if(nowDate.isBefore(midnight)) {
+    } else if (nowDate.isBefore(midnight)) {
       _lastTotalSteps = newStepCount;
 
       _lastUpdateDate = nowDate.millisecondsSinceEpoch;
@@ -267,7 +260,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     if (lastSavedDateTime.isBefore(lastMidnight)) {
       _lastTotalSteps = 0;
-    } else if(lastSavedDateTime.isAfter(lastMidnight)) {
+    } else if (lastSavedDateTime.isAfter(lastMidnight)) {
       _lastTotalSteps = prefs.getInt("lastTotalSteps") ?? 0;
     }
 
@@ -391,7 +384,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                         final appScheme = ConvertUrl(request.url);
 
                         if (appScheme.isAppLink()) {
-                          appScheme.launchApp();
+                          try {
+                            await appScheme.launchApp();
+                          } on Error catch (e) {
+                            print("Fail to start Toss Payments: $e");
+                          }
 
                           return NavigationDecision.prevent;
                         }
