@@ -387,7 +387,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                         print("Error Description: ${error.description}");
                       },
                       navigationDelegate: (request) async {
-                        /// In App PG Payment Process
+                        /// Toss Payments
                         final appScheme = ConvertUrl(request.url);
 
                         if (appScheme.isAppLink()) {
