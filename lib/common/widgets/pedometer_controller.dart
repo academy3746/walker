@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 
 class PedometerController {
-  final Function(String) onStepCountUpdate;
-
-  final Function(String) onPedestrianStatusUpdate;
-
   Stream<StepCount> stepCountStream;
 
   Stream<PedestrianStatus> pedestrianStatusStream;
@@ -15,17 +11,21 @@ class PedometerController {
 
   String steps;
 
+  final Function(String) onStepCountUpdate;
+
+  final Function(String) onPedestrianStatusUpdate;
+
   PedometerController({
-    required this.onStepCountUpdate,
-    required this.onPedestrianStatusUpdate,
     required this.stepCountStream,
     required this.pedestrianStatusStream,
     required this.status,
     required this.steps,
+    required this.onStepCountUpdate,
+    required this.onPedestrianStatusUpdate,
   });
 
   void _onStepCount(StepCount event) {
-    print("이벤트 감지: $event");
+    print("걸음수: $event");
 
     steps = event.steps.toString();
 
@@ -33,7 +33,7 @@ class PedometerController {
   }
 
   void _onPedestrianStatusChanged(PedestrianStatus event) {
-    print("이벤트 감지: $event");
+    print("운동 상태: $event");
 
     status = event.status;
 
@@ -43,7 +43,7 @@ class PedometerController {
   void _onPedestrianStatusError(error) {
     print('onPedestrianStatusError: $error');
 
-    status = "걸음 상태 감지 불가!";
+    status = "운동 상태 감지 불가!";
 
     print(status);
   }
@@ -51,7 +51,7 @@ class PedometerController {
   void _onStepCountError(error) {
     print('onStepCountError: $error');
 
-    steps = "걸음 수 측정 불가!";
+    steps = "걸음수 측정 불가!";
 
     print(steps);
   }

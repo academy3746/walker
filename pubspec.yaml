@@ -33,6 +33,7 @@ dependencies:
   geolocator_apple: ^2.3.2
   fluttertoast: ^8.2.4
   pedometer: ^4.0.1
+  tosspayments_widget_sdk_flutter: ^1.0.2
 
 
 

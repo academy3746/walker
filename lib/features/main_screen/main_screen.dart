@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tosspayments_widget_sdk_flutter/model/tosspayments_url.dart';
 import 'package:walker/common/widgets/app_cookie_handler.dart';
 import 'package:walker/common/widgets/app_version_check_handler.dart';
 import 'package:walker/common/widgets/back_handler_button.dart';
@@ -166,53 +167,66 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     }
   }
 
+  /// Update Steps Count
+  void _onStepCountUpdate(String newTotalStep) {
+    DateTime nowDate = DateTime.now();
+
+    DateTime midnight = DateTime(
+      nowDate.year,
+      nowDate.month,
+      nowDate.day,
+    );
+
+    int newStepCount = int.parse(newTotalStep);
+
+    if (nowDate.isAfter(midnight)) {
+      int dailySteps = newStepCount - _lastTotalSteps;
+
+      setState(() {
+        _steps = dailySteps.toString();
+      });
+
+      if (dailySteps >= 10000) {
+        msgController.sendInternalPush(
+          "축하드립니다",
+          "🏃‍♀️ 오늘 하루 총 $_steps걸음 걸으셨네요!",
+        );
+      }
+    } else {
+      _lastTotalSteps = newStepCount;
+
+      _lastUpdateDate = nowDate.millisecondsSinceEpoch;
+
+      setState(() {
+        _steps = "0";
+      });
+
+      _saveLastTotalSteps();
+    }
+  }
+
+  /// Update Physical Movement
+  void _onPedestrianStatusUpdate(String newStatus) {
+    setState(() {
+      _status = newStatus;
+    });
+  }
+
   /// Handling User Steps Count
   void _pedometerHandler() {
+    _loadLastTotalSteps();
+
     _stepCountStream = Pedometer.stepCountStream;
 
     _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
 
     PedometerController pedometerController = PedometerController(
-      onStepCountUpdate: (newTotalStep) {
-        int now = DateTime.now().millisecondsSinceEpoch;
-
-        int lastUpdateDay =
-            DateTime.fromMillisecondsSinceEpoch(_lastUpdateDate).day;
-
-        int newStepCount = int.parse(newTotalStep);
-
-        /// 날짜가 변경 되었을 경우, 걸음 수 초기화
-        if (DateTime.fromMillisecondsSinceEpoch(now).day != lastUpdateDay) {
-          _lastTotalSteps = newStepCount;
-
-          _lastUpdateDate = now;
-
-          _saveLastTotalSteps();
-        }
-
-        int dailySteps = newStepCount - _lastTotalSteps;
-
-        setState(() {
-          _steps = dailySteps.toString();
-        });
-
-        /// 1만보 이상일 경우, Send Push (Daily)
-        if (dailySteps >= 10000) {
-          msgController.sendInternalPush(
-            "축하드립니다",
-            "🏃‍♀️ 오늘 하루 총 $_steps걸음 걸으셨네요!",
-          );
-        }
-      },
-      onPedestrianStatusUpdate: (newStatus) {
-        setState(() {
-          _status = newStatus;
-        });
-      },
       stepCountStream: _stepCountStream,
       pedestrianStatusStream: _pedestrianStatusStream,
       status: _status,
       steps: _steps,
+      onStepCountUpdate: _onStepCountUpdate,
+      onPedestrianStatusUpdate: _onPedestrianStatusUpdate,
     );
 
     pedometerController.initPlatformState(context);
@@ -237,10 +251,27 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   Future<void> _loadLastTotalSteps() async {
     final prefs = await SharedPreferences.getInstance();
 
-    _lastTotalSteps = prefs.getInt("lastTotalSteps") ?? 0;
+    int lastSavedDate =
+        prefs.getInt("lastUpdateDate") ?? DateTime.now().millisecondsSinceEpoch;
 
-    /// 현재 날짜로 업데이트
-    _lastUpdateDate = prefs.getInt("lastUpdateDate") ?? DateTime.now().millisecondsSinceEpoch;
+    DateTime lastSavedDateTime =
+        DateTime.fromMillisecondsSinceEpoch(lastSavedDate);
+
+    DateTime now = DateTime.now();
+
+    DateTime lastMidnight = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    );
+
+    if (lastSavedDateTime.isBefore(lastMidnight)) {
+      _lastTotalSteps = 0;
+    } else {
+      _lastTotalSteps = prefs.getInt("lastTotalSteps") ?? 0;
+    }
+
+    _lastUpdateDate = now.millisecondsSinceEpoch;
   }
 
   /// 백그라운드에서 App Process 유지
@@ -277,7 +308,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             ),
             Gaps.h5,
             Text(
-              _status == "walking" ? "$_steps걸음" : "[$_steps] 조금만 더 걸어 볼까요?",
+              _status == "walking"
+                  ? "[$_steps걸음] 걷고 계시네요!"
+                  : "[$_steps걸음] 조금만 더 걸어 볼까요?",
               style: const TextStyle(
                 color: Colors.black,
                 fontSize: Sizes.size16,
@@ -352,6 +385,18 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                         print("RESOURCE ERROR Error Type ${error.errorType}");
                         print("RESOURCE ERROR Failing URL ${error.domain}");
                         print("Error Description: ${error.description}");
+                      },
+                      navigationDelegate: (request) async {
+                        /// In App PG Payment Process
+                        final appScheme = ConvertUrl(request.url);
+
+                        if (appScheme.isAppLink()) {
+                          appScheme.launchApp();
+
+                          return NavigationDecision.prevent;
+                        }
+
+                        return NavigationDecision.navigate;
                       },
                       zoomEnabled: false,
                       gestureRecognizers: Set()
