@@ -192,7 +192,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           "🏃‍♀️ 오늘 하루 총 $_steps걸음 걸으셨네요!",
         );
       }
-    } else {
+    } else if(nowDate.isBefore(midnight)) {
       _lastTotalSteps = newStepCount;
 
       _lastUpdateDate = nowDate.millisecondsSinceEpoch;
@@ -267,7 +267,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     if (lastSavedDateTime.isBefore(lastMidnight)) {
       _lastTotalSteps = 0;
-    } else {
+    } else if(lastSavedDateTime.isAfter(lastMidnight)) {
       _lastTotalSteps = prefs.getInt("lastTotalSteps") ?? 0;
     }
 
