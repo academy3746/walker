@@ -114,6 +114,26 @@ class LocationInfo {
     return false;
   }
 
+  Future<void> incheonAirport(Position currentPosition) async {
+    const double portLat = 37.4493342;
+
+    const double portLng = 126.4513395;
+
+    double distanceToAirport = Geolocator.distanceBetween(
+      currentPosition.latitude,
+      currentPosition.longitude,
+      portLat,
+      portLng,
+    );
+
+    if (distanceToAirport <= 500) {
+      msgController.sendInternalPush(
+        "인천국제공항에 도착하셨습니다.",
+        "즐거운 여행 되세요!",
+      );
+    }
+  }
+
   /// Location Changed (국가 단위)
   Future<void> getStreaming() async {
     var androidPlatform = TargetPlatform.android;
@@ -172,6 +192,8 @@ class LocationInfo {
             );
           }
 
+          await incheonAirport(position);
+
           print("위치 정보 업데이트: ${position.toString()}");
         }
       },
@@ -180,8 +202,13 @@ class LocationInfo {
 
   /// Debug Location Changed
   Future<void> debugStreaming() async {
-    const double debugLatitude = 40.7128;
-    const double debugLongitude = -74.0060;
+    // Chitose
+    //const double debugLatitude = 42.7791302;
+    //const double debugLongitude = 141.6866374;
+
+    // 인천국제공항
+    const double debugLatitude = 37.4493342;
+    const double debugLongitude = 126.4513395;
 
     Future.delayed(
       const Duration(seconds: 5),
@@ -202,7 +229,6 @@ class LocationInfo {
         if (hasLocationChanged(debugPosition)) {
           String? currentCountryCode = await getCountryCode(debugPosition);
 
-          /// Send Push 로직 추후 구성
           if (lastCountryCode != currentCountryCode) {
             print("국가 정보 업데이트: $currentCountryCode");
             lastCountryCode = currentCountryCode;
@@ -217,7 +243,10 @@ class LocationInfo {
             );
           }
 
+          await incheonAirport(debugPosition);
+
           print("위치 정보 업데이트: ${debugPosition.toString()}");
+
           lastPosition = debugPosition;
         }
       },

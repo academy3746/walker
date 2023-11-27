@@ -153,8 +153,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           print("현재 주소: $currentAddress");
         });
 
-        await locationInfo.getStreaming();
-        //await locationInfo.debugStreaming();
+        //await locationInfo.getStreaming();
+        await locationInfo.debugStreaming();
 
         /// Get User Steps Count
         await _loadLastTotalSteps().then((_) => _pedometerHandler());
