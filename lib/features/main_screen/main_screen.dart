@@ -8,7 +8,6 @@ import 'package:flutter_webview_pro/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:pedometer/pedometer.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tosspayments_widget_sdk_flutter/model/tosspayments_url.dart';
 import 'package:walker/common/widgets/app_cookie_handler.dart';
 import 'package:walker/common/widgets/app_version_check_handler.dart';
@@ -17,7 +16,6 @@ import 'package:walker/common/widgets/fcm_controller.dart';
 import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
-import 'package:walker/common/widgets/web_communication.dart';
 import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
 
@@ -64,9 +62,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Request Push Permission & Get Unique Token Value from Firebase Server
   MsgController msgController = Get.put(MsgController());
 
-  /// Import WebServerCommunication
-  WebServerCommunication? communication;
-
   /// Initialize Pedometer
   late Stream<StepCount> _stepCountStream;
 
@@ -77,8 +72,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   String _steps = "0";
 
   int _lastTotalSteps = 0;
-
-  int _lastUpdateDate = DateTime.now().millisecondsSinceEpoch;
 
   @override
   void initState() {
@@ -150,7 +143,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         await locationInfo.debugStreaming();
 
         /// Get User Steps Count
-        await _loadLastTotalSteps().then((_) => _pedometerHandler());
+        _pedometerHandler();
       } catch (e) {
         print(e);
       }
@@ -162,39 +155,19 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// Update Steps Count
   void _onStepCountUpdate(String newTotalStep) {
-    DateTime nowDate = DateTime.now();
-
-    DateTime midnight = DateTime(
-      nowDate.year,
-      nowDate.month,
-      nowDate.day,
-    );
-
     int newStepCount = int.parse(newTotalStep);
 
-    if (nowDate.isAfter(midnight)) {
-      int dailySteps = newStepCount - _lastTotalSteps;
+    setState(() {
+      _steps = newStepCount.toString();
+    });
 
-      setState(() {
-        _steps = dailySteps.toString();
-      });
+    _lastTotalSteps = newStepCount;
 
-      if (dailySteps >= 10000) {
-        msgController.sendInternalPush(
-          "축하드립니다",
-          "🏃‍♀️ 오늘 하루 총 $_steps걸음 걸으셨네요!",
-        );
-      }
-    } else if (nowDate.isBefore(midnight)) {
-      _lastTotalSteps = newStepCount;
-
-      _lastUpdateDate = nowDate.millisecondsSinceEpoch;
-
-      setState(() {
-        _steps = "0";
-      });
-
-      _saveLastTotalSteps();
+    if (_lastTotalSteps >= 10000) {
+      msgController.sendInternalPush(
+        "축하드립니다",
+        "🏃‍♀️ 오늘 하루 총 $_steps걸음 걸으셨네요!",
+      );
     }
   }
 
@@ -207,8 +180,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// Handling User Steps Count
   void _pedometerHandler() {
-    _loadLastTotalSteps();
-
     _stepCountStream = Pedometer.stepCountStream;
 
     _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
@@ -223,48 +194,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     );
 
     pedometerController.initPlatformState(context);
-  }
-
-  /// Save Daily Steps Count
-  Future<void> _saveLastTotalSteps() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    await prefs.setInt(
-      "lastTotalSteps",
-      _lastTotalSteps,
-    );
-
-    await prefs.setInt(
-      "lastUpdateDate",
-      _lastUpdateDate,
-    );
-  }
-
-  /// Load Daily Steps Count
-  Future<void> _loadLastTotalSteps() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    int lastSavedDate =
-        prefs.getInt("lastUpdateDate") ?? DateTime.now().millisecondsSinceEpoch;
-
-    DateTime lastSavedDateTime =
-        DateTime.fromMillisecondsSinceEpoch(lastSavedDate);
-
-    DateTime now = DateTime.now();
-
-    DateTime lastMidnight = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    );
-
-    if (lastSavedDateTime.isBefore(lastMidnight)) {
-      _lastTotalSteps = 0;
-    } else if (lastSavedDateTime.isAfter(lastMidnight)) {
-      _lastTotalSteps = prefs.getInt("lastTotalSteps") ?? 0;
-    }
-
-    _lastUpdateDate = now.millisecondsSinceEpoch;
   }
 
   /// 백그라운드에서 App Process 유지
