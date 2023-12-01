@@ -18,6 +18,7 @@ import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
 import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -68,6 +69,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   String _status = "";
 
   int _steps = 0;
+
+  int _dailySteps = 0;
 
   @override
   void initState() {
@@ -160,23 +163,39 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _saveDailyStepsCount() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setInt("daily_steps", _dailySteps);
+
+    print("Save Daily Steps Count: $_dailySteps");
+  }
+
   /// Load Daily Steps Count
   Future<void> _loadDailyStepsCount() async {
-    final dailySteps = await pedometerController.loadDailyStepsCount();
+    /*final prefs = await SharedPreferences.getInstance();
 
-    setState(() {
-      _steps = dailySteps;
-    });
+    int loadedSteps = prefs.getInt("daily_steps") ?? 0;*/
 
     if (mounted) {
       pedometerController.initPlatformState(context);
     }
+
+    /*setState(() {
+      _steps = loadedSteps;
+    });
+
+    print("Load Daily Steps Count: $loadedSteps");
+
+    return loadedSteps;*/
   }
 
   /// Update Steps Count
   void _onStepCountUpdate(int calculatedSteps) {
+    _dailySteps = calculatedSteps;
+
     setState(() {
-      _steps = calculatedSteps;
+      _steps = _dailySteps;
     });
   }
 
@@ -191,7 +210,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
 
-    pedometerController.saveDailyStepsCount();
+    _saveDailyStepsCount();
 
     super.dispose();
   }
@@ -204,7 +223,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       print("앱이 포그라운드에서 실행중입니다.");
     } else if (state == AppLifecycleState.paused) {
-      pedometerController.saveDailyStepsCount();
+      _saveDailyStepsCount();
 
       print("앱이 백그라운드에서 실행중입니다.");
     }

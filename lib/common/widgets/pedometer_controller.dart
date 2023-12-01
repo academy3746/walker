@@ -2,7 +2,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class PedometerController {
   /// 총 걸음수 구독
@@ -100,23 +99,5 @@ class PedometerController {
     });
 
     if (!context.mounted) return;
-  }
-
-  Future<void> saveDailyStepsCount() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    await prefs.setInt("daily_steps", steps);
-
-    print("Save Daily Steps Count: $steps");
-  }
-
-  Future<int> loadDailyStepsCount() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    int loadedSteps = prefs.getInt("daily_steps") ?? 0;
-
-    print("Load Daily Steps Count: $loadedSteps");
-
-    return loadedSteps;
   }
 }
