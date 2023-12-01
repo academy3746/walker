@@ -63,15 +63,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   MsgController msgController = Get.put(MsgController());
 
   /// Initialize Pedometer
-  late Stream<StepCount> _stepCountStream;
-
-  late Stream<PedestrianStatus> _pedestrianStatusStream;
+  late PedometerController pedometerController;
 
   String _status = "";
 
-  String _steps = "0";
-
-  int _lastTotalSteps = 0;
+  int _steps = 0;
 
   @override
   void initState() {
@@ -100,10 +96,21 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     /// App Version Handling (Manually)
     AppVersionHandler appVersionHandler = AppVersionHandler(context);
+
     appVersionHandler.getAppVersionStatus();
 
     /// Get User Data
     _fetchUserData();
+
+    /// Get Today Steps Count
+    pedometerController = PedometerController(
+      stepCountStream: Pedometer.stepCountStream,
+      pedestrianStatusStream: Pedometer.pedestrianStatusStream,
+      status: _status,
+      steps: _steps,
+      onStepCountUpdate: _onStepCountUpdate,
+      onPedestrianStatusUpdate: _onPedestrianStatusUpdate,
+    );
   }
 
   /// Request Associated Permission & Get Info
@@ -139,11 +146,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           print("현재 주소: $currentAddress");
         });
 
-        //await locationInfo.getStreaming();
-        await locationInfo.debugStreaming();
+        await locationInfo.getStreaming();
+        //await locationInfo.debugStreaming();
 
         /// Get User Steps Count
-        _pedometerHandler();
+        _loadDailyStepsCount();
       } catch (e) {
         print(e);
       }
@@ -153,22 +160,24 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     }
   }
 
-  /// Update Steps Count
-  void _onStepCountUpdate(String newTotalStep) {
-    int newStepCount = int.parse(newTotalStep);
+  /// Load Daily Steps Count
+  Future<void> _loadDailyStepsCount() async {
+    final dailySteps = await pedometerController.loadDailyStepsCount();
 
     setState(() {
-      _steps = newStepCount.toString();
+      _steps = dailySteps;
     });
 
-    _lastTotalSteps = newStepCount;
-
-    if (_lastTotalSteps >= 10000) {
-      msgController.sendInternalPush(
-        "축하드립니다",
-        "🏃‍♀️ 오늘 하루 총 $_steps걸음 걸으셨네요!",
-      );
+    if (mounted) {
+      pedometerController.initPlatformState(context);
     }
+  }
+
+  /// Update Steps Count
+  void _onStepCountUpdate(int calculatedSteps) {
+    setState(() {
+      _steps = calculatedSteps;
+    });
   }
 
   /// Update Physical Movement
@@ -178,22 +187,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     });
   }
 
-  /// Handling User Steps Count
-  void _pedometerHandler() {
-    _stepCountStream = Pedometer.stepCountStream;
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
 
-    _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
+    pedometerController.saveDailyStepsCount();
 
-    PedometerController pedometerController = PedometerController(
-      stepCountStream: _stepCountStream,
-      pedestrianStatusStream: _pedestrianStatusStream,
-      status: _status,
-      steps: _steps,
-      onStepCountUpdate: _onStepCountUpdate,
-      onPedestrianStatusUpdate: _onPedestrianStatusUpdate,
-    );
-
-    pedometerController.initPlatformState(context);
+    super.dispose();
   }
 
   /// 백그라운드에서 App Process 유지
@@ -204,15 +204,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       print("앱이 포그라운드에서 실행중입니다.");
     } else if (state == AppLifecycleState.paused) {
+      pedometerController.saveDailyStepsCount();
+
       print("앱이 백그라운드에서 실행중입니다.");
     }
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-
-    super.dispose();
   }
 
   @override
