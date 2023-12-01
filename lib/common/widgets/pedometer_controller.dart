@@ -37,14 +37,7 @@ class PedometerController {
     required this.steps,
     required this.onStepCountUpdate,
     required this.onPedestrianStatusUpdate,
-  }) {
-    stepCountStream.listen((event) {
-      //startOfDaySteps = event.steps;
-      if (startOfDaySteps == 0) {
-        startOfDaySteps = event.steps;
-      }
-    });
-  }
+  });
 
   void _onStepCount(StepCount event) {
     int calculatedSteps = event.steps - startOfDaySteps;

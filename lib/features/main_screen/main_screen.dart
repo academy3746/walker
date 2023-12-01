@@ -72,6 +72,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   int _dailySteps = 0;
 
+  int _loadSteps = 0;
+
   @override
   void initState() {
     super.initState();
@@ -172,22 +174,22 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   /// Load Daily Steps Count
-  Future<void> _loadDailyStepsCount() async {
-    /*final prefs = await SharedPreferences.getInstance();
+  Future<int> _loadDailyStepsCount() async {
+    final prefs = await SharedPreferences.getInstance();
 
-    int loadedSteps = prefs.getInt("daily_steps") ?? 0;*/
+    _loadSteps = prefs.getInt("daily_steps") ?? 0;
 
     if (mounted) {
       pedometerController.initPlatformState(context);
     }
 
-    /*setState(() {
-      _steps = loadedSteps;
+    setState(() {
+      _steps = _loadSteps;
     });
 
-    print("Load Daily Steps Count: $loadedSteps");
+    print("Load Daily Steps Count: $_steps");
 
-    return loadedSteps;*/
+    return _loadSteps;
   }
 
   /// Update Steps Count
