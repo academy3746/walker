@@ -197,7 +197,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     _dailySteps = calculatedSteps;
 
     setState(() {
-      _steps = _dailySteps;
+      _steps = _dailySteps + _loadSteps;
     });
   }
 
