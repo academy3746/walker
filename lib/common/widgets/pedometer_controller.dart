@@ -46,8 +46,8 @@ class PedometerController {
 
     onStepCountUpdate(calculatedSteps);
 
-    print("총 걸음수: $startOfDaySteps");
-    print("일일 걸음수: $steps");
+    print("Total Walk: $startOfDaySteps");
+    print("Now Walking: $steps");
   }
 
   void _onPedestrianStatusChanged(PedestrianStatus event) {

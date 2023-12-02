@@ -168,16 +168,16 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   Future<void> _saveDailyStepsCount() async {
     final prefs = await SharedPreferences.getInstance();
 
-    await prefs.setInt("daily_steps", _dailySteps);
+    await prefs.setInt("steps", _steps);
 
-    print("Save Daily Steps Count: $_dailySteps");
+    print("Save Daily Steps Count: $_steps");
   }
 
   /// Load Daily Steps Count
   Future<int> _loadDailyStepsCount() async {
     final prefs = await SharedPreferences.getInstance();
 
-    _loadSteps = prefs.getInt("daily_steps") ?? 0;
+    _loadSteps = prefs.getInt("steps") ?? 0;
 
     if (mounted) {
       pedometerController.initPlatformState(context);
@@ -223,6 +223,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
 
     if (state == AppLifecycleState.resumed) {
+      _loadDailyStepsCount();
+
       print("앱이 포그라운드에서 실행중입니다.");
     } else if (state == AppLifecycleState.paused) {
       _saveDailyStepsCount();
