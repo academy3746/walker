@@ -37,7 +37,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   WebViewController? viewController;
 
   /// Initialize App URL
-  final String url = "https://boolub.com/?is_app=y";
+  //final String url = "https://boolub.com/?is_app=y";
+  final String url = "https://boolub.com/?pn=member.login.form&_rurl=%2F%3Fis_app%3Dy";
 
   /// Initialize Home URL
   final String homeUrl = "https://boolub.com/";
@@ -165,7 +166,18 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _saveDailyStepsCount() async {
+  /// Update Steps Count
+  void _onStepCountUpdate(int calculatedSteps) {
+    _dailySteps = calculatedSteps;
+
+    setState(() {
+      _steps = _dailySteps + _loadSteps;
+    });
+
+    _saveDailyStepsCount(_steps);
+  }
+
+  Future<void> _saveDailyStepsCount(int newSteps) async {
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setInt("steps", _steps);
@@ -192,15 +204,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     return _loadSteps;
   }
 
-  /// Update Steps Count
-  void _onStepCountUpdate(int calculatedSteps) {
-    _dailySteps = calculatedSteps;
-
-    setState(() {
-      _steps = _dailySteps + _loadSteps;
-    });
-  }
-
   /// Update Physical Movement
   void _onPedestrianStatusUpdate(String newStatus) {
     setState(() {
@@ -212,7 +215,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
 
-    _saveDailyStepsCount();
+    _saveDailyStepsCount(_steps);
 
     super.dispose();
   }
@@ -227,9 +230,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
       print("앱이 포그라운드에서 실행중입니다.");
     } else if (state == AppLifecycleState.paused) {
-      _saveDailyStepsCount();
-
       print("앱이 백그라운드에서 실행중입니다.");
+
+      _saveDailyStepsCount(_steps);
     }
   }
 

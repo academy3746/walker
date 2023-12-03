@@ -42,12 +42,10 @@ class PedometerController {
   void _onStepCount(StepCount event) {
     int calculatedSteps = event.steps - startOfDaySteps;
 
-    steps = calculatedSteps;
-
     onStepCountUpdate(calculatedSteps);
 
     print("Total Walk: $startOfDaySteps");
-    print("Now Walking: $steps");
+    print("Now Walking: $calculatedSteps");
   }
 
   void _onPedestrianStatusChanged(PedestrianStatus event) {
