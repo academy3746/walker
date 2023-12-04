@@ -213,12 +213,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// Web Server Communication
   Future<void> _sendToWebServer(int savedSteps) async {
+    String? token = await _getPushToken();
+
     WebServerCommunication communication = WebServerCommunication(
       steps: _steps.toString(),
       currentAddress: currentAddress,
+      token: token,
     );
-
-    String? token = await _getPushToken();
 
     await communication.toJson({
       "steps": _steps.toString(),
