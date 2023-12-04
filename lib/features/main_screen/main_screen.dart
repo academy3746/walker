@@ -117,6 +117,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       onStepCountUpdate: _onStepCountUpdate,
       onPedestrianStatusUpdate: _onPedestrianStatusUpdate,
     );
+
+    /// Reset Daily Steps Count
+    _resetDailySteps();
   }
 
   /// Request Associated Permission & Get Info
@@ -163,6 +166,29 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     } else {
       print("위치정보 접근 권한이 거부되었습니다.");
       print("신체 활동 접근 권한이 거부되었습니다.");
+    }
+  }
+
+  /// Reset Daily Steps Count
+  Future<void> _resetDailySteps() async {
+    final now = DateTime.now();
+
+    final midnight = DateTime(
+      now.year,
+      now.month,
+      now.day + 1,
+    );
+
+    final difference = midnight.difference(now).inSeconds;
+
+    if (now.hour == 0 && now.minute == 0) {
+      Timer(Duration(seconds: difference), () async {
+        _steps = 0;
+
+        final prefs = await SharedPreferences.getInstance();
+
+        await prefs.setInt("steps", _steps);
+      });
     }
   }
 
