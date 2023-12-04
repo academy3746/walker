@@ -6,7 +6,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_pro/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:tosspayments_widget_sdk_flutter/model/tosspayments_url.dart';
 import 'package:walker/common/widgets/app_cookie_handler.dart';
@@ -16,6 +15,7 @@ import 'package:walker/common/widgets/fcm_controller.dart';
 import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
+import 'package:walker/common/widgets/web_communication.dart';
 import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,8 +37,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   WebViewController? viewController;
 
   /// Initialize App URL
-  //final String url = "https://boolub.com/?is_app=y";
-  final String url = "https://boolub.com/?pn=member.login.form&_rurl=%2F%3Fis_app%3Dy";
+  final String url = "https://boolub.com/?is_app=y";
+  //final String url = "https://boolub.com/?pn=member.login.form&_rurl=%2F%3Fis_app%3Dy";
 
   /// Initialize Home URL
   final String homeUrl = "https://boolub.com/";
@@ -62,7 +62,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   String? currentAddress;
 
   /// Request Push Permission & Get Unique Token Value from Firebase Server
-  MsgController msgController = Get.put(MsgController());
+  MsgController msgController = MsgController();
 
   /// Initialize Pedometer
   late PedometerController pedometerController;
@@ -201,7 +201,30 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     print("Load Daily Steps Count: $_steps");
 
+    await _sendToWebServer(_steps);
+
     return _loadSteps;
+  }
+
+  /// Get User Token Value
+  Future<String?> _getPushToken() async {
+    return await msgController.getToken();
+  }
+
+  /// Web Server Communication
+  Future<void> _sendToWebServer(int savedSteps) async {
+    WebServerCommunication communication = WebServerCommunication(
+      steps: _steps.toString(),
+      currentAddress: currentAddress,
+    );
+
+    String? token = await _getPushToken();
+
+    await communication.toJson({
+      "steps": _steps.toString(),
+      "currentAddress": currentAddress ?? "",
+      "token": token ?? "",
+    });
   }
 
   /// Update Physical Movement

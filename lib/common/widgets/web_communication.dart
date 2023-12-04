@@ -1,34 +1,34 @@
 // ignore_for_file: avoid_print
 import 'dart:convert';
-import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 
 class WebServerCommunication {
   final String steps;
 
-  Position? currentPosition;
-
   String? currentAddress;
+
+  String? token;
 
   WebServerCommunication({
     required this.steps,
-    this.currentPosition,
     this.currentAddress,
+    this.token,
   });
 
   /// Send API to Web Server
-  Future<void> toJson(Map<String, dynamic> toJson) async {
+  Future<void> toJson(Map<String, dynamic> data) async {
     const String redirectUrl = "https://boolub.com/?is_app=y";
 
     var response = await http.post(
       Uri.parse(redirectUrl),
       headers: {"Content-Type": "application/json"},
-      body: json.encode(toJson),
+      body: json.encode(data),
     );
 
     try {
       if (response.statusCode == 200) {
         print("POST Succeed: ${response.statusCode}");
+        print("POST Data: $data");
       } else {
         print("POST Failed: ${response.statusCode}");
       }
