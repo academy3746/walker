@@ -234,13 +234,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   /// Get User Token Value
-  Future<String?> _getPushToken() async {
+  Future<String?> _getFcmToken() async {
     return await msgController.getToken();
   }
 
   /// Web Server Communication
   Future<void> _sendToWebServer(int savedSteps) async {
-    String? token = await _getPushToken();
+    String? token = await _getFcmToken();
 
     WebServerCommunication communication = WebServerCommunication(
       steps: _steps.toString(),
