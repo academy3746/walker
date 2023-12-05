@@ -158,7 +158,7 @@ class MsgController extends GetxController {
         ),
       );
 
-      Future.delayed(const Duration(minutes: 3), () {
+      Future.delayed(const Duration(hours: 1), () {
         plugin.cancel(notificationId);
       });
     } catch (e) {
