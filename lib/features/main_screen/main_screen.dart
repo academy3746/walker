@@ -284,7 +284,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       _loadDailyStepsCount();
 
       print("앱이 포그라운드에서 실행중입니다.");
-    } else if (state == AppLifecycleState.paused) {
+    } else {
       print("앱이 백그라운드에서 실행중입니다.");
 
       _saveDailyStepsCount(_steps);
@@ -327,16 +327,18 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                         );
                       },
                       onPageStarted: (String url) async {
-                        print("현재 페이지 주소: $url");
                         setState(() {
                           isLoading = true;
                         });
+
+                        print("현재 페이지 주소: $url");
                       },
                       onPageFinished: (String url) async {
                         setState(() {
                           isLoading = false;
                         });
 
+                        /// Soft Keyboard hide TextField on Android
                         if (Platform.isAndroid) {
                           if (url.contains(homeUrl) && viewController != null) {
                             await viewController!.runJavascript("""
@@ -362,9 +364,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                         print("Error Description: ${error.description}");
                       },
                       navigationDelegate: (request) async {
-                        /// Toss Payments
                         final appScheme = ConvertUrl(request.url);
 
+                        /// Toss Payments
                         if (appScheme.isAppLink()) {
                           try {
                             await appScheme.launchApp();

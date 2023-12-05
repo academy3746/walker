@@ -26,8 +26,6 @@ class AccessPermission {
       print("Access to location data has denied by user.");
       print("Access to health data has denied by user.");
 
-      openAppSettings();
-
       return false;
     }
   }

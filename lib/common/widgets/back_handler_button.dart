@@ -5,9 +5,13 @@ import 'package:walker/constants/sizes.dart';
 
 class BackHandlerButton {
   BuildContext context;
+
   DateTime? lastPressed;
+
   String? mainUrl;
+
   String? homeUrl;
+
   WebViewController? controller;
 
   BackHandlerButton({
@@ -29,7 +33,7 @@ class BackHandlerButton {
 
         if (context.mounted) {
           Fluttertoast.showToast(
-            msg: "'뒤로가기' 버튼을 한번 더 누르면 앱이 종료됩니다.",
+            msg: "'뒤로' 버튼을 한번 더 누르면 앱이 종료됩니다.",
             gravity: ToastGravity.BOTTOM,
             backgroundColor: Theme.of(context).primaryColor,
             fontSize: Sizes.size20,
