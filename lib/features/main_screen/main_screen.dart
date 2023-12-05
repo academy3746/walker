@@ -18,6 +18,8 @@ import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
 import 'package:walker/common/widgets/web_communication.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:walker/constants/gaps.dart';
+import 'package:walker/constants/sizes.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -296,6 +298,29 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Row(
+          children: [
+            const Icon(
+              Icons.directions_walk_rounded,
+              size: Sizes.size20,
+              color: Colors.black,
+            ),
+            Gaps.h5,
+            Text(
+              _status == "walking"
+                  ? "[$_steps걸음] 걷고 계시네요!"
+                  : "[$_steps걸음] 조금만 더 걸어 볼까요?",
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: Sizes.size16,
+              ),
+            ),
+          ],
+        ),
+      ),
       body: Stack(
         children: [
           LayoutBuilder(

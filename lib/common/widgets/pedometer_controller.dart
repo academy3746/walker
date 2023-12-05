@@ -22,6 +22,7 @@ class PedometerController {
   /// 자정 정각 Reset
   Timer? midnightResetTimer;
 
+  /// 일일 걸음수 초기화
   bool startOfDayStepsInitialized = false;
 
   /// 걸음 수 업데이트
