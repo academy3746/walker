@@ -38,8 +38,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Initialize App URL
   final String url = "https://boolub.com/?is_app=y";
 
-  //final String url = "https://boolub.com/?pn=member.login.form&_rurl=%2F%3Fis_app%3Dy";
-
   /// Initialize Home URL
   final String homeUrl = "https://boolub.com/";
 
@@ -234,14 +232,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     return _loadSteps;
   }
 
-  /// Get User Token Value
-  Future<String?> _getFcmToken() async {
-    return await msgController.getToken();
-  }
-
   /// Web Server Communication
   Future<void> _sendToWebServer(int savedSteps) async {
-    String? token = await _getFcmToken();
+    String? token = await msgController.getToken();
 
     WebServerCommunication communication = WebServerCommunication(
       steps: savedSteps.toString(),
