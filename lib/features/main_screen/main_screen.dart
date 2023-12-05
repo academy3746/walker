@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_pro/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:tosspayments_widget_sdk_flutter/model/tosspayments_url.dart';
 import 'package:walker/common/widgets/app_cookie_handler.dart';
@@ -61,7 +62,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   String? currentAddress;
 
   /// Request Push Permission & Get Unique Token Value from Firebase Server
-  MsgController msgController = MsgController();
+  MsgController msgController = Get.put(MsgController());
 
   /// Initialize Pedometer
   late PedometerController pedometerController;
@@ -243,13 +244,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     String? token = await _getFcmToken();
 
     WebServerCommunication communication = WebServerCommunication(
-      steps: _steps.toString(),
+      steps: savedSteps.toString(),
       currentAddress: currentAddress,
       token: token,
     );
 
     await communication.toJson({
-      "steps": _steps.toString(),
+      "steps": savedSteps.toString(),
       "currentAddress": currentAddress ?? "",
       "token": token ?? "",
     });
@@ -257,7 +258,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// Send Push
   Future<void> _sendPush(int dailyScore) async {
-    if (_steps == 10000) {
+    if (dailyScore == 10000) {
       await msgController.sendInternalPush(
         "축하드립니다!",
         "🏃‍♀️ 오늘 하루 $_steps 걸음 이상 걸으셨네요!",
