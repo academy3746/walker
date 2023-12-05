@@ -133,9 +133,11 @@ class MsgController extends GetxController {
 
   /// Send Push to Specified Users
   Future<void> sendInternalPush(String title, String body) async {
+    int notificationId = 0;
+
     try {
       await plugin.show(
-        0,
+        notificationId,
         title,
         body,
         NotificationDetails(
@@ -155,6 +157,10 @@ class MsgController extends GetxController {
           ),
         ),
       );
+
+      Future.delayed(const Duration(minutes: 3), () {
+        plugin.cancel(notificationId);
+      });
     } catch (e) {
       print("푸시 전송 실패: $e");
     }

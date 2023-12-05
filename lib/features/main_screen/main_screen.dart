@@ -16,8 +16,6 @@ import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
 import 'package:walker/common/widgets/web_communication.dart';
-import 'package:walker/constants/gaps.dart';
-import 'package:walker/constants/sizes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainScreen extends StatefulWidget {
@@ -38,6 +36,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// Initialize App URL
   final String url = "https://boolub.com/?is_app=y";
+
   //final String url = "https://boolub.com/?pn=member.login.form&_rurl=%2F%3Fis_app%3Dy";
 
   /// Initialize Home URL
@@ -229,6 +228,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     await _sendToWebServer(_steps);
 
+    await _sendPush(_steps);
+
     return _loadSteps;
   }
 
@@ -252,6 +253,16 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       "currentAddress": currentAddress ?? "",
       "token": token ?? "",
     });
+  }
+
+  /// Send Push
+  Future<void> _sendPush(int dailyScore) async {
+    if (_steps == 10000) {
+      await msgController.sendInternalPush(
+        "축하드립니다!",
+        "🏃‍♀️ 오늘 하루 $_steps 걸음 이상 걸으셨네요!",
+      );
+    }
   }
 
   /// Update Physical Movement
@@ -289,29 +300,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Row(
-          children: [
-            const Icon(
-              Icons.directions_walk_rounded,
-              size: Sizes.size20,
-              color: Colors.black,
-            ),
-            Gaps.h5,
-            Text(
-              _status == "walking"
-                  ? "[$_steps걸음] 걷고 계시네요!"
-                  : "[$_steps걸음] 조금만 더 걸어 볼까요?",
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: Sizes.size16,
-              ),
-            ),
-          ],
-        ),
-      ),
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: Stack(
