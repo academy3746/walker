@@ -9,10 +9,13 @@ class WebServerCommunication {
 
   String? token;
 
+  String? currentPosition;
+
   WebServerCommunication({
     required this.steps,
     this.currentAddress,
     this.token,
+    this.currentPosition,
   });
 
   /// Send API to Web Server

@@ -248,6 +248,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       "steps": savedSteps.toString(),
       "currentAddress": currentAddress ?? "",
       "token": token ?? "",
+      "currentPosition": currentPosition ?? "",
     });
   }
 
