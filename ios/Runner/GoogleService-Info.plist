@@ -2,20 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>69890940954-f5o3265n1ms2i62b47g63au5cs00rshe.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyBrjgvZPWKAW7ZNJbjF9ADnndK0C_Yar6Q</string>
+	<string>AIzaSyCAd0wC7XttgU1RdixlJulT-otq5or-WSc</string>
 	<key>GCM_SENDER_ID</key>
-	<string>69890940954</string>
+	<string>270740796279</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>kr.sogeum.walker</string>
 	<key>PROJECT_ID</key>
-	<string>boolub</string>
+	<string>boolub-79e95</string>
 	<key>STORAGE_BUCKET</key>
-	<string>boolub.appspot.com</string>
+	<string>boolub-79e95.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -27,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:69890940954:ios:9e3703607facb25fb0b1a3</string>
+	<string>1:270740796279:ios:d6ff4ab54c4df46684e772</string>
 </dict>
 </plist>
