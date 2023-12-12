@@ -183,7 +183,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     if (now.hour == 0 && now.minute == 0) {
       Timer(Duration(seconds: difference), () async {
-        _steps = 0;
+        setState(() {
+          _steps = 0;
+        });
 
         final prefs = await SharedPreferences.getInstance();
 
@@ -242,6 +244,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       steps: savedSteps.toString(),
       currentAddress: currentAddress,
       token: token,
+      currentPosition: currentPosition.toString(),
     );
 
     await communication.toJson({
