@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_pro/webview_flutter.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:pedometer/pedometer.dart';
@@ -34,7 +35,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Initialize WebView Controller
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
-
   WebViewController? viewController;
 
   /// Initialize App URL
@@ -66,14 +66,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// Initialize Pedometer
   late PedometerController pedometerController;
-
   String _status = "";
-
   int _steps = 0;
-
   int _dailySteps = 0;
-
   int _loadSteps = 0;
+
+  /// Initialize Home Button
+  bool showFloatingActionButton = false;
 
   @override
   void initState() {
@@ -117,6 +116,14 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       onStepCountUpdate: _onStepCountUpdate,
       onPedestrianStatusUpdate: _onPedestrianStatusUpdate,
     );
+
+    /// 일일 걸음수 초기화
+    _resetDailySteps();
+  }
+
+  /// Direct to Home URL
+  void _loadHomeUrl() {
+    viewController?.loadUrl(url);
   }
 
   /// Request Associated Permission & Get Info
@@ -205,13 +212,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     await _sendPush(_steps);
 
-    await _resetDailySteps(_steps);
-
     return _loadSteps;
   }
 
   /// Reset Daily Steps Count
-  Future<void> _resetDailySteps(int loadDailySteps) async {
+  Future<void> _resetDailySteps() async {
     final now = DateTime.now();
 
     final midnight = DateTime(
@@ -225,12 +230,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     if (now.hour == 0 && now.minute == 0) {
       Timer(Duration(seconds: difference), () async {
         setState(() {
-          loadDailySteps = 0;
+          _steps = 0;
         });
 
         final prefs = await SharedPreferences.getInstance();
 
-        await prefs.setInt("steps", loadDailySteps);
+        await prefs.setInt("steps", _steps);
       });
     }
   }
@@ -301,7 +306,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      appBar: AppBar(
+      appBar: kDebugMode ? AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         title: Row(
@@ -323,7 +328,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             ),
           ],
         ),
-      ),
+      ) : null,
       body: Stack(
         children: [
           LayoutBuilder(
@@ -384,6 +389,17 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                             """);
                           }
                         }
+
+                        /// 외부 URL 처리
+                        if (!url.startsWith(homeUrl)) {
+                          setState(() {
+                            showFloatingActionButton = true;
+                          });
+                        } else {
+                          setState(() {
+                            showFloatingActionButton = false;
+                          });
+                        }
                       },
                       onWebResourceError: (error) {
                         print("Error Code: ${error.errorCode}");
@@ -428,6 +444,15 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
               : Container(),
         ],
       ),
+      floatingActionButton: showFloatingActionButton
+          ? FloatingActionButton(
+              onPressed: _loadHomeUrl,
+              child: const FaIcon(
+                FontAwesomeIcons.house,
+                size: Sizes.size28,
+              ),
+            )
+          : null,
     );
   }
 }
