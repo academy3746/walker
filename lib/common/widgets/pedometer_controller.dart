@@ -16,15 +16,6 @@ class PedometerController {
   /// 총 걸음수
   int steps;
 
-  /// 걸음 시작 시점 Flag
-  int startOfDaySteps = 0;
-
-  /// 자정 정각 Reset
-  Timer? midnightResetTimer;
-
-  /// 일일 걸음수 초기화
-  bool startOfDayStepsInitialized = false;
-
   /// 걸음 수 업데이트
   final Function(int) onStepCountUpdate;
 
@@ -41,11 +32,10 @@ class PedometerController {
   });
 
   void _onStepCount(StepCount event) {
-    int calculatedSteps = event.steps - startOfDaySteps;
+    int calculatedSteps = event.steps;
 
     onStepCountUpdate(calculatedSteps);
 
-    print("Total Walk: $startOfDaySteps");
     print("Now Walking: $calculatedSteps");
   }
 
@@ -70,25 +60,11 @@ class PedometerController {
 
     pedestrianStatusStream = Pedometer.pedestrianStatusStream;
 
-    stepCountStream.listen((event) {
-      if (!startOfDayStepsInitialized) {
-        startOfDaySteps = event.steps;
-
-        startOfDayStepsInitialized = true;
-      }
-    });
-
     pedestrianStatusStream
         .listen(_onPedestrianStatusChanged)
         .onError(_onPedestrianStatusError);
 
     stepCountStream.listen(_onStepCount).onError(_onStepCountError);
-
-    midnightResetTimer = Timer.periodic(const Duration(days: 1), (timer) async {
-      StepCount? latestStepCount = await stepCountStream.first;
-
-      startOfDaySteps = latestStepCount.steps;
-    });
 
     if (!context.mounted) return;
   }

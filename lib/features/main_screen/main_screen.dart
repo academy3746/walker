@@ -116,9 +116,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       onStepCountUpdate: _onStepCountUpdate,
       onPedestrianStatusUpdate: _onPedestrianStatusUpdate,
     );
-
-    /// 일일 걸음수 초기화
-    _resetDailySteps();
   }
 
   /// Direct to Home URL
@@ -178,7 +175,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     _dailySteps = calculatedSteps;
 
     setState(() {
-      _steps = _dailySteps + _loadSteps;
+      _steps = _dailySteps;
     });
 
     _saveDailyStepsCount(_steps);
@@ -213,31 +210,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     await _sendPush(_steps);
 
     return _loadSteps;
-  }
-
-  /// Reset Daily Steps Count
-  Future<void> _resetDailySteps() async {
-    final now = DateTime.now();
-
-    final midnight = DateTime(
-      now.year,
-      now.month,
-      now.day + 1,
-    );
-
-    final difference = midnight.difference(now).inSeconds;
-
-    if (now.hour == 0 && now.minute == 0) {
-      Timer(Duration(seconds: difference), () async {
-        setState(() {
-          _steps = 0;
-        });
-
-        final prefs = await SharedPreferences.getInstance();
-
-        await prefs.setInt("steps", _steps);
-      });
-    }
   }
 
   /// Web Server Communication
@@ -291,9 +263,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
 
     if (state == AppLifecycleState.resumed) {
-      _loadDailyStepsCount();
-
       print("앱이 포그라운드에서 실행중입니다.");
+
+      _loadDailyStepsCount();
     } else {
       print("앱이 백그라운드에서 실행중입니다.");
 
@@ -446,10 +418,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       ),
       floatingActionButton: showFloatingActionButton
           ? FloatingActionButton(
+              backgroundColor: Theme.of(context).primaryColor,
               onPressed: _loadHomeUrl,
               child: const FaIcon(
                 FontAwesomeIcons.house,
-                size: Sizes.size28,
+                size: Sizes.size26,
               ),
             )
           : null,

@@ -38,7 +38,7 @@ class WalkerApp extends StatelessWidget {
     return MaterialApp(
       title: '부럽',
       theme: ThemeData(
-        primaryColor: Colors.blueAccent,
+        primaryColor: const Color(0xFF38BEEF),
         useMaterial3: false,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
