@@ -117,9 +117,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       onStepCountUpdate: _onStepCountUpdate,
       onPedestrianStatusUpdate: _onPedestrianStatusUpdate,
     );
-
-    /// Reset Daily Steps Count
-    _resetDailySteps();
   }
 
   /// Request Associated Permission & Get Info
@@ -169,31 +166,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     }
   }
 
-  /// Reset Daily Steps Count
-  Future<void> _resetDailySteps() async {
-    final now = DateTime.now();
-
-    final midnight = DateTime(
-      now.year,
-      now.month,
-      now.day + 1,
-    );
-
-    final difference = midnight.difference(now).inSeconds;
-
-    if (now.hour == 0 && now.minute == 0) {
-      Timer(Duration(seconds: difference), () async {
-        setState(() {
-          _steps = 0;
-        });
-
-        final prefs = await SharedPreferences.getInstance();
-
-        await prefs.setInt("steps", _steps);
-      });
-    }
-  }
-
   /// Update Steps Count
   void _onStepCountUpdate(int calculatedSteps) {
     _dailySteps = calculatedSteps;
@@ -233,7 +205,34 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     await _sendPush(_steps);
 
+    await _resetDailySteps(_steps);
+
     return _loadSteps;
+  }
+
+  /// Reset Daily Steps Count
+  Future<void> _resetDailySteps(int loadDailySteps) async {
+    final now = DateTime.now();
+
+    final midnight = DateTime(
+      now.year,
+      now.month,
+      now.day + 1,
+    );
+
+    final difference = midnight.difference(now).inSeconds;
+
+    if (now.hour == 0 && now.minute == 0) {
+      Timer(Duration(seconds: difference), () async {
+        setState(() {
+          loadDailySteps = 0;
+        });
+
+        final prefs = await SharedPreferences.getInstance();
+
+        await prefs.setInt("steps", loadDailySteps);
+      });
+    }
   }
 
   /// Web Server Communication
@@ -256,8 +255,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   /// Send Push
-  Future<void> _sendPush(int dailyScore) async {
-    if (dailyScore == 10000) {
+  Future<void> _sendPush(int dailySteps) async {
+    if (dailySteps == 10000) {
       await msgController.sendInternalPush(
         "축하드립니다!",
         "🏃‍♀️ 오늘 하루 $_steps 걸음 이상 걸으셨네요!",
