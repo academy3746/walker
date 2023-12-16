@@ -181,10 +181,19 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     _saveDailyStepsCount(_steps);
   }
 
+  /// Save Steps Count
   Future<void> _saveDailyStepsCount(int newSteps) async {
     final prefs = await SharedPreferences.getInstance();
 
+    final now = DateTime.now();
+
     await prefs.setInt("steps", _steps);
+
+    if (_steps >= 10000) {
+      int savedTime = now.millisecondsSinceEpoch;
+
+      await prefs.setInt("savedTime", savedTime);
+    }
 
     print("Save Steps Count: $_steps");
   }
@@ -233,11 +242,23 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// Send Push
   Future<void> _sendPush(int dailySteps) async {
-    if (dailySteps == 10000) {
+    final prefs = await SharedPreferences.getInstance();
+
+    final savedTime = prefs.getInt("savedTime") ?? 0;
+
+    final lastSavedDate = DateTime.fromMillisecondsSinceEpoch(savedTime);
+
+    final today = DateTime.now();
+
+    if (dailySteps >= 10000 && lastSavedDate.day != today.day) {
       await msgController.sendInternalPush(
         "축하드립니다!",
         "🏃‍♀️ 오늘 하루 $_steps 걸음 이상 걸으셨네요!",
       );
+
+      int savedTime = today.millisecondsSinceEpoch;
+
+      await prefs.setInt("savedTime", savedTime);
     }
   }
 
