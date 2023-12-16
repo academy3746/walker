@@ -158,7 +158,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         //await locationInfo.debugStreaming();
 
         /// Get User Steps Count
-        _loadDailyStepsCount();
+        _initPedometer();
       } catch (e) {
         print(e);
       }
@@ -169,7 +169,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   /// Load Daily Steps Count
-  void _loadDailyStepsCount() {
+  void _initPedometer() {
     pedometerController.initPlatformState(context);
   }
 
