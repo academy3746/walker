@@ -18,7 +18,6 @@ import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
 import 'package:walker/common/widgets/web_communication.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
 
@@ -69,7 +68,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   String _status = "";
   int _steps = 0;
   int _totalSteps = 0;
-  int _loadSteps = 0;
 
   /// Initialize Home Button
   bool showFloatingActionButton = false;
@@ -160,7 +158,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         //await locationInfo.debugStreaming();
 
         /// Get User Steps Count
-        _loadDailyStepsCount();
+        await _loadDailyStepsCount();
       } catch (e) {
         print(e);
       }
@@ -170,99 +168,45 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     }
   }
 
+  /// Load Daily Steps Count
+  Future<void> _loadDailyStepsCount() async {
+    pedometerController.initPlatformState(context);
+
+    await _sendToWebServer();
+  }
+
   /// Update Steps Count
-  Future<void> _onStepCountUpdate(int calculatedSteps) async {
+  void _onStepCountUpdate(int calculatedSteps) {
     _totalSteps = calculatedSteps;
 
     setState(() {
       _steps = _totalSteps;
     });
-
-    final prefs = await SharedPreferences.getInstance();
-
-    final now = DateTime.now();
-
-    await prefs.setInt("steps", _steps);
-
-    if (_steps >= 10000) {
-      int savedTime = now.millisecondsSinceEpoch;
-
-      await prefs.setInt("savedTime", savedTime);
-
-      print("Datetime has saved: $savedTime");
-    }
-
-    print("Save Steps Count: $_steps");
-  }
-
-  /// Load Daily Steps Count
-  Future<int> _loadDailyStepsCount() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    _loadSteps = prefs.getInt("steps") ?? 0;
-
-    if (mounted) {
-      pedometerController.initPlatformState(context);
-    }
-
-    setState(() {
-      _steps =  _loadSteps;
-    });
-
-    print("Load Steps Count: $_steps");
-
-    await _sendToWebServer(_steps);
-
-    await _sendPush(_steps);
-
-    return _loadSteps;
-  }
-
-  /// Web Server Communication
-  Future<void> _sendToWebServer(int savedSteps) async {
-    String? token = await msgController.getToken();
-
-    WebServerCommunication communication = WebServerCommunication(
-      steps: savedSteps.toString(),
-      currentAddress: currentAddress,
-      token: token,
-      currentPosition: currentPosition.toString(),
-    );
-
-    await communication.toJson({
-      "steps": savedSteps.toString(),
-      "currentAddress": currentAddress ?? "",
-      "token": token ?? "",
-      "currentPosition": currentPosition ?? "",
-    });
-  }
-
-  /// Send Push
-  Future<void> _sendPush(int dailySteps) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    final savedTime = prefs.getInt("savedTime") ?? 0;
-
-    final lastSavedDate = DateTime.fromMillisecondsSinceEpoch(savedTime);
-
-    final today = DateTime.now();
-
-    if (dailySteps >= 10000 && lastSavedDate.day != today.day) {
-      await msgController.sendInternalPush(
-        "축하드립니다!",
-        "🏃‍♀️ 오늘 하루 $_steps 걸음 이상 걸으셨네요!",
-      );
-
-      int savedTime = today.millisecondsSinceEpoch;
-
-      await prefs.setInt("savedTime", savedTime);
-    }
   }
 
   /// Update Physical Movement
   void _onPedestrianStatusUpdate(String newStatus) {
     setState(() {
       _status = newStatus;
+    });
+  }
+
+  /// Web Server Communication
+  Future<void> _sendToWebServer() async {
+    String? token = await msgController.getToken();
+
+    WebServerCommunication communication = WebServerCommunication(
+      steps: _steps.toString(),
+      currentAddress: currentAddress,
+      token: token,
+      currentPosition: currentPosition.toString(),
+    );
+
+    await communication.toJson({
+      "steps": _steps.toString(),
+      "currentAddress": currentAddress ?? "",
+      "token": token ?? "",
+      "currentPosition": currentPosition ?? "",
     });
   }
 
@@ -280,8 +224,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     if (state == AppLifecycleState.resumed) {
       print("앱이 포그라운드에서 실행중입니다.");
-
-      _loadDailyStepsCount();
     } else {
       print("앱이 백그라운드에서 실행중입니다.");
     }
