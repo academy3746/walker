@@ -171,18 +171,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   /// Update Steps Count
-  void _onStepCountUpdate(int calculatedSteps) {
+  Future<void> _onStepCountUpdate(int calculatedSteps) async {
     _totalSteps = calculatedSteps;
 
     setState(() {
       _steps = _totalSteps;
     });
 
-    _saveDailyStepsCount(_steps);
-  }
-
-  /// Save Steps Count
-  Future<void> _saveDailyStepsCount(int newSteps) async {
     final prefs = await SharedPreferences.getInstance();
 
     final now = DateTime.now();
@@ -193,6 +188,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       int savedTime = now.millisecondsSinceEpoch;
 
       await prefs.setInt("savedTime", savedTime);
+
+      print("Datetime has saved: $savedTime");
     }
 
     print("Save Steps Count: $_steps");
@@ -273,8 +270,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
 
-    _saveDailyStepsCount(_steps);
-
     super.dispose();
   }
 
@@ -289,8 +284,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       _loadDailyStepsCount();
     } else {
       print("앱이 백그라운드에서 실행중입니다.");
-
-      _saveDailyStepsCount(_steps);
     }
   }
 
