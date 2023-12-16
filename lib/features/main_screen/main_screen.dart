@@ -170,34 +170,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     }
   }
 
-  /// Update Steps Count
-  void _onStepCountUpdate(int calculatedSteps) {
-    _totalSteps = calculatedSteps;
-
-    setState(() {
-      _steps = _totalSteps;
-    });
-
-    _saveDailyStepsCount(_steps);
-  }
-
-  /// Save Steps Count
-  Future<void> _saveDailyStepsCount(int newSteps) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    final now = DateTime.now();
-
-    await prefs.setInt("steps", _steps);
-
-    if (_steps >= 10000) {
-      int savedTime = now.millisecondsSinceEpoch;
-
-      await prefs.setInt("savedTime", savedTime);
-    }
-
-    print("Save Steps Count: $_steps");
-  }
-
   /// Load Daily Steps Count
   Future<int> _loadDailyStepsCount() async {
     final prefs = await SharedPreferences.getInstance();
@@ -260,6 +232,34 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
       await prefs.setInt("savedTime", savedTime);
     }
+  }
+
+  /// Update Steps Count
+  void _onStepCountUpdate(int calculatedSteps) {
+    _totalSteps = calculatedSteps;
+
+    setState(() {
+      _steps = _totalSteps;
+    });
+
+    _saveDailyStepsCount(_steps);
+  }
+
+  /// Save Steps Count
+  Future<void> _saveDailyStepsCount(int newSteps) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final now = DateTime.now();
+
+    await prefs.setInt("steps", _steps);
+
+    if (_steps >= 10000) {
+      int savedTime = now.millisecondsSinceEpoch;
+
+      await prefs.setInt("savedTime", savedTime);
+    }
+
+    print("Save Steps Count: $_steps");
   }
 
   /// Update Physical Movement
