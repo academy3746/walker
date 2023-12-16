@@ -36,7 +36,7 @@ class PedometerController {
 
     onStepCountUpdate(calculatedSteps);
 
-    print("Now Walking: $calculatedSteps");
+    print("Total Steps: $calculatedSteps");
   }
 
   void _onPedestrianStatusChanged(PedestrianStatus event) {

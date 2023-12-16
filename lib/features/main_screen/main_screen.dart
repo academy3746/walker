@@ -68,7 +68,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   late PedometerController pedometerController;
   String _status = "";
   int _steps = 0;
-  int _dailySteps = 0;
+  int _totalSteps = 0;
   int _loadSteps = 0;
 
   /// Initialize Home Button
@@ -172,10 +172,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// Update Steps Count
   void _onStepCountUpdate(int calculatedSteps) {
-    _dailySteps = calculatedSteps;
+    _totalSteps = calculatedSteps;
 
     setState(() {
-      _steps = _dailySteps;
+      _steps = _totalSteps;
     });
 
     _saveDailyStepsCount(_steps);
@@ -186,7 +186,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     await prefs.setInt("steps", _steps);
 
-    print("Save Daily Steps Count: $_steps");
+    print("Save Steps Count: $_steps");
   }
 
   /// Load Daily Steps Count
@@ -200,10 +200,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     }
 
     setState(() {
-      _steps = _loadSteps;
+      _steps =  _loadSteps;
     });
 
-    print("Load Daily Steps Count: $_steps");
+    print("Load Steps Count: $_steps");
 
     await _sendToWebServer(_steps);
 
