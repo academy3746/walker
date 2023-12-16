@@ -158,7 +158,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         //await locationInfo.debugStreaming();
 
         /// Get User Steps Count
-        await _loadDailyStepsCount();
+        _loadDailyStepsCount();
       } catch (e) {
         print(e);
       }
@@ -169,19 +169,19 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   /// Load Daily Steps Count
-  Future<void> _loadDailyStepsCount() async {
+  void _loadDailyStepsCount() {
     pedometerController.initPlatformState(context);
-
-    await _sendToWebServer();
   }
 
   /// Update Steps Count
-  void _onStepCountUpdate(int calculatedSteps) {
+  Future<void> _onStepCountUpdate(int calculatedSteps) async {
     _totalSteps = calculatedSteps;
 
     setState(() {
       _steps = _totalSteps;
     });
+
+    await _sendToWebServer(_steps);
   }
 
   /// Update Physical Movement
@@ -192,18 +192,18 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   /// Web Server Communication
-  Future<void> _sendToWebServer() async {
+  Future<void> _sendToWebServer(int stepsData) async {
     String? token = await msgController.getToken();
 
     WebServerCommunication communication = WebServerCommunication(
-      steps: _steps.toString(),
+      steps: stepsData.toString(),
       currentAddress: currentAddress,
       token: token,
       currentPosition: currentPosition.toString(),
     );
 
     await communication.toJson({
-      "steps": _steps.toString(),
+      "steps": stepsData.toString(),
       "currentAddress": currentAddress ?? "",
       "token": token ?? "",
       "currentPosition": currentPosition ?? "",
