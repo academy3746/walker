@@ -158,7 +158,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         //await locationInfo.debugStreaming();
 
         /// Get User Steps Count
-        _initPedometer();
+        await _initPedometer();
       } catch (e) {
         print(e);
       }
@@ -169,8 +169,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   /// Load Daily Steps Count
-  void _initPedometer() {
+  Future<void> _initPedometer() async {
     pedometerController.initPlatformState(context);
+
+    await _achieveDailySteps();
   }
 
   /// Update Steps Count
@@ -210,6 +212,23 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     });
   }
 
+  Future<void> _achieveDailySteps() async {
+    final now = DateTime.now();
+
+    final today = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    );
+
+    if (_steps >= 10000 && now.day != today.day) {
+      await msgController.sendInternalPush(
+        "축하드립니다!",
+        "🏃‍♀️ 오늘 하루 총 $_steps걸음 걸으셨네요!",
+      );
+    }
+  }
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -234,29 +253,31 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      appBar: kDebugMode ? AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Row(
-          children: [
-            const Icon(
-              Icons.directions_walk_rounded,
-              size: Sizes.size20,
-              color: Colors.black,
-            ),
-            Gaps.h5,
-            Text(
-              _status == "walking"
-                  ? "[$_steps걸음] 걷고 계시네요!"
-                  : "[$_steps걸음] 조금만 더 걸어 볼까요?",
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: Sizes.size16,
+      appBar: kDebugMode
+          ? AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              title: Row(
+                children: [
+                  const Icon(
+                    Icons.directions_walk_rounded,
+                    size: Sizes.size20,
+                    color: Colors.black,
+                  ),
+                  Gaps.h5,
+                  Text(
+                    _status == "walking"
+                        ? "[$_steps걸음] 걷고 계시네요!"
+                        : "[$_steps걸음] 조금만 더 걸어 볼까요?",
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: Sizes.size16,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
-      ) : null,
+            )
+          : null,
       body: Stack(
         children: [
           LayoutBuilder(
