@@ -32,11 +32,11 @@ class PedometerController {
   });
 
   void _onStepCount(StepCount event) {
-    int calculatedSteps = event.steps;
+    int streamSteps = event.steps;
 
-    onStepCountUpdate(calculatedSteps);
+    onStepCountUpdate(streamSteps);
 
-    print("Total Steps: $calculatedSteps");
+    print("Total Steps: $streamSteps");
   }
 
   void _onPedestrianStatusChanged(PedestrianStatus event) {
