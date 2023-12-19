@@ -17,8 +17,8 @@ class AppVersionHandler {
     print("App Version: $version");
 
     /// Version Management (Manually)
-    const String androidVersion = "1.0";
-    const String iosVersion = "1.0";
+    const String androidVersion = "1.0.0";
+    const String iosVersion = "1.0.0";
 
     if ((Platform.isAndroid && version != androidVersion) ||
         (Platform.isIOS && version != iosVersion)) {

@@ -11,16 +11,19 @@ class WebServerCommunication {
 
   String? currentPosition;
 
+  final String version;
+
   WebServerCommunication({
     required this.steps,
     this.currentAddress,
     this.token,
     this.currentPosition,
+    required this.version,
   });
 
   /// Send API to Web Server
   Future<void> toJson(Map<String, dynamic> data) async {
-    const String redirectUrl = "https://boolub.com/test/comm.php";
+    const String redirectUrl = "https://boolub.com/addons/app/comm.php";
 
     var response = await http.post(
       Uri.parse(redirectUrl),

@@ -20,6 +20,7 @@ import 'package:walker/common/widgets/permission_controller.dart';
 import 'package:walker/common/widgets/web_communication.dart';
 import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
+import 'package:package_info/package_info.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -71,6 +72,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// Initialize Home Button
   bool showFloatingActionButton = false;
+
+  /// App Version to send
+  String version = "";
 
   @override
   void initState() {
@@ -197,11 +201,15 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   Future<void> _sendToWebServer(int stepsData) async {
     String? token = await msgController.getToken();
 
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    version = packageInfo.version;
+
     WebServerCommunication communication = WebServerCommunication(
       steps: stepsData.toString(),
       currentAddress: currentAddress,
       token: token,
       currentPosition: currentPosition.toString(),
+      version: version,
     );
 
     await communication.toJson({
@@ -209,6 +217,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       "currentAddress": currentAddress ?? "",
       "token": token ?? "",
       "currentPosition": currentPosition ?? "",
+      "version": version,
     });
   }
 
