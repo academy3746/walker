@@ -13,12 +13,21 @@ class WebServerCommunication {
 
   final String version;
 
+  final String appId;
+
+  final String os;
+
+  final String agent;
+
   WebServerCommunication({
     required this.steps,
     this.currentAddress,
     this.token,
     this.currentPosition,
     required this.version,
+    required this.appId,
+    required this.os,
+    required this.agent,
   });
 
   /// Send API to Web Server

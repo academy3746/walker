@@ -36,6 +36,9 @@ dependencies:
   tosspayments_widget_sdk_flutter: ^1.0.2
   intl: ^0.18.1
   font_awesome_flutter: ^10.6.0
+  device_info_plus: ^9.1.1
+  android_id: ^0.3.6
+  fk_user_agent: ^2.1.0
 
 
 
