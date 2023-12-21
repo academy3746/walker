@@ -1,8 +1,6 @@
 // ignore_for_file: avoid_print, prefer_collection_literals, deprecated_member_use
 import 'dart:async';
 import 'dart:io';
-import 'package:android_id/android_id.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:fk_user_agent/fk_user_agent.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -20,6 +18,7 @@ import 'package:walker/common/widgets/fcm_controller.dart';
 import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
+import 'package:walker/common/widgets/user_info.dart';
 import 'package:walker/common/widgets/web_communication.dart';
 import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
@@ -79,6 +78,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// App Version to send
   String version = "";
 
+  /// Get Unique User Information
+  UserInfo userInfo = UserInfo();
+
   @override
   void initState() {
     super.initState();
@@ -88,7 +90,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       await FkUserAgent.init();
 
-      _getDevicePlatform();
+      userInfo.getDevicePlatform();
     });
 
     /// Improve Android Performance
@@ -206,57 +208,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     });
   }
 
-  /// Get Unique Device ID
-  Future<String> _getDeviceId() async {
-    var deviceIdentifier = "undefined";
-
-    var deviceInfo = DeviceInfoPlugin();
-
-    if (Platform.isAndroid) {
-      var androidInfo = const AndroidId();
-
-      String? androidId = await androidInfo.getId();
-
-      deviceIdentifier = androidId!;
-    } else if (Platform.isIOS) {
-      var iosInfo = await deviceInfo.iosInfo;
-
-      deviceIdentifier = iosInfo.identifierForVendor!;
-    } else if (kIsWeb) {
-      var webInfo = await deviceInfo.webBrowserInfo;
-
-      deviceIdentifier = webInfo.vendor! +
-          webInfo.userAgent! +
-          webInfo.hardwareConcurrency.toString();
-    }
-
-    return deviceIdentifier;
-  }
-
-  /// Get Device Platform
-  Future<String> _getDeviceOs() async {
-    var devicePlatform = "undefined";
-
-    if (Platform.isAndroid) {
-      devicePlatform = "android";
-    } else if (Platform.isIOS) {
-      devicePlatform = "ios";
-    } else if (kIsWeb) {
-      devicePlatform = "web";
-    }
-
-    return devicePlatform;
-  }
-
-  /// Get User Agent
-  Future<String> _getDevicePlatform() async {
-    var platformVersion = "undefined";
-
-    platformVersion = FkUserAgent.userAgent!;
-
-    return platformVersion;
-  }
-
   /// Web Server Communication
   Future<void> _sendToWebServer(int stepsData) async {
     String? token = await msgController.getToken();
@@ -264,11 +215,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     version = packageInfo.version;
 
-    String uuid = await _getDeviceId();
+    String uuid = await userInfo.getDeviceId();
 
-    String os = await _getDeviceOs();
+    String os = await userInfo.getDeviceOs();
 
-    String agent = await _getDevicePlatform();
+    String agent = await userInfo.getDevicePlatform();
 
     WebServerCommunication communication = WebServerCommunication(
       steps: stepsData.toString(),
