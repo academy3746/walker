@@ -32,7 +32,8 @@ class WebServerCommunication {
 
   /// Send API to Web Server
   Future<void> toJson(Map<String, dynamic> data) async {
-    const String redirectUrl = "https://boolub.com/addons/app/comm.php";
+    const String redirectUrl =
+        "https://boolub.com/addons/app/request/pushUpdate.php";
 
     var response = await http.post(
       Uri.parse(redirectUrl),
