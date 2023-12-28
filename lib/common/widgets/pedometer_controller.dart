@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PedometerController {
   /// 총 걸음수 구독
@@ -31,12 +32,44 @@ class PedometerController {
     required this.onPedestrianStatusUpdate,
   });
 
-  void _onStepCount(StepCount event) {
-    int streamSteps = event.steps;
+  Future<void> _onStepCount(StepCount event) async {
+    var currentSteps = event.steps;
 
-    onStepCountUpdate(streamSteps);
+    var now = DateTime.now();
 
-    print("Total Steps: $streamSteps");
+    var endOfDay = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      23,
+      59,
+      59,
+    );
+
+    onStepCountUpdate(currentSteps);
+
+    print("Current Steps: $currentSteps");
+
+    if (now.isAtSameMomentAs(endOfDay)) {
+      await _saveTodaySeps(
+        savedSteps: currentSteps,
+        savedDatetime: now.millisecondsSinceEpoch,
+      );
+
+      print("오늘의 총 걸음수: $currentSteps");
+      print("마지막 저장 시간: $now");
+    }
+  }
+
+  Future<void> _saveTodaySeps({
+    required int savedSteps,
+    required int savedDatetime,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setInt("savedSteps", savedSteps);
+
+    await prefs.setInt("savedDatetime", savedDatetime);
   }
 
   void _onPedestrianStatusChanged(PedestrianStatus event) {
