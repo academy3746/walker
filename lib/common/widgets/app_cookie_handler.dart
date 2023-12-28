@@ -6,9 +6,13 @@ import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 class AppCookieHandler {
   final WebviewCookieManager _cookieManager = WebviewCookieManager();
+
   final String _cookieValue = "cookieValue";
+
   final String _domain;
+
   final String _cookieName = "cookieName";
+
   final String _url;
 
   AppCookieHandler(
