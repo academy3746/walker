@@ -10,6 +10,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:pedometer/pedometer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tosspayments_widget_sdk_flutter/model/tosspayments_url.dart';
 import 'package:walker/common/widgets/app_cookie_handler.dart';
 import 'package:walker/common/widgets/app_version_check_handler.dart';
@@ -70,7 +71,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   late PedometerController pedometerController;
   String _status = "";
   int _steps = 0;
-  int _totalSteps = 0;
+  int _currentSteps = 0;
 
   /// Initialize Home Button
   bool showFloatingActionButton = false;
@@ -191,11 +192,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   /// Update Steps Count
-  Future<void> _onStepCountUpdate(int calculatedSteps) async {
-    _totalSteps = calculatedSteps;
+  Future<void> _onStepCountUpdate(int streamingSteps) async {
+    _currentSteps = streamingSteps;
 
     setState(() {
-      _steps = _totalSteps;
+      _steps = _currentSteps;
     });
 
     await _sendToWebServer(_steps);
@@ -221,8 +222,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     String agent = await userInfo.getDevicePlatform();
 
+    final prefs = await SharedPreferences.getInstance();
+    var savedSteps = prefs.getInt("savedSteps") ?? 0;
+    var savedDatetime = prefs.getInt("savedDatetime") ?? 0;
+
     WebServerCommunication communication = WebServerCommunication(
-      steps: stepsData.toString(),
+      currentSteps: stepsData.toString(),
       currentAddress: currentAddress,
       token: token,
       currentPosition: currentPosition.toString(),
@@ -230,10 +235,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       appId: uuid,
       os: os,
       agent: agent,
+      savedSteps: savedSteps,
+      savedDatetime: savedDatetime,
     );
 
     await communication.toJson({
-      "steps": stepsData.toString(),
+      "currentSteps": stepsData.toString(),
       "currentAddress": currentAddress ?? "",
       "token": token ?? "",
       "currentPosition": currentPosition ?? "",
@@ -241,6 +248,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       "appId": uuid,
       "os": os,
       "agent": agent,
+      "savedSteps": savedSteps,
+      "savedDatetime": savedDatetime,
     });
   }
 

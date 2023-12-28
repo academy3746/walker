@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class WebServerCommunication {
-  final String steps;
+  final String currentSteps;
 
   String? currentAddress;
 
@@ -19,8 +19,12 @@ class WebServerCommunication {
 
   final String agent;
 
+  int? savedSteps;
+
+  int? savedDatetime;
+
   WebServerCommunication({
-    required this.steps,
+    required this.currentSteps,
     this.currentAddress,
     this.token,
     this.currentPosition,
@@ -28,6 +32,8 @@ class WebServerCommunication {
     required this.appId,
     required this.os,
     required this.agent,
+    this.savedSteps,
+    this.savedDatetime,
   });
 
   /// Send API to Web Server

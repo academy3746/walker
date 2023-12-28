@@ -36,7 +36,6 @@ class PedometerController {
     var currentSteps = event.steps;
 
     var now = DateTime.now();
-
     var endOfDay = DateTime(
       now.year,
       now.month,
@@ -48,16 +47,13 @@ class PedometerController {
 
     onStepCountUpdate(currentSteps);
 
-    print("Current Steps: $currentSteps");
+    print("Now Walking: $currentSteps");
 
     if (now.isAtSameMomentAs(endOfDay)) {
       await _saveTodaySeps(
         savedSteps: currentSteps,
         savedDatetime: now.millisecondsSinceEpoch,
       );
-
-      print("오늘의 총 걸음수: $currentSteps");
-      print("마지막 저장 시간: $now");
     }
   }
 
