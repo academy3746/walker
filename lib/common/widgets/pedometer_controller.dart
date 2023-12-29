@@ -38,6 +38,13 @@ class PedometerController {
     onStepCountUpdate(currentSteps);
 
     print("Now Walking: $currentSteps");
+
+    final prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getInt("savedSteps") == 0 ||
+        prefs.getInt("initialSteps") == null) {
+      await prefs.setInt("initialSteps", currentSteps);
+    }
   }
 
   Future<void> _saveTodaySeps() async {
@@ -50,9 +57,6 @@ class PedometerController {
     await prefs.setInt("savedSteps", savedSteps);
 
     await prefs.setInt("savedDatetime", savedDatetime);
-
-    print("Today Total Steps: $savedSteps");
-    print("Last Saved Datetime: $savedDatetime");
   }
 
   void _onPedestrianStatusChanged(PedestrianStatus event) {
@@ -71,7 +75,7 @@ class PedometerController {
     print('onStepCountError: $error');
   }
 
-  void initPlatformState(BuildContext context) {
+  Future<void> initPlatformState(BuildContext context) async {
     stepCountStream = Pedometer.stepCountStream;
 
     pedestrianStatusStream = Pedometer.pedestrianStatusStream;
@@ -82,8 +86,34 @@ class PedometerController {
 
     stepCountStream.listen(_onStepCount).onError(_onStepCountError);
 
-    Timer.periodic(const Duration(days: 1), (t) => _saveTodaySeps());
+    /*Timer.periodic(
+      const Duration(days: 1),
+      (timer) async => await _saveTodaySeps(),
+    );*/
+
+    await _initTimer();
 
     if (!context.mounted) return;
+  }
+
+  Future<void> _initTimer() async {
+    var now = DateTime.now();
+
+    var nextMidnight = DateTime(
+      now.year,
+      now.month,
+      now.day + 1,
+    );
+
+    var initDelay = nextMidnight.difference(now);
+
+    Timer(initDelay, () async {
+      await _saveTodaySeps();
+
+      Timer.periodic(
+        const Duration(days: 1),
+        (timer) async => await _saveTodaySeps(),
+      );
+    });
   }
 }

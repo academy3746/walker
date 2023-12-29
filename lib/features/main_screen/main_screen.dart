@@ -74,6 +74,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   int _currentSteps = 0;
   int _savedSteps = 0;
   int _nowWalking = 0;
+  int _initialSteps = 0;
 
   /// Initialize Home Button
   bool showFloatingActionButton = false;
@@ -219,18 +220,25 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     version = packageInfo.version;
 
     String uuid = await userInfo.getDeviceId();
-
     String os = await userInfo.getDeviceOs();
-
     String agent = await userInfo.getDevicePlatform();
 
     final prefs = await SharedPreferences.getInstance();
-    _savedSteps = prefs.getInt("savedSteps")!;
-    var savedDatetime = prefs.getInt("savedDatetime")!;
 
-    setState(() {
-      _nowWalking = _steps - _savedSteps;
-    });
+    _savedSteps = prefs.getInt("savedSteps") ?? 0;
+    var savedDatetime = prefs.getInt("savedDatetime") ?? 0;
+
+    _initialSteps = prefs.getInt("initialSteps")!;
+
+    if (_savedSteps == 0) {
+      setState(() {
+        _nowWalking = _steps - _initialSteps;
+      });
+    } else {
+      setState(() {
+        _nowWalking = _steps - _savedSteps;
+      });
+    }
 
     WebServerCommunication communication = WebServerCommunication(
       currentSteps: stepsData,
@@ -270,10 +278,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       now.day,
     );
 
-    if (_savedSteps >= 10000 && now.day != today.day) {
+    if (_nowWalking >= 10000 && now.day != today.day) {
       await msgController.sendInternalPush(
         "축하드립니다!",
-        "🏃‍♀️ 오늘 하루 총 $_savedSteps걸음 걸으셨네요!",
+        "🏃‍♀️ 오늘 하루 총 $_nowWalking걸음 걸으셨네요!",
       );
     }
   }
