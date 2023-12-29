@@ -225,8 +225,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     String agent = await userInfo.getDevicePlatform();
 
     final prefs = await SharedPreferences.getInstance();
-    _savedSteps = prefs.getInt("savedSteps") ?? 0;
-    var savedDatetime = prefs.getInt("savedDatetime") ?? 0;
+    _savedSteps = prefs.getInt("savedSteps")!;
+    var savedDatetime = prefs.getInt("savedDatetime")!;
 
     setState(() {
       _nowWalking = _steps - _savedSteps;
