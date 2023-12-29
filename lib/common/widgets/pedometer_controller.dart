@@ -81,7 +81,7 @@ class PedometerController {
   }
 
   /// Pedometer Controller 초기화
-  Future<void> initPlatformState(BuildContext context) async {
+  void initPlatformState(BuildContext context) {
     stepCountStream = Pedometer.stepCountStream;
 
     pedestrianStatusStream = Pedometer.pedestrianStatusStream;
@@ -92,29 +92,24 @@ class PedometerController {
 
     stepCountStream.listen(_onStepCount).onError(_onStepCountError);
 
-    /*Timer.periodic(
-      const Duration(days: 1),
-      (timer) async => await _saveTodaySeps(),
-    );*/
-
-    await _initTimer();
+    _initDailyTimer();
 
     if (!context.mounted) return;
   }
 
-  /// Reset Timer (일일 단위)
-  Future<void> _initTimer() async {
+  /// Timer Reset (일일 단위)
+  Future<void> _initDailyTimer() async {
     var now = DateTime.now();
 
-    var nextMidnight = DateTime(
+    var midnight = DateTime(
       now.year,
       now.month,
       now.day + 1,
     );
 
-    var initDelay = nextMidnight.difference(now);
+    var initialDelay = midnight.difference(now);
 
-    Timer(initDelay, () async {
+    Timer(initialDelay, () async {
       await _saveTodaySeps();
 
       Timer.periodic(
