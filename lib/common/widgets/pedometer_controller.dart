@@ -5,7 +5,7 @@ import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PedometerController {
-  /// 총 걸음수 구독
+  /// 걸음수 구독
   Stream<StepCount> stepCountStream;
 
   /// 운동 상태 구독
@@ -32,6 +32,7 @@ class PedometerController {
     required this.onPedestrianStatusUpdate,
   });
 
+  /// 걸음수 구독 (Realtime)
   Future<void> _onStepCount(StepCount event) async {
     currentSteps = event.steps;
 
@@ -47,6 +48,7 @@ class PedometerController {
     }
   }
 
+  /// 걸음수 저장 (일일 단위)
   Future<void> _saveTodaySeps() async {
     int savedSteps = currentSteps;
 
@@ -59,6 +61,7 @@ class PedometerController {
     await prefs.setInt("savedDatetime", savedDatetime);
   }
 
+  /// 운동 상태 감지 이벤트
   void _onPedestrianStatusChanged(PedestrianStatus event) {
     status = event.status;
 
@@ -67,14 +70,17 @@ class PedometerController {
     print("운동 상태: ${event.status}");
   }
 
+  /// 운동 상태 에러 헨들링
   void _onPedestrianStatusError(error) {
     print('onPedestrianStatusError: $error');
   }
 
+  /// 걸음 수 구독 에러 헨들링
   void _onStepCountError(error) {
     print('onStepCountError: $error');
   }
 
+  /// Pedometer Controller 초기화
   Future<void> initPlatformState(BuildContext context) async {
     stepCountStream = Pedometer.stepCountStream;
 
@@ -96,6 +102,7 @@ class PedometerController {
     if (!context.mounted) return;
   }
 
+  /// Reset Timer (일일 단위)
   Future<void> _initTimer() async {
     var now = DateTime.now();
 

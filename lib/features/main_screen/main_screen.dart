@@ -77,14 +77,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   int _nowWalking = 0;
   int _initialSteps = 0;
 
-  /// Initialize Home Button
-  bool showFloatingActionButton = false;
-
-  /// App Version to send
-  String version = "";
 
   /// Get Unique User Information
   UserInfo userInfo = UserInfo();
+
+  /// Initialize Home Button
+  bool showFloatingActionButton = false;
 
   @override
   void initState() {
@@ -213,17 +211,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     });
   }
 
-  /// Web Server Communication
-  Future<void> _sendToWebServer(int stepsData) async {
-    String? token = await msgController.getToken();
-
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    version = packageInfo.version;
-
-    String uuid = await userInfo.getDeviceId();
-    String os = await userInfo.getDeviceOs();
-    String agent = await userInfo.getDevicePlatform();
-
+  /// 일일 걸음수 관리
+  Future<int> _todaySteps() async {
     final prefs = await SharedPreferences.getInstance();
     _savedSteps = prefs.getInt("savedSteps") ?? 0;
     _savedDatetime = prefs.getInt("savedDatetime") ?? 0;
@@ -239,12 +228,28 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       });
     }
 
+    return _nowWalking;
+  }
+
+  /// Web Server Communication
+  Future<void> _sendToWebServer(int stepsData) async {
+    String? token = await msgController.getToken();
+
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    var appVersion = packageInfo.version;
+
+    String uuid = await userInfo.getDeviceId();
+    String os = await userInfo.getDeviceOs();
+    String agent = await userInfo.getDevicePlatform();
+
+    await _todaySteps();
+
     WebServerCommunication communication = WebServerCommunication(
       currentSteps: stepsData,
       currentAddress: currentAddress,
       token: token,
       currentPosition: currentPosition.toString(),
-      version: version,
+      version: appVersion,
       appId: uuid,
       os: os,
       agent: agent,
@@ -258,7 +263,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       "currentAddress": currentAddress ?? "",
       "token": token ?? "",
       "currentPosition": currentPosition ?? "",
-      "version": version,
+      "version": appVersion,
       "appId": uuid,
       "os": os,
       "agent": agent,
@@ -268,6 +273,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     });
   }
 
+  /// 1만 걸음 달성 이벤트
   Future<void> _achieveDailySteps() async {
     final now = DateTime.now();
 
