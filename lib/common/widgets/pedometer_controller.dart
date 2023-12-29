@@ -14,8 +14,8 @@ class PedometerController {
   /// 운동 상태
   String status;
 
-  /// 총 걸음수
-  int steps;
+  /// 현재 걸음수
+  int currentSteps = 0;
 
   /// 걸음 수 업데이트
   final Function(int) onStepCountUpdate;
@@ -27,45 +27,32 @@ class PedometerController {
     required this.stepCountStream,
     required this.pedestrianStatusStream,
     required this.status,
-    required this.steps,
+    required this.currentSteps,
     required this.onStepCountUpdate,
     required this.onPedestrianStatusUpdate,
   });
 
   Future<void> _onStepCount(StepCount event) async {
-    var currentSteps = event.steps;
-
-    var now = DateTime.now();
-    var endOfDay = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      23,
-      59,
-      59,
-    );
+    currentSteps = event.steps;
 
     onStepCountUpdate(currentSteps);
 
     print("Now Walking: $currentSteps");
-
-    if (now.isAtSameMomentAs(endOfDay)) {
-      await _saveTodaySeps(
-        savedSteps: currentSteps,
-        savedDatetime: now.millisecondsSinceEpoch,
-      );
-    }
   }
 
-  Future<void> _saveTodaySeps({
-    required int savedSteps,
-    required int savedDatetime,
-  }) async {
+  Future<void> _saveTodaySeps() async {
+    int savedSteps = currentSteps;
+
+    var savedDatetime = DateTime.now().millisecondsSinceEpoch;
+
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setInt("savedSteps", savedSteps);
 
     await prefs.setInt("savedDatetime", savedDatetime);
+
+    print("Today Total Steps: $savedSteps");
+    print("Last Saved Datetime: $savedDatetime");
   }
 
   void _onPedestrianStatusChanged(PedestrianStatus event) {
@@ -94,6 +81,8 @@ class PedometerController {
         .onError(_onPedestrianStatusError);
 
     stepCountStream.listen(_onStepCount).onError(_onStepCountError);
+
+    Timer.periodic(const Duration(days: 1), (t) => _saveTodaySeps());
 
     if (!context.mounted) return;
   }

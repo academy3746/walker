@@ -72,6 +72,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   String _status = "";
   int _steps = 0;
   int _currentSteps = 0;
+  int _savedSteps = 0;
+  int _nowWalking = 0;
 
   /// Initialize Home Button
   bool showFloatingActionButton = false;
@@ -126,7 +128,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       stepCountStream: Pedometer.stepCountStream,
       pedestrianStatusStream: Pedometer.pedestrianStatusStream,
       status: _status,
-      steps: _steps,
+      currentSteps: _steps,
       onStepCountUpdate: _onStepCountUpdate,
       onPedestrianStatusUpdate: _onPedestrianStatusUpdate,
     );
@@ -223,11 +225,15 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     String agent = await userInfo.getDevicePlatform();
 
     final prefs = await SharedPreferences.getInstance();
-    var savedSteps = prefs.getInt("savedSteps") ?? 0;
+    _savedSteps = prefs.getInt("savedSteps") ?? 0;
     var savedDatetime = prefs.getInt("savedDatetime") ?? 0;
 
+    setState(() {
+      _nowWalking = _steps - _savedSteps;
+    });
+
     WebServerCommunication communication = WebServerCommunication(
-      currentSteps: stepsData.toString(),
+      currentSteps: stepsData,
       currentAddress: currentAddress,
       token: token,
       currentPosition: currentPosition.toString(),
@@ -235,12 +241,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       appId: uuid,
       os: os,
       agent: agent,
-      savedSteps: savedSteps,
+      savedSteps: _savedSteps,
       savedDatetime: savedDatetime,
+      todaySteps: _nowWalking
     );
 
     await communication.toJson({
-      "currentSteps": stepsData.toString(),
+      "currentSteps": stepsData,
       "currentAddress": currentAddress ?? "",
       "token": token ?? "",
       "currentPosition": currentPosition ?? "",
@@ -248,8 +255,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       "appId": uuid,
       "os": os,
       "agent": agent,
-      "savedSteps": savedSteps,
+      "savedSteps": _savedSteps,
       "savedDatetime": savedDatetime,
+      "todaySteps": _nowWalking,
     });
   }
 
@@ -262,10 +270,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       now.day,
     );
 
-    if (_steps >= 10000 && now.day != today.day) {
+    if (_savedSteps >= 10000 && now.day != today.day) {
       await msgController.sendInternalPush(
         "축하드립니다!",
-        "🏃‍♀️ 오늘 하루 총 $_steps걸음 걸으셨네요!",
+        "🏃‍♀️ 오늘 하루 총 $_savedSteps걸음 걸으셨네요!",
       );
     }
   }
@@ -308,8 +316,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                   Gaps.h5,
                   Text(
                     _status == "walking"
-                        ? "[$_steps걸음] 걷고 계시네요!"
-                        : "[$_steps걸음] 조금만 더 걸어 볼까요?",
+                        ? "[$_nowWalking걸음] 걷고 계시네요!"
+                        : "[$_nowWalking걸음] 조금만 더 걸어 볼까요?",
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: Sizes.size16,
