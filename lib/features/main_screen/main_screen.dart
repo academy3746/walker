@@ -214,8 +214,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// 일일 걸음수 관리
   Future<int> _todaySteps() async {
     final prefs = await SharedPreferences.getInstance();
+
     _savedSteps = prefs.getInt("savedSteps") ?? 0;
+
     _savedDatetime = prefs.getInt("savedDatetime") ?? 0;
+
     _initialSteps = prefs.getInt("initialSteps")!;
 
     if (_savedSteps == 0) {
