@@ -73,6 +73,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   int _steps = 0;
   int _currentSteps = 0;
   int _savedSteps = 0;
+  int _savedDatetime = 0;
   int _nowWalking = 0;
   int _initialSteps = 0;
 
@@ -224,10 +225,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     String agent = await userInfo.getDevicePlatform();
 
     final prefs = await SharedPreferences.getInstance();
-
     _savedSteps = prefs.getInt("savedSteps") ?? 0;
-    var savedDatetime = prefs.getInt("savedDatetime") ?? 0;
-
+    _savedDatetime = prefs.getInt("savedDatetime") ?? 0;
     _initialSteps = prefs.getInt("initialSteps")!;
 
     if (_savedSteps == 0) {
@@ -250,7 +249,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       os: os,
       agent: agent,
       savedSteps: _savedSteps,
-      savedDatetime: savedDatetime,
+      savedDatetime: _savedDatetime,
       todaySteps: _nowWalking
     );
 
@@ -264,7 +263,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       "os": os,
       "agent": agent,
       "savedSteps": _savedSteps,
-      "savedDatetime": savedDatetime,
+      "savedDatetime": _savedDatetime,
       "todaySteps": _nowWalking,
     });
   }
