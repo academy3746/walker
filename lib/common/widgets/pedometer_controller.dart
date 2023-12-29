@@ -81,7 +81,7 @@ class PedometerController {
   }
 
   /// Pedometer Controller 초기화
-  void initPlatformState(BuildContext context) {
+  Future<void> initPlatformState(BuildContext context) async {
     stepCountStream = Pedometer.stepCountStream;
 
     pedestrianStatusStream = Pedometer.pedestrianStatusStream;
@@ -92,7 +92,7 @@ class PedometerController {
 
     stepCountStream.listen(_onStepCount).onError(_onStepCountError);
 
-    _initDailyTimer();
+    await _initDailyTimer();
 
     if (!context.mounted) return;
   }
