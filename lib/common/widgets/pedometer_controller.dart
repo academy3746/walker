@@ -49,7 +49,7 @@ class PedometerController {
   }
 
   /// 걸음수 저장 (일일 단위)
-  Future<void> _saveTodaySeps() async {
+  Future<void> _saveTodaySteps() async {
     int savedSteps = currentSteps;
 
     var savedDatetime = DateTime.now().millisecondsSinceEpoch;
@@ -110,11 +110,11 @@ class PedometerController {
     var initialDelay = midnight.difference(now);
 
     Timer(initialDelay, () async {
-      await _saveTodaySeps();
+      await _saveTodaySteps();
 
       Timer.periodic(
         const Duration(days: 1),
-        (timer) async => await _saveTodaySeps(),
+        (timer) async => await _saveTodaySteps(),
       );
     });
   }
