@@ -275,15 +275,15 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// 1만 걸음 달성 이벤트
   Future<void> _achieveDailySteps() async {
-    final now = DateTime.now();
+    var now = DateTime.now();
 
-    final today = DateTime(
+    var nextMidnight = DateTime(
       now.year,
       now.month,
-      now.day,
+      now.day + 1,
     );
 
-    if (_nowWalking >= 10000 && now.day != today.day) {
+    if (_nowWalking >= 10000 && now.isAtSameMomentAs(nextMidnight)) {
       await msgController.sendInternalPush(
         "축하드립니다!",
         "🏃‍♀️ 오늘 하루 총 $_nowWalking걸음 걸으셨네요!",

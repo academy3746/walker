@@ -38,7 +38,7 @@ class PedometerController {
 
     onStepCountUpdate(currentSteps);
 
-    print("Now Walking: $currentSteps");
+    print("Streaming Steps Count: $currentSteps");
 
     final prefs = await SharedPreferences.getInstance();
 
@@ -106,13 +106,13 @@ class PedometerController {
   Future<void> _initDailyTimer() async {
     var now = DateTime.now();
 
-    var midnight = DateTime(
+    var afterMidnight = DateTime(
       now.year,
       now.month,
       now.day + 1,
     );
 
-    var initialDelay = midnight.difference(now);
+    var initialDelay = afterMidnight.difference(now);
 
     Timer(initialDelay, () async {
       await _saveTodaySteps();
