@@ -42,9 +42,14 @@ class PedometerController {
 
     final prefs = await SharedPreferences.getInstance();
 
-    if (prefs.getInt("savedSteps") == 0 ||
-        prefs.getInt("initialSteps") == null) {
+    if (prefs.getInt("initialSteps") == null) {
       await prefs.setInt("initialSteps", currentSteps);
+    } else if (prefs.getInt("initialSteps") != null) {
+      var initialSteps = prefs.getInt("initialSteps") ?? 0;
+
+      var newSteps = currentSteps - initialSteps;
+
+      await prefs.setInt("newSteps", newSteps);
     }
   }
 

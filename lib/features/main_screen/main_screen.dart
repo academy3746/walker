@@ -76,7 +76,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   int _savedDatetime = 0;
   int _nowWalking = 0;
   int _initialSteps = 0;
-
+  int _newSteps = 0;
 
   /// Get Unique User Information
   UserInfo userInfo = UserInfo();
@@ -225,15 +225,22 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     final prefs = await SharedPreferences.getInstance();
     _savedSteps = prefs.getInt("savedSteps") ?? 0;
     _savedDatetime = prefs.getInt("savedDatetime") ?? 0;
-    _initialSteps = prefs.getInt("initialSteps")!;
+    _initialSteps = prefs.getInt("initialSteps") ?? 0;
+    _newSteps = prefs.getInt("newSteps") ?? 0;
 
-    if (_savedSteps == 0) {
-      setState(() {
-        _nowWalking = _steps - _initialSteps;
-      });
+    if (_initialSteps != 0) {
+      if (_savedSteps == 0) {
+        setState(() {
+          _nowWalking = _steps - _initialSteps;
+        });
+      } else {
+        setState(() {
+          _nowWalking = _steps - _savedSteps;
+        });
+      }
     } else {
       setState(() {
-        _nowWalking = _steps - _savedSteps;
+        _nowWalking = _newSteps;
       });
     }
 
@@ -248,7 +255,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       agent: agent,
       savedSteps: _savedSteps,
       savedDatetime: _savedDatetime,
-      todaySteps: _nowWalking
+      todaySteps: _nowWalking,
     );
 
     await communication.toJson({
