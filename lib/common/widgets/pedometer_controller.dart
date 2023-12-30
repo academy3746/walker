@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:walker/common/widgets/fcm_controller.dart';
 
 class PedometerController {
   /// 걸음수 구독
@@ -23,8 +22,6 @@ class PedometerController {
 
   /// 운동 상태 업데이트
   final Function(String) onPedestrianStatusUpdate;
-
-  final MsgController msgController = MsgController();
 
   PedometerController({
     required this.stepCountStream,
