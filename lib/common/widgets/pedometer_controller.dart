@@ -61,9 +61,19 @@ class PedometerController {
 
     final prefs = await SharedPreferences.getInstance();
 
-    await prefs.setInt("savedSteps", savedSteps);
+    var now = DateTime.now();
 
-    await prefs.setInt("savedDatetime", savedDatetime);
+    var nextMidnight = DateTime(
+      now.year,
+      now.month,
+      now.day + 1,
+    );
+
+    if (now.isAtSameMomentAs(nextMidnight) || now.isAfter(nextMidnight)) {
+      await prefs.setInt("savedSteps", savedSteps);
+
+      await prefs.setInt("savedDatetime", savedDatetime);
+    }
   }
 
   /// 운동 상태 감지 이벤트
