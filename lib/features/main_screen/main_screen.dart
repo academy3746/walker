@@ -269,7 +269,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     });
   }
 
-  /// 1만 걸음 달성 이벤트
+  /// 걸음수 알림 이벤트
   Future<void> _achieveDailySteps() async {
     var now = DateTime.now();
 
@@ -279,17 +279,25 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       now.day + 1,
     );
 
-    if (_nowWalking >= 10000 && now.isAtSameMomentAs(nextMidnight)) {
-      await msgController.sendInternalPush(
-        "축하드려요!",
-        "🏃‍♀️ 오늘 하루만 총 $_nowWalking걸음 걸으셨네요!",
-      );
-    } else if (now.isAtSameMomentAs(nextMidnight)) {
-      await msgController.sendInternalPush(
-        "수고하셨어요!",
-        "🏃‍♀️ 오늘 하루 총 $_nowWalking걸음 걸으셨네요!",
-      );
-    }
+    var diff = nextMidnight.difference(now);
+
+    var inTime = diff.inHours;
+
+    var tomorrow = Duration(hours: inTime);
+
+    Timer(tomorrow, () async {
+      if (_nowWalking >= 10000) {
+        await msgController.sendInternalPush(
+          "축하드려요!",
+          "🏃‍♀️ 오늘 하루 총 $_nowWalking걸음 걸으셨네요!",
+        );
+      } else {
+        await msgController.sendInternalPush(
+          "수고하셨어요!",
+          "🏃‍♀️ 오늘 하루 총 $_nowWalking걸음 걸으셨네요!",
+        );
+      }
+    });
   }
 
   @override

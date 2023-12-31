@@ -105,20 +105,20 @@ class PedometerController {
   Future<void> _initDailyTimer() async {
     var now = DateTime.now();
 
-    var afterMidnight = DateTime(
+    var nextMidnight = DateTime(
       now.year,
       now.month,
       now.day + 1,
     );
 
-    var initialDelay = afterMidnight.difference(now);
+    var diff = nextMidnight.difference(now);
 
-    //var debugTime = const Duration(minutes: 3);
+    var inTime = diff.inHours;
 
-    Timer(initialDelay, () async {
+    var tomorrow = Duration(hours: inTime);
+
+    Timer(tomorrow, () async {
       await _saveTodaySteps();
-
-      //print("일일 걸음수 리셋!");
     });
   }
 }
