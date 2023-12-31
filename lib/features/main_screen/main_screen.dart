@@ -73,7 +73,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   int _steps = 0;
   int _currentSteps = 0;
   int _savedSteps = 0;
-  int _savedDatetime = 0;
   int _nowWalking = 0;
   int _initialSteps = 0;
   int _newSteps = 0;
@@ -224,7 +223,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     final prefs = await SharedPreferences.getInstance();
     _savedSteps = prefs.getInt("savedSteps") ?? 0;
-    _savedDatetime = prefs.getInt("savedDatetime") ?? 0;
     _initialSteps = prefs.getInt("initialSteps") ?? 0;
     _newSteps = prefs.getInt("newSteps") ?? 0;
 
@@ -254,7 +252,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       os: os,
       agent: agent,
       savedSteps: _savedSteps,
-      savedDatetime: _savedDatetime,
       todaySteps: _nowWalking,
     );
 
@@ -268,7 +265,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       "os": os,
       "agent": agent,
       "savedSteps": _savedSteps,
-      "savedDatetime": _savedDatetime,
       "todaySteps": _nowWalking,
     });
   }
@@ -285,7 +281,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     if (_nowWalking >= 10000 && now.isAtSameMomentAs(nextMidnight)) {
       await msgController.sendInternalPush(
-        "축하드립니다!",
+        "축하드려요!",
+        "🏃‍♀️ 오늘 하루만 총 $_nowWalking걸음 걸으셨네요!",
+      );
+    } else if (now.isAtSameMomentAs(nextMidnight)) {
+      await msgController.sendInternalPush(
+        "수고하셨어요!",
         "🏃‍♀️ 오늘 하루 총 $_nowWalking걸음 걸으셨네요!",
       );
     }

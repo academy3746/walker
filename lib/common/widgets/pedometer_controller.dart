@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:walker/common/widgets/fcm_controller.dart';
 
 class PedometerController {
   /// 걸음수 구독
@@ -15,13 +16,15 @@ class PedometerController {
   String status;
 
   /// 현재 걸음수
-  int currentSteps = 0;
+  int currentSteps;
 
   /// 걸음 수 업데이트
   final Function(int) onStepCountUpdate;
 
   /// 운동 상태 업데이트
   final Function(String) onPedestrianStatusUpdate;
+
+  final MsgController msgController = MsgController();
 
   PedometerController({
     required this.stepCountStream,
@@ -57,13 +60,9 @@ class PedometerController {
   Future<void> _saveTodaySteps() async {
     int savedSteps = currentSteps;
 
-    var savedDatetime = DateTime.now().millisecondsSinceEpoch;
-
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setInt("savedSteps", savedSteps);
-
-    await prefs.setInt("savedDatetime", savedDatetime);
   }
 
   /// 운동 상태 감지 이벤트
@@ -114,8 +113,12 @@ class PedometerController {
 
     var initialDelay = afterMidnight.difference(now);
 
+    //var debugTime = const Duration(minutes: 3);
+
     Timer(initialDelay, () async {
       await _saveTodaySteps();
+
+      //print("일일 걸음수 리셋!");
     });
   }
 }

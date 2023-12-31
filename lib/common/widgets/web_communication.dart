@@ -21,8 +21,6 @@ class WebServerCommunication {
 
   int? savedSteps;
 
-  int? savedDatetime;
-
   int? todaySteps;
 
   WebServerCommunication({
@@ -35,7 +33,6 @@ class WebServerCommunication {
     required this.os,
     required this.agent,
     this.savedSteps,
-    this.savedDatetime,
     this.todaySteps,
   });
 
