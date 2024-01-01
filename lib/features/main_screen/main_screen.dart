@@ -288,12 +288,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     Timer(tomorrow, () async {
       if (_nowWalking >= 10000) {
         await msgController.sendInternalPush(
-          "축하드려요!",
+          "💕 축하드려요!",
           "🏃‍♀️ 오늘 하루 총 $_nowWalking걸음 걸으셨네요!",
         );
       } else {
         await msgController.sendInternalPush(
-          "수고하셨어요!",
+          "💕 수고하셨어요!",
           "🏃‍♀️ 오늘 하루 총 $_nowWalking걸음 걸으셨네요!",
         );
       }
