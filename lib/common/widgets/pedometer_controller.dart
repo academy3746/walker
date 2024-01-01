@@ -113,12 +113,14 @@ class PedometerController {
 
     var diff = nextMidnight.difference(now);
 
-    var inTime = diff.inHours;
+    var inTime = diff.inMilliseconds;
 
-    var tomorrow = Duration(hours: inTime);
+    var tomorrow = Duration(milliseconds: inTime);
 
     Timer(tomorrow, () async {
       await _saveTodaySteps();
+
+      print("걸음수 초기화: $now");
     });
   }
 }

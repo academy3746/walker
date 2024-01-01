@@ -281,18 +281,18 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     var diff = nextMidnight.difference(now);
 
-    var inTime = diff.inHours;
+    var inTime = diff.inMilliseconds;
 
-    var tomorrow = Duration(hours: inTime);
+    var tomorrow = Duration(milliseconds: inTime);
 
-    var title = _nowWalking >= 10000 ? "💕 축하드려요!" : "💕 수고하셨어요!";
-
-    Timer(tomorrow, () async {
-      await msgController.sendInternalPush(
-        title,
-        "🏃‍♀️ 오늘 하루 총 $_nowWalking걸음 걸으셨네요!",
-      );
-    });
+    if (_nowWalking >= 10000) {
+      Timer(tomorrow, () async {
+        await msgController.sendInternalPush(
+          "💕 축하드려요!",
+          "🏃‍♀️오늘 하루만 1만 걸음 이상 걸으셨네요! ",
+        );
+      });
+    }
   }
 
   @override
