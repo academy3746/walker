@@ -113,9 +113,11 @@ class PedometerController {
 
     var diff = nextMidnight.difference(now);
 
-    var inTime = diff.inMilliseconds;
+    var inTime = diff.inSeconds;
 
-    var tomorrow = Duration(milliseconds: inTime);
+    var tomorrow = Duration(seconds: inTime);
+
+    //var debugTime = const Duration(minutes: 1);
 
     Timer(tomorrow, () async {
       await _saveTodaySteps();
