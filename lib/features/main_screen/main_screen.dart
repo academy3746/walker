@@ -187,9 +187,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// Load Daily Steps Count
   Future<void> _initPedometer() async {
-    pedometerController.initPlatformState(context);
-
-    await _achieveDailySteps();
+    await pedometerController.initPlatformState(context);
   }
 
   /// Update Steps Count
@@ -269,32 +267,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     });
   }
 
-  /// 걸음수 알림 이벤트
-  Future<void> _achieveDailySteps() async {
-    var now = DateTime.now();
-
-    var nextMidnight = DateTime(
-      now.year,
-      now.month,
-      now.day + 1,
-    );
-
-    var diff = nextMidnight.difference(now);
-
-    var inTime = diff.inMilliseconds;
-
-    var tomorrow = Duration(milliseconds: inTime);
-
-    if (_nowWalking >= 10000) {
-      Timer(tomorrow, () async {
-        await msgController.sendInternalPush(
-          "💕 축하드려요!",
-          "🏃‍♀️오늘 하루만 1만 걸음 이상 걸으셨네요! ",
-        );
-      });
-    }
-  }
-
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -319,7 +291,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      appBar: kDebugMode
+      appBar: kDebugMode || kReleaseMode
           ? AppBar(
               backgroundColor: Colors.white,
               elevation: 0,
