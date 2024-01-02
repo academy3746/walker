@@ -187,7 +187,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// Load Daily Steps Count
   Future<void> _initPedometer() async {
-    await pedometerController.initPlatformState(context);
+    pedometerController.initPlatformState(context);
   }
 
   /// Update Steps Count
