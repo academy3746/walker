@@ -76,12 +76,12 @@ class PedometerController {
 
   /// 운동 상태 에러 헨들링
   void _onPedestrianStatusError(error) {
-    print('onPedestrianStatusError: $error');
+    print("onPedestrianStatusError: $error");
   }
 
   /// 걸음 수 구독 에러 헨들링
   void _onStepCountError(error) {
-    print('onStepCountError: $error');
+    print("onStepCountError: $error");
   }
 
   /// Pedometer Controller 초기화
@@ -111,11 +111,7 @@ class PedometerController {
       now.day + 1,
     );
 
-    var diff = nextMidnight.difference(now);
-
-    var inTime = diff.inSeconds;
-
-    var tomorrow = Duration(seconds: inTime);
+    var tomorrow = nextMidnight.difference(now);
 
     //var debugTime = const Duration(minutes: 1);
 
