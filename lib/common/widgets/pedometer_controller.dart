@@ -84,6 +84,16 @@ class PedometerController {
 
   /// Pedometer Controller 초기화
   Future<void> initPlatformState(BuildContext context) async {
+    stepCountStream = Pedometer.stepCountStream;
+
+    pedestrianStatusStream = Pedometer.pedestrianStatusStream;
+
+    pedestrianStatusStream
+        .listen(_onPedestrianStatusChanged)
+        .onError(_onPedestrianStatusError);
+
+    stepCountStream.listen(_onStepCount).onError(_onStepCountError);
+
     var now = DateTime.now();
 
     var midnight = DateTime(
@@ -93,6 +103,8 @@ class PedometerController {
     );
 
     var diff = midnight.difference(now).inMilliseconds;
+
+    await _initDailyTimer();
 
     await Workmanager().initialize(
       callbackDispatcher,
@@ -104,18 +116,6 @@ class PedometerController {
       "saveStepsTask",
       frequency: Duration(milliseconds: diff),
     );
-
-    stepCountStream = Pedometer.stepCountStream;
-
-    pedestrianStatusStream = Pedometer.pedestrianStatusStream;
-
-    pedestrianStatusStream
-        .listen(_onPedestrianStatusChanged)
-        .onError(_onPedestrianStatusError);
-
-    stepCountStream.listen(_onStepCount).onError(_onStepCountError);
-
-    await _initDailyTimer();
 
     if (!context.mounted) return;
   }
