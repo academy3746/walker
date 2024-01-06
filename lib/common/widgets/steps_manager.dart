@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
@@ -20,6 +22,8 @@ Future<void> callbackDispatcher() async {
   Workmanager().executeTask((taskName, inputData) async {
     if (now.isAfter(midnight)) {
       await prefs.setInt("savedSteps", currentSteps);
+
+      print("일일 걸음수 저장 및 초기화!");
     }
 
     return Future.value(true);
