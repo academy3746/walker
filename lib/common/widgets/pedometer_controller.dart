@@ -68,8 +68,6 @@ class PedometerController {
     await prefs.setInt("savedSteps", savedSteps);
 
     await prefs.setInt("savedTime", now);
-
-    await _pushEventTrigger();
   }
 
   /// 운동 상태 감지 이벤트
@@ -104,6 +102,8 @@ class PedometerController {
     stepCountStream.listen(_onStepCount).onError(_onStepCountError);
 
     await _initDailyTimer();
+
+    await _pushEventTrigger();
 
     if (!context.mounted) return;
   }
