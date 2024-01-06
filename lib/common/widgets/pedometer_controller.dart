@@ -24,6 +24,7 @@ class PedometerController {
   /// 운동 상태 업데이트
   final Function(String) onPedestrianStatusUpdate;
 
+  /// Push Event Flag
   final MsgController msgController = MsgController();
 
   PedometerController({
@@ -63,6 +64,8 @@ class PedometerController {
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setInt("savedSteps", savedSteps);
+
+    await _pushEventTrigger();
   }
 
   /// 운동 상태 감지 이벤트
@@ -103,16 +106,44 @@ class PedometerController {
 
   /// Timer Reset (일일 단위)
   Future<void> _initDailyTimer() async {
-    var resetToday = const Duration(
-      hours: 23,
-      minutes: 59,
-      seconds: 59,
+    var now = DateTime.now();
+
+    var midnight = DateTime(
+      now.year,
+      now.month,
+      now.day + 1,
     );
 
-    Timer(resetToday, () async {
+    var oneDay = midnight.difference(now).inMilliseconds;
+
+    var diff = Duration(milliseconds: oneDay);
+
+    Timer(diff, () async {
       await _saveTodaySteps();
 
-      print("걸음수 초기화!");
+      Timer.periodic(const Duration(days: 1), (timer) async {
+        await _saveTodaySteps();
+      });
     });
+  }
+
+  /// 1만 걸음 달성 Push Event
+  Future<void> _pushEventTrigger() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    var lastSavedSteps = prefs.getInt("savedSteps") ?? 0;
+
+    var dailySteps = currentSteps - lastSavedSteps;
+
+    await prefs.setInt("savedDailySteps", dailySteps);
+
+    var savedDailySteps = prefs.getInt("savedDailySteps") ?? 0;
+
+    if (savedDailySteps >= 10000) {
+      await msgController.sendInternalPush(
+        "축하드려요!",
+        "🏃‍♀️ 오늘 하루만 총 $savedDailySteps 걸음 걸으셨어요! 💕",
+      );
+    }
   }
 }
