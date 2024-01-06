@@ -44,7 +44,7 @@ class PedometerController {
   Future<void> _onStepCount(StepCount event) async {
     currentSteps = event.steps;
 
-    onStepCountUpdate(currentSteps);
+    await onStepCountUpdate(currentSteps);
 
     print("Streaming Steps Count: $currentSteps");
 
@@ -61,26 +61,6 @@ class PedometerController {
     }
 
     await _stepsOnBackground(currentSteps);
-  }
-
-  /// 걸음수 백그라운드 저장
-  Future<void> _stepsOnBackground(int steps) async {
-    var streamingSteps = stepsManager?.steps;
-
-    streamingSteps = steps;
-
-    final prefs = await SharedPreferences.getInstance();
-
-    await prefs.setInt("currentSteps", streamingSteps);
-  }
-
-  /// 걸음수 저장 (일일 단위)
-  Future<void> _saveTodaySteps() async {
-    var savedSteps = currentSteps;
-
-    final prefs = await SharedPreferences.getInstance();
-
-    await prefs.setInt("savedSteps", savedSteps);
   }
 
   /// 운동 상태 감지 이벤트
@@ -167,5 +147,25 @@ class PedometerController {
     if (now.isAfter(midnight)) {
       await _saveTodaySteps();
     }
+  }
+
+  /// 걸음수 저장 (일일 단위)
+  Future<void> _saveTodaySteps() async {
+    var savedSteps = currentSteps;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setInt("savedSteps", savedSteps);
+  }
+
+  /// 걸음수 백그라운드 저장
+  Future<void> _stepsOnBackground(int steps) async {
+    var streamingSteps = stepsManager?.steps;
+
+    streamingSteps = steps;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setInt("currentSteps", streamingSteps);
   }
 }
