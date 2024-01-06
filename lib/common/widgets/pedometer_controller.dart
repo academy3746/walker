@@ -108,7 +108,7 @@ class PedometerController {
 
     await Workmanager().initialize(
       callbackDispatcher,
-      isInDebugMode: true,
+      isInDebugMode: false,
     );
 
     await Workmanager().registerPeriodicTask(
