@@ -61,9 +61,13 @@ class PedometerController {
   Future<void> _saveTodaySteps() async {
     int savedSteps = currentSteps;
 
+    var now = DateTime.now().millisecondsSinceEpoch;
+
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setInt("savedSteps", savedSteps);
+
+    await prefs.setInt("savedTime", now);
 
     await _pushEventTrigger();
   }
