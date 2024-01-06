@@ -291,7 +291,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      appBar: kDebugMode || kReleaseMode
+      appBar: kDebugMode
           ? AppBar(
               backgroundColor: Colors.white,
               elevation: 0,
