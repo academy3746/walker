@@ -25,7 +25,7 @@ class PedometerController {
   /// 운동 상태 업데이트
   final Function(String) onPedestrianStatusUpdate;
 
-  /// 걸음수 저장 3안
+  /// 백그라운드 상태에서 걸음수 저장
   StepsManager? stepsManager;
 
   PedometerController({
@@ -84,6 +84,17 @@ class PedometerController {
 
   /// Pedometer Controller 초기화
   Future<void> initPlatformState(BuildContext context) async {
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: false,
+    );
+
+    await Workmanager().registerPeriodicTask(
+      "1",
+      "saveStepsTask",
+      frequency: const Duration(days: 1),
+    );
+
     stepCountStream = Pedometer.stepCountStream;
 
     pedestrianStatusStream = Pedometer.pedestrianStatusStream;
@@ -94,28 +105,7 @@ class PedometerController {
 
     stepCountStream.listen(_onStepCount).onError(_onStepCountError);
 
-    var now = DateTime.now();
-
-    var midnight = DateTime(
-      now.year,
-      now.month,
-      now.day + 1,
-    );
-
-    var diff = midnight.difference(now).inMilliseconds;
-
     await _initDailyTimer();
-
-    await Workmanager().initialize(
-      callbackDispatcher,
-      isInDebugMode: true,
-    );
-
-    await Workmanager().registerPeriodicTask(
-      "1",
-      "saveStepsTask",
-      frequency: Duration(milliseconds: diff),
-    );
 
     if (!context.mounted) return;
   }
@@ -134,22 +124,12 @@ class PedometerController {
 
     var diff = Duration(milliseconds: oneDay);
 
-    /// 걸음수 저장 1안
     Timer(diff, () async {
       await _saveTodaySteps();
-
-      Timer.periodic(const Duration(days: 1), (timer) async {
-        await _saveTodaySteps();
-      });
     });
-
-    /// 걸음수 저장 2안
-    if (now.isAfter(midnight)) {
-      await _saveTodaySteps();
-    }
   }
 
-  /// 걸음수 저장 (일일 단위)
+  /// 프그라운드 상태에서 걸음수 저장
   Future<void> _saveTodaySteps() async {
     var savedSteps = currentSteps;
 
@@ -160,12 +140,12 @@ class PedometerController {
 
   /// 걸음수 백그라운드 저장
   Future<void> _stepsOnBackground(int steps) async {
-    var streamingSteps = stepsManager?.steps;
+    stepsManager?.steps = steps;
 
-    streamingSteps = steps;
+    var streamingSteps = stepsManager?.steps;
 
     final prefs = await SharedPreferences.getInstance();
 
-    await prefs.setInt("currentSteps", streamingSteps);
+    await prefs.setInt("currentSteps", streamingSteps!);
   }
 }

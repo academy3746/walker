@@ -188,6 +188,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Load Daily Steps Count
   Future<void> _initPedometer() async {
     await pedometerController.initPlatformState(context);
+
+    await _achieveDailySteps();
   }
 
   /// Update Steps Count
@@ -229,15 +231,21 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         setState(() {
           _nowWalking = _steps - _initialSteps;
         });
+
+        await prefs.setInt("dailySteps", _nowWalking);
       } else {
         setState(() {
           _nowWalking = _steps - _savedSteps;
         });
+
+        await prefs.setInt("dailySteps", _nowWalking);
       }
     } else {
       setState(() {
         _nowWalking = _newSteps;
       });
+
+      await prefs.setInt("dailySteps", _nowWalking);
     }
 
     WebServerCommunication communication = WebServerCommunication(
@@ -265,6 +273,32 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       "savedSteps": _savedSteps,
       "todaySteps": _nowWalking,
     });
+  }
+
+  /// 1만 걸음 달성 이벤트
+  Future<void> _achieveDailySteps() async {
+    var now = DateTime.now();
+
+    var midnight = DateTime(
+      now.year,
+      now.month,
+      now.day + 1,
+    );
+
+    final prefs = await SharedPreferences.getInstance();
+
+    var dailySteps = prefs.getInt("dailySteps") ?? 0;
+
+    if (now.day != midnight.day) {
+      if (now.isAfter(midnight)) {
+        if (dailySteps >= 10000) {
+          await msgController.sendInternalPush(
+            "축하드려요!",
+            "🏃‍♀️ 오늘 하루만 총 $dailySteps 걸음 걸으셨어요! 💕",
+          );
+        }
+      }
+    }
   }
 
   @override

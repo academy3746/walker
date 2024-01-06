@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
@@ -20,10 +21,10 @@ Future<void> callbackDispatcher() async {
   var currentSteps = prefs.getInt("currentSteps") ?? 0;
 
   Workmanager().executeTask((taskName, inputData) async {
-    if (now.isAfter(midnight)) {
-      await prefs.setInt("savedSteps", currentSteps);
-
-      print("일일 걸음수 저장 및 초기화!");
+    if (now.day != midnight.day) {
+      if (now.isAfter(midnight)) {
+        await prefs.setInt("savedSteps", currentSteps);
+      }
     }
 
     return Future.value(true);
