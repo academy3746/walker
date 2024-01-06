@@ -39,6 +39,7 @@ dependencies:
   device_info_plus: ^9.1.1
   android_id: ^0.3.6
   fk_user_agent: ^2.1.0
+  workmanager: ^0.5.2
 
 
 

@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:walker/common/widgets/steps_manager.dart';
+import 'package:workmanager/workmanager.dart';
 
 class PedometerController {
   /// 걸음수 구독
@@ -23,6 +25,9 @@ class PedometerController {
   /// 운동 상태 업데이트
   final Function(String) onPedestrianStatusUpdate;
 
+  /// 걸음수 저장 3안
+  StepsManager? stepsManager;
+
   PedometerController({
     required this.stepCountStream,
     required this.pedestrianStatusStream,
@@ -30,7 +35,10 @@ class PedometerController {
     required this.currentSteps,
     required this.onStepCountUpdate,
     required this.onPedestrianStatusUpdate,
-  });
+  }) {
+    stepsManager = StepsManager(steps: currentSteps);
+  }
+
 
   /// 걸음수 구독 (Realtime)
   Future<void> _onStepCount(StepCount event) async {
@@ -51,19 +59,28 @@ class PedometerController {
 
       await prefs.setInt("newSteps", newSteps);
     }
+
+    await _stepsOnBackground(currentSteps);
+  }
+
+  /// 걸음수 백그라운드 저장
+  Future<void> _stepsOnBackground(int steps) async {
+    var streamingSteps = stepsManager?.steps;
+
+    streamingSteps = steps;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setInt("currentSteps", streamingSteps);
   }
 
   /// 걸음수 저장 (일일 단위)
   Future<void> _saveTodaySteps() async {
-    int savedSteps = currentSteps;
-
-    var now = DateTime.now().millisecondsSinceEpoch;
+    var savedSteps = currentSteps;
 
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setInt("savedSteps", savedSteps);
-
-    await prefs.setInt("savedTime", now);
   }
 
   /// 운동 상태 감지 이벤트
@@ -87,6 +104,27 @@ class PedometerController {
 
   /// Pedometer Controller 초기화
   Future<void> initPlatformState(BuildContext context) async {
+    var now = DateTime.now();
+
+    var midnight = DateTime(
+      now.year,
+      now.month,
+      now.day + 1,
+    );
+
+    var diff = midnight.difference(now).inMilliseconds;
+
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: true,
+    );
+
+    await Workmanager().registerPeriodicTask(
+      "1",
+      "saveStepsTask",
+      frequency: Duration(milliseconds: diff),
+    );
+
     stepCountStream = Pedometer.stepCountStream;
 
     pedestrianStatusStream = Pedometer.pedestrianStatusStream;
