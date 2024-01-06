@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:walker/common/widgets/fcm_controller.dart';
 
 class PedometerController {
   /// 걸음수 구독
@@ -23,9 +22,6 @@ class PedometerController {
 
   /// 운동 상태 업데이트
   final Function(String) onPedestrianStatusUpdate;
-
-  /// Push Event Flag
-  final MsgController msgController = MsgController();
 
   PedometerController({
     required this.stepCountStream,
@@ -103,8 +99,6 @@ class PedometerController {
 
     await _initDailyTimer();
 
-    await _pushEventTrigger();
-
     if (!context.mounted) return;
   }
 
@@ -129,25 +123,5 @@ class PedometerController {
         await _saveTodaySteps();
       });
     });
-  }
-
-  /// 1만 걸음 달성 Push Event
-  Future<void> _pushEventTrigger() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    var lastSavedSteps = prefs.getInt("savedSteps") ?? 0;
-
-    var dailySteps = currentSteps - lastSavedSteps;
-
-    await prefs.setInt("savedDailySteps", dailySteps);
-
-    var savedDailySteps = prefs.getInt("savedDailySteps") ?? 0;
-
-    if (savedDailySteps >= 10000) {
-      await msgController.sendInternalPush(
-        "축하드려요!",
-        "🏃‍♀️ 오늘 하루만 총 $savedDailySteps 걸음 걸으셨어요! 💕",
-      );
-    }
   }
 }
