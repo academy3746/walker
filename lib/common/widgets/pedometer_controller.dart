@@ -116,6 +116,7 @@ class PedometerController {
 
     var diff = Duration(milliseconds: oneDay);
 
+    /// 걸음수 저장 1안
     Timer(diff, () async {
       await _saveTodaySteps();
 
@@ -123,5 +124,10 @@ class PedometerController {
         await _saveTodaySteps();
       });
     });
+
+    /// 걸음수 저장 2안
+    if (now.isAfter(midnight)) {
+      await _saveTodaySteps();
+    }
   }
 }
