@@ -129,9 +129,9 @@ class PedometerController {
       now.day + 1,
     );
 
-    var oneDay = midnight.difference(now).inMilliseconds;
+    var oneDay = midnight.difference(now).inSeconds;
 
-    var diff = Duration(milliseconds: oneDay);
+    var diff = Duration(seconds: oneDay);
 
     Timer(diff, () async {
       await _saveTodaySteps();

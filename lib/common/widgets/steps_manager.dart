@@ -21,10 +21,8 @@ Future<void> callbackDispatcher() async {
   var currentSteps = prefs.getInt("currentSteps") ?? 0;
 
   Workmanager().executeTask((taskName, inputData) async {
-    if (now.day != midnight.day) {
-      if (now.isAfter(midnight)) {
-        await prefs.setInt("savedSteps", currentSteps);
-      }
+    if (now.isAfter(midnight)) {
+      await prefs.setInt("savedSteps", currentSteps);
     }
 
     return Future.value(true);
