@@ -39,7 +39,6 @@ class PedometerController {
     stepsManager = StepsManager(steps: currentSteps);
   }
 
-
   /// 걸음수 구독 (Realtime)
   Future<void> _onStepCount(StepCount event) async {
     currentSteps = event.steps;
@@ -84,6 +83,16 @@ class PedometerController {
 
   /// Pedometer Controller 초기화
   Future<void> initPlatformState(BuildContext context) async {
+    var now = DateTime.now();
+
+    var midnight = DateTime(
+      now.year,
+      now.month,
+      now.day + 1,
+    );
+
+    var diff = midnight.difference(now).inSeconds;
+
     await Workmanager().initialize(
       callbackDispatcher,
       isInDebugMode: false,
@@ -92,7 +101,7 @@ class PedometerController {
     await Workmanager().registerPeriodicTask(
       "1",
       "saveStepsTask",
-      frequency: const Duration(days: 1),
+      frequency: Duration(seconds: diff),
     );
 
     stepCountStream = Pedometer.stepCountStream;
