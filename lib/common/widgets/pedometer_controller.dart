@@ -129,12 +129,20 @@ class PedometerController {
       now.day + 1,
     );
 
-    var oneDay = midnight.difference(now).inSeconds;
+    var oneDayRemain = midnight.difference(now);
 
-    var diff = Duration(seconds: oneDay);
+    //var debug = const Duration(minutes: 1);
 
-    Timer(diff, () async {
+    Timer(oneDayRemain, () async {
       await _saveTodaySteps();
+
+      Timer.periodic(oneDayRemain, (timer) async {
+        await _saveTodaySteps();
+
+        //print("일일 걸음수 저장: $midnight / $oneDayRemain");
+      });
+
+      //print("일일 걸음수 저장: $midnight / $oneDayRemain");
     });
   }
 
