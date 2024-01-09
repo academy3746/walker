@@ -9,6 +9,7 @@ import 'package:flutter_webview_pro/webview_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tosspayments_widget_sdk_flutter/model/tosspayments_url.dart';
@@ -16,14 +17,13 @@ import 'package:walker/common/widgets/app_cookie_handler.dart';
 import 'package:walker/common/widgets/app_version_check_handler.dart';
 import 'package:walker/common/widgets/back_handler_button.dart';
 import 'package:walker/common/widgets/fcm_controller.dart';
+import 'package:walker/common/widgets/location_comm.dart';
 import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
 import 'package:walker/common/widgets/user_info.dart';
-import 'package:walker/common/widgets/web_communication.dart';
 import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
-import 'package:package_info/package_info.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -63,6 +63,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// Initialize Address
   String? currentAddress;
+
+  /// Initialize Country Code
+  String? currentCountryCode;
+
+  /// Initialize Country Name
+  String? currentCountryName;
 
   /// Request Push Permission & Get Unique Token Value from Firebase Server
   MsgController msgController = Get.put(MsgController());
@@ -151,13 +157,18 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       try {
         Position position = await locationInfo.determinePermission();
 
-        String? countryCode = await locationInfo.getCountryCode(position);
+        currentCountryCode = await locationInfo.getCountryCode(position);
 
         locationInfo.lastPosition = position;
 
-        locationInfo.lastCountryCode = countryCode;
+        locationInfo.lastCountryCode = currentCountryCode;
 
         String address = await locationInfo.getCurrentAddress(
+          position.latitude,
+          position.longitude,
+        );
+
+        String countryName = await locationInfo.getCountryName(
           position.latitude,
           position.longitude,
         );
@@ -167,8 +178,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
           currentAddress = address;
 
+          currentCountryName = countryName;
+
           print("현재 위치 값: $currentPosition");
-          print("현재 주소: $currentAddress");
+          print("현재 위치한 국가 코드: $currentCountryCode");
+          print("현재 위치한 국가명: $currentCountryName");
+          print("현재 위치한 도시: $currentAddress");
         });
 
         await locationInfo.getStreaming();
@@ -212,14 +227,20 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// Web Server Communication
   Future<void> _sendToWebServer(int stepsData) async {
-    String? token = await msgController.getToken();
+    var now = DateTime.now();
+    var dateFormat = DateFormat("yyyy-MM-dd");
+    var timeFormat = DateFormat("HH:mm:ss");
+    var date = dateFormat.format(now);
+    var time = timeFormat.format(now);
 
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    var appVersion = packageInfo.version;
+    //String? token = await msgController.getToken();
 
-    String uuid = await userInfo.getDeviceId();
+    /*PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    var appVersion = packageInfo.version;*/
+
+    /*String uuid = await userInfo.getDeviceId();
     String os = await userInfo.getDeviceOs();
-    String agent = await userInfo.getDevicePlatform();
+    String agent = await userInfo.getDevicePlatform();*/
 
     final prefs = await SharedPreferences.getInstance();
     _savedSteps = prefs.getInt("savedSteps") ?? 0;
@@ -248,30 +269,22 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       await prefs.setInt("dailySteps", _nowWalking);
     }
 
-    WebServerCommunication communication = WebServerCommunication(
-      currentSteps: stepsData,
-      currentAddress: currentAddress,
-      token: token,
-      currentPosition: currentPosition.toString(),
-      version: appVersion,
-      appId: uuid,
-      os: os,
-      agent: agent,
-      savedSteps: _savedSteps,
-      todaySteps: _nowWalking,
+    LocationCommunication locationComm = LocationCommunication(
+      countryName: currentCountryName,
+      cityName: currentAddress,
+      lat: currentPosition!.latitude.toString(),
+      lng: currentPosition!.longitude.toString(),
+      date: date,
+      time: time,
     );
 
-    await communication.toJson({
-      "currentSteps": stepsData,
-      "currentAddress": currentAddress ?? "",
-      "token": token ?? "",
-      "currentPosition": currentPosition ?? "",
-      "version": appVersion,
-      "appId": uuid,
-      "os": os,
-      "agent": agent,
-      "savedSteps": _savedSteps,
-      "todaySteps": _nowWalking,
+    await locationComm.toJson({
+      "countryName": currentCountryName,
+      "cityName": currentAddress,
+      "lat": currentPosition!.latitude.toString(),
+      "lng": currentPosition!.longitude.toString(),
+      "date": date,
+      "time": time,
     });
   }
 
@@ -289,14 +302,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     var dailySteps = prefs.getInt("dailySteps") ?? 0;
 
-    if (now.day != midnight.day) {
-      if (now.isAfter(midnight)) {
-        if (dailySteps >= 10000) {
-          await msgController.sendInternalPush(
-            "축하드려요!",
-            "🏃‍♀️ 오늘 하루만 총 $dailySteps 걸음 걸으셨어요! 💕",
-          );
-        }
+    if (now.isAfter(midnight)) {
+      if (dailySteps >= 10000) {
+        await msgController.sendInternalPush(
+          "축하드려요!",
+          "🏃‍♀️ 오늘 하루만 총 $dailySteps 걸음 걸으셨어요! 💕",
+        );
       }
     }
   }

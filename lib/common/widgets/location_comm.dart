@@ -1,45 +1,33 @@
 // ignore_for_file: avoid_print
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class WebServerCommunication {
-  final int currentSteps;
+class LocationCommunication {
+  String? countryName;
 
-  String? currentAddress;
+  String? cityName;
 
-  String? token;
+  String? lat;
 
-  String? currentPosition;
+  String? lng;
 
-  final String version;
+  String date;
 
-  final String appId;
+  String time;
 
-  final String os;
-
-  final String agent;
-
-  int? savedSteps;
-
-  int? todaySteps;
-
-  WebServerCommunication({
-    required this.currentSteps,
-    this.currentAddress,
-    this.token,
-    this.currentPosition,
-    required this.version,
-    required this.appId,
-    required this.os,
-    required this.agent,
-    this.savedSteps,
-    this.todaySteps,
+  LocationCommunication({
+    this.countryName,
+    this.cityName,
+    this.lat,
+    this.lng,
+    required this.date,
+    required this.time,
   });
 
-  /// Send API to Web Server
   Future<void> toJson(Map<String, dynamic> data) async {
     const String redirectUrl =
-        "https://boolub.com/addons/app/request/pushUpdate.php";
+        "https://boolub.com/addons/app/request/appUpdateCity.vn.php";
 
     var response = await http.post(
       Uri.parse(redirectUrl),

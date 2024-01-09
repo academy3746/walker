@@ -49,6 +49,7 @@ class LocationInfo {
 
       if (placeMarks.isNotEmpty) {
         geocoding.Placemark place = placeMarks.first;
+
         String result = "";
 
         if (place.locality != null && place.locality!.isNotEmpty) {
@@ -72,6 +73,32 @@ class LocationInfo {
     }
   }
 
+  /// 해당 국가명 GET
+  Future<String> getCountryName(double latitude, double longitude) async {
+    try {
+      List<geocoding.Placemark> placeMarks =
+      await geocoding.placemarkFromCoordinates(latitude, longitude);
+
+      if (placeMarks.isNotEmpty) {
+        geocoding.Placemark place = placeMarks.first;
+
+        String result = "";
+
+        if (place.country != null && place.country!.isNotEmpty) {
+          result = place.country!;
+        }
+
+        return result;
+      }
+
+      return "해당 지역의 국가 정보를 갱신할 수 없습니다.";
+    } catch (e) {
+      print(e);
+
+      return "주소 변환 중 오류가 발생하였습니다.";
+    }
+  }
+
   /// 해당 국가 ISO Code GET
   Future<String?> getCountryCode(Position position) async {
     try {
@@ -79,8 +106,6 @@ class LocationInfo {
           .placemarkFromCoordinates(position.latitude, position.longitude);
 
       var country = placeMarks.first.isoCountryCode;
-
-      print("현재 위치 국가 ISO Code: $country");
 
       return country;
     } catch (e) {
