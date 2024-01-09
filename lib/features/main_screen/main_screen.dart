@@ -203,6 +203,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Load Daily Steps Count
   Future<void> _initPedometer() async {
     await pedometerController.initPlatformState(context);
+    
+    await _sendLocationInfoToWebServer();
 
     await _achieveDailySteps();
   }
@@ -215,7 +217,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       _steps = _currentSteps;
     });
 
-    await _sendToWebServer(_steps);
+    await _sendStepsToWebServer(_steps);
   }
 
   /// Update Physical Movement
@@ -225,14 +227,35 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     });
   }
 
-  /// Web Server Communication
-  Future<void> _sendToWebServer(int stepsData) async {
+  /// 위치 정보 전송
+  Future<void> _sendLocationInfoToWebServer() async {
     var now = DateTime.now();
     var dateFormat = DateFormat("yyyy-MM-dd");
     var timeFormat = DateFormat("HH:mm:ss");
     var date = dateFormat.format(now);
     var time = timeFormat.format(now);
 
+    LocationCommunication locationComm = LocationCommunication(
+      countryName: currentCountryName,
+      cityName: currentAddress,
+      lat: currentPosition!.latitude.toString(),
+      lng: currentPosition!.longitude.toString(),
+      date: date,
+      time: time,
+    );
+
+    await locationComm.toJson({
+      "countryName": currentCountryName,
+      "cityName": currentAddress,
+      "lat": currentPosition!.latitude.toString(),
+      "lng": currentPosition!.longitude.toString(),
+      "date": date,
+      "time": time,
+    });
+  }
+
+  /// 걸음 수 전송 (작업중)
+  Future<void> _sendStepsToWebServer(int steps) async {
     //String? token = await msgController.getToken();
 
     /*PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -268,24 +291,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
       await prefs.setInt("dailySteps", _nowWalking);
     }
-
-    LocationCommunication locationComm = LocationCommunication(
-      countryName: currentCountryName,
-      cityName: currentAddress,
-      lat: currentPosition!.latitude.toString(),
-      lng: currentPosition!.longitude.toString(),
-      date: date,
-      time: time,
-    );
-
-    await locationComm.toJson({
-      "countryName": currentCountryName,
-      "cityName": currentAddress,
-      "lat": currentPosition!.latitude.toString(),
-      "lng": currentPosition!.longitude.toString(),
-      "date": date,
-      "time": time,
-    });
   }
 
   /// 1만 걸음 달성 이벤트
