@@ -3,20 +3,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class UserAgentCommunication {
-  String userAgent;
+class DeviceInfoCommunication {
+  String agent;
 
-  String? fcmToken;
-
-  UserAgentCommunication({
-    required this.userAgent,
-    required this.fcmToken,
-  });
+  DeviceInfoCommunication({required this.agent});
 
   Future<void> toJson(Map<String, dynamic> data) async {
-    const String apiKey = "lib.php";
+    const String apiKey = "lib.func.php";
 
-    var redirectUrl = "https://boolub.com/addons/app/$apiKey";
+    var redirectUrl = "https://boolub.com/include/$apiKey";
 
     var response = await http.post(
       Uri.parse(redirectUrl),

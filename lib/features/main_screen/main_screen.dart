@@ -16,13 +16,13 @@ import 'package:tosspayments_widget_sdk_flutter/model/tosspayments_url.dart';
 import 'package:walker/common/widgets/app_cookie_handler.dart';
 import 'package:walker/common/widgets/app_version_check_handler.dart';
 import 'package:walker/common/widgets/back_handler_button.dart';
+import 'package:walker/common/widgets/device_info_comm.dart';
 import 'package:walker/common/widgets/fcm_controller.dart';
 import 'package:walker/common/widgets/location_comm.dart';
 import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
 import 'package:walker/common/widgets/steps_comm.dart';
-import 'package:walker/common/widgets/user_agent_comm.dart';
 import 'package:walker/common/widgets/user_info.dart';
 import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
@@ -211,7 +211,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   Future<void> _initPedometer() async {
     await pedometerController.initPlatformState(context);
 
-    await _sendUserAgentToWebServer();
+    await sendDeviceInfoToWebServer();
 
     await _sendLocationInfoToWebServer();
 
@@ -237,22 +237,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   /// User Agent
-  Future<void> _sendUserAgentToWebServer() async {
-    var agent = await userInfo.sendUserAgent();
+  Future<void> sendDeviceInfoToWebServer() async {
+    var agent = await userInfo.getDevicePlatform();
 
-    var userAgent = agent.toString();
+    DeviceInfoCommunication device = DeviceInfoCommunication(agent: agent);
 
-    var fcmToken = await msgController.getToken();
-
-    UserAgentCommunication agentComm = UserAgentCommunication(
-      userAgent: userAgent,
-      fcmToken: fcmToken,
-    );
-
-    await agentComm.toJson({
-      "au_user_agent": userAgent,
-      "au_push_token": fcmToken,
-    });
+    device.toJson({"os": agent});
   }
 
   /// 위치 정보 전송

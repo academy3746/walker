@@ -53,18 +53,20 @@ class UserInfo {
     return platformVersion;
   }
 
-  /// Customize User Agent
-  Future<String> sendUserAgent() async {
-    var result = "undefined";
+  /// Generate App Scheme
+  Future<String> getAppScheme() async {
+    var scheme = "";
 
-    var userAgent = await getDevicePlatform();
+    var agent = await getDevicePlatform();
+
+    var hyApp = "hyapp;";
 
     var appId = await getDeviceId();
 
-    var appVersion = await getAppVersion();
+    var version = await getAppVersion();
 
-    result = "$userAgent (hyapp; boolub.com $appId $appVersion)";
+    scheme = "$agent ($hyApp boolub.com $appId $version)";
 
-    return result;
+    return scheme;
   }
 }
