@@ -212,11 +212,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   Future<void> _initPedometer() async {
     await pedometerController.initPlatformState(context);
 
-    await _sendDeviceInfoToWebServer();
+    await _sendDeviceInfoToServer();
 
-    await _sendUserAgentToWebServer();
+    await _sendUserAgentToServer();
 
-    await _sendLocationInfoToWebServer();
+    await _sendLocationInfoToServer();
 
     await _achieveDailySteps();
   }
@@ -229,7 +229,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       _steps = _currentSteps;
     });
 
-    await _sendStepsToWebServer(_steps);
+    await _sendStepsToServer(_steps);
   }
 
   /// Update Physical Movement
@@ -240,7 +240,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   /// 기기 정보 전송
-  Future<void> _sendDeviceInfoToWebServer() async {
+  Future<void> _sendDeviceInfoToServer() async {
     var agent = await userInfo.getDevicePlatform();
 
     DeviceInfoCommunication device = DeviceInfoCommunication(agent: agent);
@@ -249,7 +249,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   /// 유저 정보 전송
-  Future<void> _sendUserAgentToWebServer() async {
+  Future<void> _sendUserAgentToServer() async {
     var appKey = "hyapp;";
 
     var appScheme = await userInfo.getAppScheme();
@@ -274,7 +274,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   /// 위치 정보 전송
-  Future<void> _sendLocationInfoToWebServer() async {
+  Future<void> _sendLocationInfoToServer() async {
     var date = dateFormat.format(now);
     var time = timeFormat.format(now);
 
@@ -298,7 +298,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   /// 걸음 수 전송
-  Future<void> _sendStepsToWebServer(int steps) async {
+  Future<void> _sendStepsToServer(int steps) async {
     var date = dateFormat.format(now);
 
     final prefs = await SharedPreferences.getInstance();
