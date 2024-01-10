@@ -254,18 +254,19 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     });
   }
 
-  /// 걸음 수 전송 (작업중)
-  Future<void> _sendStepsToWebServer(int steps) async {
-    //String? token = await msgController.getToken();
+  //String? token = await msgController.getToken();
 
-    /*PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  /*PackageInfo packageInfo = await PackageInfo.fromPlatform();
     var appVersion = packageInfo.version;*/
 
-    /*String uuid = await userInfo.getDeviceId();
+  /*String uuid = await userInfo.getDeviceId();
     String os = await userInfo.getDeviceOs();
     String agent = await userInfo.getDevicePlatform();*/
 
+  /// 걸음 수 전송 (작업중)
+  Future<void> _sendStepsToWebServer(int steps) async {
     final prefs = await SharedPreferences.getInstance();
+
     _savedSteps = prefs.getInt("savedSteps") ?? 0;
     _initialSteps = prefs.getInt("initialSteps") ?? 0;
     _newSteps = prefs.getInt("newSteps") ?? 0;
@@ -273,13 +274,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     if (_initialSteps != 0) {
       if (_savedSteps == 0) {
         setState(() {
-          _nowWalking = _steps - _initialSteps;
+          _nowWalking = steps - _initialSteps;
         });
 
         await prefs.setInt("dailySteps", _nowWalking);
       } else {
         setState(() {
-          _nowWalking = _steps - _savedSteps;
+          _nowWalking = steps - _savedSteps;
         });
 
         await prefs.setInt("dailySteps", _nowWalking);
