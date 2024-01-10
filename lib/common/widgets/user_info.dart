@@ -5,6 +5,13 @@ import 'package:fk_user_agent/fk_user_agent.dart';
 import 'package:flutter/foundation.dart';
 
 class UserInfo {
+  /// Customize User Agent
+  Future<String> getUserAgent() async {
+    var result = "";
+
+    return result;
+  }
+
   /// Get Unique Device ID
   Future<String> getDeviceId() async {
     var deviceIdentifier = "undefined";

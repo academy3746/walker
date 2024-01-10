@@ -99,7 +99,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       await FkUserAgent.init();
 
-      userInfo.getDevicePlatform();
+      userInfo.getUserAgent();
     });
 
     /// Improve Android Performance
