@@ -26,8 +26,7 @@ class StepsCommunication {
 
     try {
       if (response.statusCode == 200) {
-        print("POST Succeed: ${response.statusCode}");
-        print("POST Data: $data");
+        print("POST Succeed: ${response.statusCode} / $data");
       } else {
         print("POST Failed: ${response.statusCode} / ${response.body}");
       }
