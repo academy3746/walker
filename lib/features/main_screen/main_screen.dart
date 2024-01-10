@@ -22,6 +22,7 @@ import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
 import 'package:walker/common/widgets/steps_comm.dart';
+import 'package:walker/common/widgets/user_agent_comm.dart';
 import 'package:walker/common/widgets/user_info.dart';
 import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
@@ -104,7 +105,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       await FkUserAgent.init();
 
-      userInfo.getUserAgent();
+      userInfo.getDevicePlatform();
     });
 
     /// Improve Android Performance
@@ -210,6 +211,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   Future<void> _initPedometer() async {
     await pedometerController.initPlatformState(context);
 
+    await _sendUserAgentToWebServer();
+
     await _sendLocationInfoToWebServer();
 
     await _achieveDailySteps();
@@ -230,6 +233,25 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   void _onPedestrianStatusUpdate(String newStatus) {
     setState(() {
       _status = newStatus;
+    });
+  }
+
+  /// User Agent
+  Future<void> _sendUserAgentToWebServer() async {
+    var agent = await userInfo.sendUserAgent();
+
+    var userAgent = agent.toString();
+
+    var fcmToken = await msgController.getToken();
+
+    UserAgentCommunication agentComm = UserAgentCommunication(
+      userAgent: userAgent,
+      fcmToken: fcmToken,
+    );
+
+    await agentComm.toJson({
+      "au_user_agent": userAgent,
+      "au_push_token": fcmToken,
     });
   }
 

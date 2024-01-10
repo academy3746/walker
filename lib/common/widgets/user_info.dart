@@ -3,13 +3,18 @@ import 'package:android_id/android_id.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:fk_user_agent/fk_user_agent.dart';
 import 'package:flutter/foundation.dart';
+import 'package:package_info/package_info.dart';
 
 class UserInfo {
-  /// Customize User Agent
-  Future<String> getUserAgent() async {
-    var result = "";
+  /// Get App Version
+  Future<String> getAppVersion() async {
+    var version = "undefined";
 
-    return result;
+    var packageInfo = await PackageInfo.fromPlatform();
+
+    version = packageInfo.version;
+
+    return version;
   }
 
   /// Get Unique Device ID
@@ -39,21 +44,6 @@ class UserInfo {
     return deviceIdentifier;
   }
 
-  /// Get Device Platform
-  Future<String> getDeviceOs() async {
-    var devicePlatform = "undefined";
-
-    if (Platform.isAndroid) {
-      devicePlatform = "android";
-    } else if (Platform.isIOS) {
-      devicePlatform = "ios";
-    } else if (kIsWeb) {
-      devicePlatform = "web";
-    }
-
-    return devicePlatform;
-  }
-
   /// Get User Agent
   Future<String> getDevicePlatform() async {
     var platformVersion = "undefined";
@@ -61,5 +51,20 @@ class UserInfo {
     platformVersion = FkUserAgent.userAgent!;
 
     return platformVersion;
+  }
+
+  /// Customize User Agent
+  Future<String> sendUserAgent() async {
+    var result = "undefined";
+
+    var userAgent = await getDevicePlatform();
+
+    var appId = await getDeviceId();
+
+    var appVersion = await getAppVersion();
+
+    result = "$userAgent (hyapp; boolub.com $appId $appVersion)";
+
+    return result;
   }
 }
