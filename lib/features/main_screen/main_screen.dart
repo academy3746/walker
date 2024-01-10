@@ -245,7 +245,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     DeviceInfoCommunication device = DeviceInfoCommunication(agent: agent);
 
-    device.toJson({"os": agent});
+    await device.toJson({"os": agent});
   }
 
   /// 유저 정보 전송
@@ -265,7 +265,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       appVersion: appVersion,
     );
 
-    userAgentComm.toJson({
+    await userAgentComm.toJson({
       "appkey": appKey,
       "scheme": appScheme,
       "appid": appId,
