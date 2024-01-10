@@ -205,7 +205,7 @@ class LocationInfo {
 
             print("도시 정보 업데이트: $currentAddress");
 
-            msgController.sendInternalPush(
+            await msgController.sendInternalPush(
               "$currentAddress에서 여행중이시네요!",
               "주변 맛집을 알려드릴게요!",
             );
