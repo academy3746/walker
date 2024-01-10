@@ -171,12 +171,6 @@ class LocationInfo {
         distanceFilter: 500,
         forceLocationManager: true,
         intervalDuration: const Duration(seconds: 10),
-        foregroundNotificationConfig: const ForegroundNotificationConfig(
-          notificationTitle: "부럽 앱이 실행중입니다.",
-          notificationText: "회원님의 위치 정보를 실시간으로 갱신중입니다.",
-          enableWakeLock: true,
-          enableWifiLock: true,
-        ),
       );
     } else if (defaultTargetPlatform == iosPlatform) {
       locationSettings = AppleSettings(
@@ -186,7 +180,7 @@ class LocationInfo {
         timeLimit: const Duration(seconds: 10),
         pauseLocationUpdatesAutomatically: false,
         allowBackgroundLocationUpdates: true,
-        showBackgroundLocationIndicator: true,
+        showBackgroundLocationIndicator: false,
       );
     } else {
       locationSettings = const LocationSettings(
