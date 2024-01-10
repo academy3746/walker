@@ -41,7 +41,7 @@ class LocationCommunication {
         print("POST Succeed: ${response.statusCode}");
         print("POST Data: $data");
       } else {
-        print("POST Failed: ${response.statusCode}");
+        print("POST Failed: ${response.statusCode} / ${response.body}");
       }
     } on Error catch (e) {
       print("웹 서버 통신 오류: $e");
