@@ -10,17 +10,20 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info/package_info.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tosspayments_widget_sdk_flutter/model/tosspayments_url.dart';
 import 'package:walker/common/widgets/app_cookie_handler.dart';
 import 'package:walker/common/widgets/app_version_check_handler.dart';
 import 'package:walker/common/widgets/back_handler_button.dart';
+import 'package:walker/common/widgets/client_info_comm.dart';
 import 'package:walker/common/widgets/fcm_controller.dart';
 import 'package:walker/common/widgets/location_comm.dart';
 import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
+import 'package:walker/common/widgets/steps_comm.dart';
 import 'package:walker/common/widgets/user_info.dart';
 import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
@@ -203,10 +206,39 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Load Daily Steps Count
   Future<void> _initPedometer() async {
     await pedometerController.initPlatformState(context);
-    
+
+    await _sendClientInfoToServer();
+
     await _sendLocationInfoToWebServer();
 
     await _achieveDailySteps();
+  }
+
+  Future<void> _sendClientInfoToServer() async {
+    String os = await userInfo.getDeviceOs();
+    String userAgent = await userInfo.getDevicePlatform();
+    String appId = await userInfo.getDeviceId();
+
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    var appVersion = packageInfo.version;
+
+    String? token = await msgController.getToken();
+
+    ClientInfoCommunication infoComm = ClientInfoCommunication(
+      os: os,
+      userAgent: userAgent,
+      appId: appId,
+      appVersion: appVersion,
+      token: token,
+    );
+
+    await infoComm.toJson({
+      "au_os": os,
+      "au_user_agent": userAgent,
+      "au_app_id": appId,
+      "au_app_ver": appVersion,
+      "au_push_token": token,
+    });
   }
 
   /// Update Steps Count
@@ -254,22 +286,22 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     });
   }
 
-  //String? token = await msgController.getToken();
-
-  /*PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    var appVersion = packageInfo.version;*/
-
-  /*String uuid = await userInfo.getDeviceId();
-    String os = await userInfo.getDeviceOs();
-    String agent = await userInfo.getDevicePlatform();*/
-
   /// 걸음 수 전송 (작업중)
   Future<void> _sendStepsToWebServer(int steps) async {
+    var now = DateTime.now();
+    var dateFormat = DateFormat("yyyy-MM-dd");
+    var date = dateFormat.format(now);
+
     final prefs = await SharedPreferences.getInstance();
 
     _savedSteps = prefs.getInt("savedSteps") ?? 0;
     _initialSteps = prefs.getInt("initialSteps") ?? 0;
     _newSteps = prefs.getInt("newSteps") ?? 0;
+
+    StepsCommunication stepsComm = StepsCommunication(
+      steps: steps,
+      date: date,
+    );
 
     if (_initialSteps != 0) {
       if (_savedSteps == 0) {
@@ -278,12 +310,22 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         });
 
         await prefs.setInt("dailySteps", _nowWalking);
+
+        await stepsComm.toJson({
+          "steps": _nowWalking,
+          "date": date,
+        });
       } else {
         setState(() {
           _nowWalking = steps - _savedSteps;
         });
 
         await prefs.setInt("dailySteps", _nowWalking);
+
+        await stepsComm.toJson({
+          "steps": _nowWalking,
+          "date": date,
+        });
       }
     } else {
       setState(() {
@@ -291,6 +333,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       });
 
       await prefs.setInt("dailySteps", _nowWalking);
+
+      await stepsComm.toJson({
+        "steps": _nowWalking,
+        "date": date,
+      });
     }
   }
 

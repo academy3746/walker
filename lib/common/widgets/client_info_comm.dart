@@ -3,30 +3,27 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class LocationCommunication {
-  String? countryName;
+class ClientInfoCommunication {
+  String? os;
 
-  String? cityName;
+  String? userAgent;
 
-  String? lat;
+  String? appId;
 
-  String? lng;
+  String? appVersion;
 
-  String date;
+  String? token;
 
-  String time;
-
-  LocationCommunication({
-    this.countryName,
-    this.cityName,
-    this.lat,
-    this.lng,
-    required this.date,
-    required this.time,
+  ClientInfoCommunication({
+    required this.os,
+    required this.userAgent,
+    required this.appId,
+    required this.appVersion,
+    required this.token,
   });
 
   Future<void> toJson(Map<String, dynamic> data) async {
-    const String apiKey = "appUpdateCity.vn.php";
+    const String apiKey = "pushUpdate.php";
 
     var redirectUrl = "https://boolub.com/addons/app/request/$apiKey";
 

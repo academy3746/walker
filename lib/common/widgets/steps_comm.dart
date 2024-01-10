@@ -26,7 +26,9 @@ class StepsCommunication {
 
     try {
       if (response.statusCode == 200) {
-        print("POST Succeed: ${response.statusCode} / $data");
+        print("POST Succeed: ${response.statusCode}");
+        print("Redirect URL: $redirectUrl");
+        print("POST Data: $data");
       } else {
         print("POST Failed: ${response.statusCode} / ${response.body}");
       }
