@@ -289,7 +289,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     });
   }
 
-  /// 걸음 수 전송 (작업중)
+  /// 걸음 수 전송
   Future<void> _sendStepsToWebServer(int steps) async {
     var now = DateTime.now();
     var dateFormat = DateFormat("yyyy-MM-dd");
