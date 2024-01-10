@@ -74,6 +74,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   /// Request Push Permission & Get Unique Token Value from Firebase Server
   MsgController msgController = Get.put(MsgController());
 
+  /// Initialize Timestamp
+  DateTime now = DateTime.now();
+  DateFormat dateFormat = DateFormat("yyyy-MM-dd");
+  DateFormat timeFormat = DateFormat("HH:mm:ss");
+
   /// Initialize Pedometer
   late PedometerController pedometerController;
   String _status = "";
@@ -230,9 +235,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// 위치 정보 전송
   Future<void> _sendLocationInfoToWebServer() async {
-    var now = DateTime.now();
-    var dateFormat = DateFormat("yyyy-MM-dd");
-    var timeFormat = DateFormat("HH:mm:ss");
     var date = dateFormat.format(now);
     var time = timeFormat.format(now);
 
@@ -257,8 +259,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// 걸음 수 전송
   Future<void> _sendStepsToWebServer(int steps) async {
-    var now = DateTime.now();
-    var dateFormat = DateFormat("yyyy-MM-dd");
     var date = dateFormat.format(now);
 
     final prefs = await SharedPreferences.getInstance();
