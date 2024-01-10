@@ -88,6 +88,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   /// Get Unique User Information
   UserInfo userInfo = UserInfo();
+  String _os = "";
+  String _userAgent = "";
+  String _appId = "";
 
   /// Initialize Home Button
   bool showFloatingActionButton = false;
@@ -215,9 +218,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _sendClientInfoToServer() async {
-    String os = await userInfo.getDeviceOs();
-    String userAgent = await userInfo.getDevicePlatform();
-    String appId = await userInfo.getDeviceId();
+    _os = await userInfo.getDeviceOs();
+    _userAgent = await userInfo.getDevicePlatform();
+    _appId = await userInfo.getDeviceId();
 
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     var appVersion = packageInfo.version;
@@ -225,17 +228,17 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     String? token = await msgController.getToken();
 
     ClientInfoCommunication infoComm = ClientInfoCommunication(
-      os: os,
-      userAgent: userAgent,
-      appId: appId,
+      os: _os,
+      userAgent: _userAgent,
+      appId: _appId,
       appVersion: appVersion,
       token: token,
     );
 
     await infoComm.toJson({
-      "au_os": os,
-      "au_user_agent": userAgent,
-      "au_app_id": appId,
+      "au_os": _os,
+      "au_user_agent": _userAgent,
+      "au_app_id": _appId,
       "au_app_ver": appVersion,
       "au_push_token": token,
     });
