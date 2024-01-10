@@ -48,7 +48,7 @@ class UserInfo {
   Future<String> getDevicePlatform() async {
     var platformVersion = "undefined";
 
-    platformVersion = FkUserAgent.userAgent!;
+    platformVersion = FkUserAgent.webViewUserAgent!;
 
     return platformVersion;
   }

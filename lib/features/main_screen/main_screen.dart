@@ -23,6 +23,7 @@ import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
 import 'package:walker/common/widgets/steps_comm.dart';
+import 'package:walker/common/widgets/user_agent_comm.dart';
 import 'package:walker/common/widgets/user_info.dart';
 import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
@@ -211,7 +212,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   Future<void> _initPedometer() async {
     await pedometerController.initPlatformState(context);
 
-    await sendDeviceInfoToWebServer();
+    await _sendDeviceInfoToWebServer();
+
+    await _sendUserAgentToWebServer();
 
     await _sendLocationInfoToWebServer();
 
@@ -236,13 +239,37 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     });
   }
 
-  /// User Agent
-  Future<void> sendDeviceInfoToWebServer() async {
+  /// 기기 정보 전송
+  Future<void> _sendDeviceInfoToWebServer() async {
     var agent = await userInfo.getDevicePlatform();
 
     DeviceInfoCommunication device = DeviceInfoCommunication(agent: agent);
 
     device.toJson({"os": agent});
+  }
+
+  Future<void> _sendUserAgentToWebServer() async {
+    var appKey = "hyapp;";
+
+    var appScheme = await userInfo.getAppScheme();
+
+    var appId = await userInfo.getDeviceId();
+
+    var appVersion = await userInfo.getAppVersion();
+
+    UserAgentCommunication userAgentComm = UserAgentCommunication(
+      appKey: appKey,
+      appScheme: appScheme,
+      appId: appId,
+      appVersion: appVersion,
+    );
+
+    userAgentComm.toJson({
+      "appkey": appKey,
+      "scheme": appScheme,
+      "appid": appId,
+      "version":appVersion,
+    });
   }
 
   /// 위치 정보 전송
