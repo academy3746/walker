@@ -248,6 +248,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     device.toJson({"os": agent});
   }
 
+  /// 유저 정보 전송
   Future<void> _sendUserAgentToWebServer() async {
     var appKey = "hyapp;";
 
