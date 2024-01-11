@@ -23,6 +23,7 @@ import 'package:walker/common/widgets/location_info.dart';
 import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
 import 'package:walker/common/widgets/steps_comm.dart';
+import 'package:walker/common/widgets/token_comm.dart';
 import 'package:walker/common/widgets/user_agent_comm.dart';
 import 'package:walker/common/widgets/user_info.dart';
 import 'package:walker/constants/gaps.dart';
@@ -197,8 +198,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         await locationInfo.getStreaming();
         //await locationInfo.debugStreaming();
 
-        /// Get User Steps Count
-        await _initPedometer();
+        /// Get User Steps Count & Other Status
+        await _initCurrentStatus();
       } catch (e) {
         print(e);
       }
@@ -208,9 +209,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     }
   }
 
-  /// Load Daily Steps Count
-  Future<void> _initPedometer() async {
+  /// Load Daily Steps Count & Server Communication
+  Future<void> _initCurrentStatus() async {
     await pedometerController.initPlatformState(context);
+
+    await _sendTokenToServer();
 
     await _sendDeviceInfoToServer();
 
@@ -236,6 +239,23 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   void _onPedestrianStatusUpdate(String newStatus) {
     setState(() {
       _status = newStatus;
+    });
+  }
+
+  /// FCM Token 전송
+  Future<void> _sendTokenToServer() async {
+    var token = await msgController.getToken();
+
+    var appId = await userInfo.getDeviceId();
+
+    FcmTokenCommunication fcmComm = FcmTokenCommunication(
+      appId: appId,
+      token: token,
+    );
+
+    await fcmComm.toJson({
+      "appID": appId,
+      "fcmToken": token,
     });
   }
 
@@ -269,7 +289,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       "appkey": appKey,
       "scheme": appScheme,
       "appid": appId,
-      "version":appVersion,
+      "version": appVersion,
     });
   }
 
