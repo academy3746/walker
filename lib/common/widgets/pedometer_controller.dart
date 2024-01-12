@@ -83,16 +83,6 @@ class PedometerController {
 
   /// Pedometer Controller 초기화
   Future<void> initPlatformState(BuildContext context) async {
-    var now = DateTime.now();
-
-    var midnight = DateTime(
-      now.year,
-      now.month,
-      now.day + 1,
-    );
-
-    var diff = midnight.difference(now).inSeconds;
-
     await Workmanager().initialize(
       callbackDispatcher,
       isInDebugMode: false,
@@ -101,7 +91,11 @@ class PedometerController {
     await Workmanager().registerPeriodicTask(
       "1",
       "saveStepsTask",
-      frequency: Duration(seconds: diff),
+      frequency: const Duration(
+        hours: 23,
+        minutes: 59,
+        seconds: 59,
+      ),
     );
 
     stepCountStream = Pedometer.stepCountStream;
@@ -121,28 +115,24 @@ class PedometerController {
 
   /// Timer Reset (일일 단위)
   Future<void> _initDailyTimer() async {
-    var now = DateTime.now();
-
-    var midnight = DateTime(
-      now.year,
-      now.month,
-      now.day + 1,
+    var oneDay = const Duration(
+      hours: 23,
+      minutes: 59,
+      seconds: 59,
     );
-
-    var oneDayRemain = midnight.difference(now);
 
     //var debug = const Duration(minutes: 1);
 
-    Timer(oneDayRemain, () async {
+    Timer(oneDay, () async {
       await _saveTodaySteps();
 
-      Timer.periodic(oneDayRemain, (timer) async {
+      Timer.periodic(oneDay, (timer) async {
         await _saveTodaySteps();
 
-        //print("일일 걸음수 저장: $midnight / $oneDayRemain");
+        //print("일일 걸음수 저장: $midnight");
       });
 
-      //print("일일 걸음수 저장: $midnight / $oneDayRemain");
+      //print("일일 걸음수 저장: $midnight");
     });
   }
 

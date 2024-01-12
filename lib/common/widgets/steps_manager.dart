@@ -10,6 +10,12 @@ Future<void> callbackDispatcher() async {
 
   var now = DateTime.now();
 
+  var today = DateTime(
+    now.year,
+    now.month,
+    now.day,
+  );
+
   var midnight = DateTime(
     now.year,
     now.month,
@@ -21,7 +27,7 @@ Future<void> callbackDispatcher() async {
   var currentSteps = prefs.getInt("currentSteps") ?? 0;
 
   Workmanager().executeTask((taskName, inputData) async {
-    if (now.isAfter(midnight)) {
+    if (today.isAfter(midnight)) {
       await prefs.setInt("savedSteps", currentSteps);
     }
 
