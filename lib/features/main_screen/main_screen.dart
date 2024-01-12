@@ -32,7 +32,7 @@ import 'package:walker/constants/sizes.dart';
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
-  static String routeName = "/main";
+  static const String routeName = "/main";
 
   @override
   State<MainScreen> createState() => _MainScreenState();

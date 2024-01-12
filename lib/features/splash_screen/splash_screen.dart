@@ -5,7 +5,7 @@ import 'package:walker/features/main_screen/main_screen.dart';
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
-  static String routeName = "/";
+  static const String routeName = "/";
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
