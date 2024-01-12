@@ -91,11 +91,7 @@ class PedometerController {
     await Workmanager().registerPeriodicTask(
       "1",
       "saveStepsTask",
-      frequency: const Duration(
-        hours: 23,
-        minutes: 59,
-        seconds: 59,
-      ),
+      frequency: const Duration(days: 1),
     );
 
     stepCountStream = Pedometer.stepCountStream;
