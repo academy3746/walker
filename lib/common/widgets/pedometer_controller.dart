@@ -115,24 +115,24 @@ class PedometerController {
 
   /// Timer Reset (일일 단위)
   Future<void> _initDailyTimer() async {
-    var oneDay = const Duration(
-      hours: 23,
-      minutes: 59,
-      seconds: 59,
+    var now = DateTime.now();
+
+    var nextMidnight = DateTime(
+      now.year,
+      now.month,
+      now.day + 1,
     );
 
-    //var debug = const Duration(minutes: 1);
+    var remains = nextMidnight.difference(now);
 
-    Timer(oneDay, () async {
+    var oneDay = const Duration(days: 1);
+
+    Timer(remains, () async {
       await _saveTodaySteps();
 
       Timer.periodic(oneDay, (timer) async {
         await _saveTodaySteps();
-
-        //print("일일 걸음수 저장: $midnight");
       });
-
-      //print("일일 걸음수 저장: $midnight");
     });
   }
 
