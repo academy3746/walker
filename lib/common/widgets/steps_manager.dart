@@ -3,13 +3,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:walker/common/widgets/fcm_controller.dart';
 import 'package:workmanager/workmanager.dart';
 
 Future<void> callbackDispatcher() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  MsgController msgController = MsgController();
 
   var now = DateTime.now();
 
@@ -26,11 +23,6 @@ Future<void> callbackDispatcher() async {
   Workmanager().executeTask((taskName, inputData) async {
     if (now.isAfter(nextMidnight)) {
       await prefs.setInt("savedSteps", currentSteps);
-
-      await msgController.sendInternalPush(
-        "수고하셨어요!",
-        "내일도 응원 할게요 💕",
-      );
     }
 
     return Future.value(true);
