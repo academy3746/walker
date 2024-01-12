@@ -13,12 +13,6 @@ Future<void> callbackDispatcher() async {
 
   var now = DateTime.now();
 
-  var todayMidnight = DateTime(
-    now.year,
-    now.month,
-    now.day,
-  );
-
   var nextMidnight = DateTime(
     now.year,
     now.month,
@@ -30,7 +24,7 @@ Future<void> callbackDispatcher() async {
   var currentSteps = prefs.getInt("currentSteps") ?? 0;
 
   Workmanager().executeTask((taskName, inputData) async {
-    if (todayMidnight.isAfter(nextMidnight)) {
+    if (now.isAfter(nextMidnight)) {
       await prefs.setInt("savedSteps", currentSteps);
 
       await msgController.sendInternalPush(
@@ -41,10 +35,4 @@ Future<void> callbackDispatcher() async {
 
     return Future.value(true);
   });
-}
-
-class StepsManager {
-  int? steps;
-
-  StepsManager({required this.steps});
 }

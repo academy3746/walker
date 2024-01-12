@@ -25,9 +25,6 @@ class PedometerController {
   /// 운동 상태 업데이트
   final Function(String) onPedestrianStatusUpdate;
 
-  /// 백그라운드 상태에서 걸음수 저장
-  StepsManager? stepsManager;
-
   PedometerController({
     required this.stepCountStream,
     required this.pedestrianStatusStream,
@@ -35,9 +32,7 @@ class PedometerController {
     required this.currentSteps,
     required this.onStepCountUpdate,
     required this.onPedestrianStatusUpdate,
-  }) {
-    stepsManager = StepsManager(steps: currentSteps);
-  }
+  });
 
   /// 걸음수 구독 (Realtime)
   Future<void> _onStepCount(StepCount event) async {
@@ -49,6 +44,8 @@ class PedometerController {
 
     final prefs = await SharedPreferences.getInstance();
 
+    await prefs.setInt("currentSteps", currentSteps);
+
     if (prefs.getInt("initialSteps") == null) {
       await prefs.setInt("initialSteps", currentSteps);
     } else if (prefs.getInt("initialSteps") != null) {
@@ -58,8 +55,6 @@ class PedometerController {
 
       await prefs.setInt("newSteps", newSteps);
     }
-
-    await _stepsOnBackground(currentSteps);
   }
 
   /// 운동 상태 감지 이벤트
@@ -139,16 +134,5 @@ class PedometerController {
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setInt("savedSteps", savedSteps);
-  }
-
-  /// 걸음수 백그라운드 저장
-  Future<void> _stepsOnBackground(int steps) async {
-    stepsManager?.steps = steps;
-
-    var streamingSteps = stepsManager?.steps;
-
-    final prefs = await SharedPreferences.getInstance();
-
-    await prefs.setInt("currentSteps", streamingSteps!);
   }
 }
