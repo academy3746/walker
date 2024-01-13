@@ -78,15 +78,30 @@ class PedometerController {
 
   /// Pedometer Controller 초기화
   Future<void> initPlatformState(BuildContext context) async {
+    var now = DateTime.now();
+
+    var tomorrow = DateTime(
+      now.year,
+      now.month,
+      now.day + 1,
+    );
+
+    var remains = tomorrow.difference(now);
+
+    var uniqueName = "일일 걸음수 저장";
+
+    var taskName = "saveStepsTask";
+
     await Workmanager().initialize(
       callbackDispatcher,
-      isInDebugMode: false,
+      isInDebugMode: true,
     );
 
     await Workmanager().registerPeriodicTask(
-      "1",
-      "saveStepsTask",
-      frequency: const Duration(days: 1),
+      uniqueName,
+      taskName,
+      frequency: const Duration(hours: 24),
+      initialDelay: Duration(milliseconds: remains.inMilliseconds),
     );
 
     stepCountStream = Pedometer.stepCountStream;
@@ -106,17 +121,13 @@ class PedometerController {
 
   /// Timer Reset (일일 단위)
   Future<void> _initDailyTimer() async {
-    var oneDay = const Duration(days: 1);
-
-    //var debug = const Duration(minutes: 2);
+    var oneDay = const Duration(hours: 24);
 
     Timer(oneDay, () async {
       await _saveTodaySteps();
-      //print("걸음수가 초기화 되었습니다!");
 
       Timer.periodic(oneDay, (timer) async {
         await _saveTodaySteps();
-        //print("걸음수가 초기화 되었습니다!");
       });
     });
   }

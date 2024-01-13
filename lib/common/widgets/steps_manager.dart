@@ -8,22 +8,12 @@ import 'package:workmanager/workmanager.dart';
 Future<void> callbackDispatcher() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  var now = DateTime.now();
-
-  var nextMidnight = DateTime(
-    now.year,
-    now.month,
-    now.day + 1,
-  );
-
   final prefs = await SharedPreferences.getInstance();
 
   var currentSteps = prefs.getInt("currentSteps") ?? 0;
 
   Workmanager().executeTask((taskName, inputData) async {
-    if (now.isAfter(nextMidnight) && now.isBefore(nextMidnight)) {
-      await prefs.setInt("savedSteps", currentSteps);
-    }
+    await prefs.setInt("savedSteps", currentSteps);
 
     return Future.value(true);
   });
