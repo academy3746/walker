@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print, prefer_collection_literals, deprecated_member_use
 import 'dart:async';
 import 'dart:io';
-import 'package:fk_user_agent/fk_user_agent.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +15,6 @@ import 'package:tosspayments_widget_sdk_flutter/model/tosspayments_url.dart';
 import 'package:walker/common/widgets/app_cookie_handler.dart';
 import 'package:walker/common/widgets/app_version_check_handler.dart';
 import 'package:walker/common/widgets/back_handler_button.dart';
-import 'package:walker/common/widgets/device_info_comm.dart';
 import 'package:walker/common/widgets/fcm_controller.dart';
 import 'package:walker/common/widgets/location_comm.dart';
 import 'package:walker/common/widgets/location_info.dart';
@@ -24,7 +22,6 @@ import 'package:walker/common/widgets/pedometer_controller.dart';
 import 'package:walker/common/widgets/permission_controller.dart';
 import 'package:walker/common/widgets/steps_comm.dart';
 import 'package:walker/common/widgets/token_comm.dart';
-import 'package:walker/common/widgets/user_agent_comm.dart';
 import 'package:walker/common/widgets/user_info.dart';
 import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
@@ -105,8 +102,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      await FkUserAgent.init();
-
       userInfo.getDevicePlatform();
     });
 
@@ -215,10 +210,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     await _sendTokenToServer();
 
-    await _sendDeviceInfoToServer();
-
-    await _sendUserAgentToServer();
-
     await _sendLocationInfoToServer();
 
     await _achieveDailySteps();
@@ -248,48 +239,18 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     var appId = await userInfo.getDeviceId();
 
+    var userAgent = await userInfo.getAppScheme();
+
     FcmTokenCommunication fcmComm = FcmTokenCommunication(
       appId: appId,
       token: token,
+      userAgent: userAgent,
     );
 
     await fcmComm.toJson({
       "appID": appId,
       "fcmToken": token,
-    });
-  }
-
-  /// 기기 정보 전송
-  Future<void> _sendDeviceInfoToServer() async {
-    var agent = await userInfo.getDevicePlatform();
-
-    DeviceInfoCommunication device = DeviceInfoCommunication(agent: agent);
-
-    await device.toJson({"os": agent});
-  }
-
-  /// 유저 정보 전송
-  Future<void> _sendUserAgentToServer() async {
-    var appKey = "hyapp;";
-
-    var appScheme = await userInfo.getAppScheme();
-
-    var appId = await userInfo.getDeviceId();
-
-    var appVersion = await userInfo.getAppVersion();
-
-    UserAgentCommunication userAgentComm = UserAgentCommunication(
-      appKey: appKey,
-      appScheme: appScheme,
-      appId: appId,
-      appVersion: appVersion,
-    );
-
-    await userAgentComm.toJson({
-      "appkey": appKey,
-      "scheme": appScheme,
-      "appid": appId,
-      "version": appVersion,
+      "userAgent": userAgent,
     });
   }
 
@@ -298,6 +259,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     var date = dateFormat.format(now);
     var time = timeFormat.format(now);
 
+    var userAgent = await userInfo.getAppScheme();
+
     LocationCommunication locationComm = LocationCommunication(
       countryName: currentCountryName,
       cityName: currentAddress,
@@ -305,6 +268,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       lng: currentPosition!.longitude.toString(),
       date: date,
       time: time,
+      userAgent: userAgent,
     );
 
     await locationComm.toJson({
@@ -314,6 +278,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       "lng": currentPosition!.longitude.toString(),
       "date": date,
       "time": time,
+      "userAgent": userAgent,
     });
   }
 
@@ -327,9 +292,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     _initialSteps = prefs.getInt("initialSteps") ?? 0;
     _newSteps = prefs.getInt("newSteps") ?? 0;
 
+    var userAgent = await userInfo.getAppScheme();
+
     StepsCommunication stepsComm = StepsCommunication(
       steps: steps,
       date: date,
+      userAgent: userAgent,
     );
 
     if (_initialSteps != 0) {
@@ -343,6 +311,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         await stepsComm.toJson({
           "steps": _nowWalking,
           "date": date,
+          "userAgent": userAgent,
         });
       } else {
         setState(() {
@@ -354,6 +323,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         await stepsComm.toJson({
           "steps": _nowWalking,
           "date": date,
+          "userAgent": userAgent,
         });
       }
     } else {
@@ -366,6 +336,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       await stepsComm.toJson({
         "steps": _nowWalking,
         "date": date,
+        "userAgent": userAgent,
       });
     }
   }
@@ -447,48 +418,53 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         children: [
           LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
-              return WillPopScope(
-                onWillPop: () async {
-                  if (backHandlerButton != null) {
-                    return backHandlerButton!.onWillPop();
-                  }
-                  return false;
-                },
-                child: SizedBox(
-                  height: constraints.maxHeight,
-                  child: SafeArea(
-                    child: WebView(
-                      initialUrl: url,
-                      javascriptMode: JavascriptMode.unrestricted,
-                      onWebViewCreated:
-                          (WebViewController webViewController) async {
-                        _controller.complete(webViewController);
-                        viewController = webViewController;
-
-                        /// Get Cookie Statement
-                        await cookieHandler?.setCookies(
-                          cookieHandler!.cookieValue,
-                          cookieHandler!.domain,
-                          cookieHandler!.cookieName,
-                          cookieHandler!.url,
-                        );
+              return FutureBuilder<String>(
+                future: userInfo.getAppScheme(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    //print("User Agent: $snapshot");
+                    return WillPopScope(
+                      onWillPop: () async {
+                        if (backHandlerButton != null) {
+                          return backHandlerButton!.onWillPop();
+                        }
+                        return false;
                       },
-                      onPageStarted: (String url) async {
-                        setState(() {
-                          isLoading = true;
-                        });
+                      child: SizedBox(
+                        height: constraints.maxHeight,
+                        child: SafeArea(
+                          child: WebView(
+                            initialUrl: url,
+                            javascriptMode: JavascriptMode.unrestricted,
+                            onWebViewCreated:
+                                (WebViewController webViewController) async {
+                              _controller.complete(webViewController);
+                              viewController = webViewController;
 
-                        print("현재 페이지 주소: $url");
-                      },
-                      onPageFinished: (String url) async {
-                        setState(() {
-                          isLoading = false;
-                        });
+                              /// Get Cookie Statement
+                              await cookieHandler?.setCookies(
+                                cookieHandler!.cookieValue,
+                                cookieHandler!.domain,
+                                cookieHandler!.cookieName,
+                                cookieHandler!.url,
+                              );
+                            },
+                            onPageStarted: (String url) async {
+                              setState(() {
+                                isLoading = true;
+                              });
 
-                        /// Soft Keyboard hide TextField on Android
-                        if (Platform.isAndroid) {
-                          if (url.contains(homeUrl) && viewController != null) {
-                            await viewController!.runJavascript("""
+                              print("현재 페이지 주소: $url");
+                            },
+                            onPageFinished: (String url) async {
+                              setState(() {
+                                isLoading = false;
+                              });
+
+                              /// Soft Keyboard hide TextField on Android
+                              if (Platform.isAndroid) {
+                                if (url.contains(homeUrl) && viewController != null) {
+                                  await viewController!.runJavascript("""
                               (function() {
                               function scrollToFocusedInput(event) {
                                 const focusedElement = document.activeElement;
@@ -501,53 +477,59 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                               document.addEventListener('focus', scrollToFocusedInput, true);
                             })();
                             """);
-                          }
-                        }
+                                }
+                              }
 
-                        /// 외부 URL 처리
-                        if (!url.startsWith(homeUrl)) {
-                          setState(() {
-                            showFloatingActionButton = true;
-                          });
-                        } else {
-                          setState(() {
-                            showFloatingActionButton = false;
-                          });
-                        }
-                      },
-                      onWebResourceError: (error) {
-                        print("Error Code: ${error.errorCode}");
-                        print("RESOURCE ERROR Error Type ${error.errorType}");
-                        print("RESOURCE ERROR Failing URL ${error.domain}");
-                        print("Error Description: ${error.description}");
-                      },
-                      navigationDelegate: (request) async {
-                        final appScheme = ConvertUrl(request.url);
+                              /// 외부 URL 처리
+                              if (!url.startsWith(homeUrl)) {
+                                setState(() {
+                                  showFloatingActionButton = true;
+                                });
+                              } else {
+                                setState(() {
+                                  showFloatingActionButton = false;
+                                });
+                              }
+                            },
+                            onWebResourceError: (error) {
+                              print("Error Code: ${error.errorCode}");
+                              print("RESOURCE ERROR Error Type ${error.errorType}");
+                              print("RESOURCE ERROR Failing URL ${error.domain}");
+                              print("Error Description: ${error.description}");
+                            },
+                            navigationDelegate: (request) async {
+                              final appScheme = ConvertUrl(request.url);
 
-                        /// Toss Payments
-                        if (appScheme.isAppLink()) {
-                          try {
-                            await appScheme.launchApp();
-                          } on Error catch (e) {
-                            print("Fail to start Toss Payments: $e");
-                          }
+                              /// Toss Payments
+                              if (appScheme.isAppLink()) {
+                                try {
+                                  await appScheme.launchApp();
+                                } on Error catch (e) {
+                                  print("Fail to start Toss Payments: $e");
+                                }
 
-                          return NavigationDecision.prevent;
-                        }
+                                return NavigationDecision.prevent;
+                              }
 
-                        return NavigationDecision.navigate;
-                      },
-                      zoomEnabled: false,
-                      gestureRecognizers: Set()
-                        ..add(
-                          Factory<EagerGestureRecognizer>(
-                            () => EagerGestureRecognizer(),
+                              return NavigationDecision.navigate;
+                            },
+                            zoomEnabled: false,
+                            gestureRecognizers: Set()
+                              ..add(
+                                Factory<EagerGestureRecognizer>(
+                                      () => EagerGestureRecognizer(),
+                                ),
+                              ),
+                            gestureNavigationEnabled: true,
+                            userAgent: snapshot.data,
                           ),
                         ),
-                      gestureNavigationEnabled: true,
-                    ),
-                  ),
-                ),
+                      ),
+                    );
+                  } else {
+                    return const CircularProgressIndicator.adaptive();
+                  }
+                },
               );
             },
           ),

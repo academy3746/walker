@@ -8,9 +8,12 @@ class StepsCommunication {
 
   String date;
 
+  String userAgent;
+
   StepsCommunication({
     required this.steps,
     required this.date,
+    required this.userAgent,
   });
 
   Future<void> toJson(Map<String, dynamic> data) async {

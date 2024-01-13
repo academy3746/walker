@@ -16,6 +16,8 @@ class LocationCommunication {
 
   String time;
 
+  String userAgent;
+
   LocationCommunication({
     this.countryName,
     this.cityName,
@@ -23,6 +25,7 @@ class LocationCommunication {
     this.lng,
     required this.date,
     required this.time,
+    required this.userAgent,
   });
 
   Future<void> toJson(Map<String, dynamic> data) async {

@@ -46,16 +46,16 @@ class UserInfo {
 
   /// Get User Agent
   Future<String> getDevicePlatform() async {
-    var platformVersion = "undefined";
+    await FkUserAgent.init();
 
-    platformVersion = FkUserAgent.webViewUserAgent!;
+    var platformVersion = FkUserAgent.webViewUserAgent ?? "undefined";
 
     return platformVersion;
   }
 
   /// Generate App Scheme
   Future<String> getAppScheme() async {
-    var scheme = "";
+    var scheme = "undefined";
 
     var agent = await getDevicePlatform();
 
