@@ -300,7 +300,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       userAgent: userAgent,
     );
 
-    if (prefs.getInt("initialSteps") != null) {
+    if (_initialSteps != 0) {
       if (_savedSteps == 0) {
         setState(() {
           _nowWalking = steps - _initialSteps;
@@ -326,7 +326,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           "userAgent": userAgent,
         });
       }
-    } else if (prefs.getInt("initialSteps") == null) {
+    } else {
       setState(() {
         _nowWalking = _newSteps;
       });
