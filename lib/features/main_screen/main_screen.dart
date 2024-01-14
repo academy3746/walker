@@ -439,6 +439,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                             onWebViewCreated:
                                 (WebViewController webViewController) async {
                               _controller.complete(webViewController);
+
                               viewController = webViewController;
 
                               /// Get Cookie Statement
