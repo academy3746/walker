@@ -370,8 +370,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     if (now.isAfter(midnight)) {
       if (dailySteps >= 10000) {
         await msgController.sendInternalPush(
-          "축하드려요!",
-          "🏃‍♀️ 오늘 하루만 총 $dailySteps 걸음 걸으셨어요! 💕",
+          "축하드려요 💕",
+          "🏃‍♀️ 오늘 하루만 총 $dailySteps 걸음 걸으셨어요!",
         );
       }
     }
