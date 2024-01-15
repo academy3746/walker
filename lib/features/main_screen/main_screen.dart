@@ -300,22 +300,46 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       userAgent: userAgent,
     );
 
-    if (_initialSteps != 0) {
-      if (_savedSteps == 0) {
-        setState(() {
-          _nowWalking = steps - _initialSteps;
-        });
+    if (steps == 0) {
+      setState(() {
+        _nowWalking = steps;
+      });
 
-        await prefs.setInt("dailySteps", _nowWalking);
+      await stepsComm.toJson({
+        "steps": _nowWalking,
+        "date": date,
+        "userAgent": userAgent,
+      });
+    } else {
+      if (_initialSteps != 0) {
+        if (_savedSteps == 0) {
+          setState(() {
+            _nowWalking = steps - _initialSteps;
+          });
 
-        await stepsComm.toJson({
-          "steps": _nowWalking,
-          "date": date,
-          "userAgent": userAgent,
-        });
+          await prefs.setInt("dailySteps", _nowWalking);
+
+          await stepsComm.toJson({
+            "steps": _nowWalking,
+            "date": date,
+            "userAgent": userAgent,
+          });
+        } else {
+          setState(() {
+            _nowWalking = steps - _savedSteps;
+          });
+
+          await prefs.setInt("dailySteps", _nowWalking);
+
+          await stepsComm.toJson({
+            "steps": _nowWalking,
+            "date": date,
+            "userAgent": userAgent,
+          });
+        }
       } else {
         setState(() {
-          _nowWalking = steps - _savedSteps;
+          _nowWalking = _newSteps;
         });
 
         await prefs.setInt("dailySteps", _nowWalking);
@@ -326,18 +350,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           "userAgent": userAgent,
         });
       }
-    } else {
-      setState(() {
-        _nowWalking = _newSteps;
-      });
-
-      await prefs.setInt("dailySteps", _nowWalking);
-
-      await stepsComm.toJson({
-        "steps": _nowWalking,
-        "date": date,
-        "userAgent": userAgent,
-      });
     }
   }
 
