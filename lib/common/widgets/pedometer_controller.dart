@@ -48,7 +48,7 @@ class PedometerController {
 
     if (prefs.getInt("initialSteps") == null) {
       await prefs.setInt("initialSteps", currentSteps);
-    } else if (prefs.getInt("initialSteps") != null) {
+    } else {
       var initialSteps = prefs.getInt("initialSteps") ?? 0;
 
       var newSteps = currentSteps - initialSteps;
