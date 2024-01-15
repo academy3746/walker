@@ -300,18 +300,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       userAgent: userAgent,
     );
 
-    if (steps == 0) {
-      setState(() {
-        _nowWalking = steps;
-      });
-
-      await stepsComm.toJson({
-        "steps": _nowWalking,
-        "date": date,
-        "userAgent": userAgent,
-      });
-    } else {
-      if (_initialSteps != 0) {
+    if (_initialSteps != 0) {
+      if (steps != 0) {
         if (_savedSteps == 0) {
           setState(() {
             _nowWalking = steps - _initialSteps;
@@ -337,7 +327,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             "userAgent": userAgent,
           });
         }
-      } else {
+      }
+    } else {
+      if (steps != 0) {
         setState(() {
           _nowWalking = _newSteps;
         });
@@ -476,7 +468,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
                               /// Soft Keyboard hide TextField on Android
                               if (Platform.isAndroid) {
-                                if (url.contains(homeUrl) && viewController != null) {
+                                if (url.contains(homeUrl) &&
+                                    viewController != null) {
                                   await viewController!.runJavascript("""
                               (function() {
                               function scrollToFocusedInput(event) {
@@ -506,8 +499,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                             },
                             onWebResourceError: (error) {
                               print("Error Code: ${error.errorCode}");
-                              print("RESOURCE ERROR Error Type ${error.errorType}");
-                              print("RESOURCE ERROR Failing URL ${error.domain}");
+                              print(
+                                  "RESOURCE ERROR Error Type ${error.errorType}");
+                              print(
+                                  "RESOURCE ERROR Failing URL ${error.domain}");
                               print("Error Description: ${error.description}");
                             },
                             navigationDelegate: (request) async {
@@ -530,7 +525,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                             gestureRecognizers: Set()
                               ..add(
                                 Factory<EagerGestureRecognizer>(
-                                      () => EagerGestureRecognizer(),
+                                  () => EagerGestureRecognizer(),
                                 ),
                               ),
                             gestureNavigationEnabled: true,
