@@ -390,6 +390,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
@@ -420,125 +423,121 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           : null,
       body: Stack(
         children: [
-          LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              return FutureBuilder<String>(
-                future: userInfo.getAppScheme(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    //print("User Agent: $snapshot");
-                    return WillPopScope(
-                      onWillPop: () async {
-                        if (backHandlerButton != null) {
-                          return backHandlerButton!.onWillPop();
-                        }
-                        return false;
-                      },
-                      child: SizedBox(
-                        height: constraints.maxHeight,
-                        child: SafeArea(
-                          child: WebView(
-                            initialUrl: url,
-                            javascriptMode: JavascriptMode.unrestricted,
-                            onWebViewCreated:
-                                (WebViewController webViewController) async {
-                              _controller.complete(webViewController);
+          FutureBuilder<String>(
+            future: userInfo.getAppScheme(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                //print("User Agent: $snapshot");
+                return WillPopScope(
+                  onWillPop: () async {
+                    if (backHandlerButton != null) {
+                      return backHandlerButton!.onWillPop();
+                    }
+                    return false;
+                  },
+                  child: SafeArea(
+                    child: SizedBox(
+                      height: height,
+                      width: width,
+                      child: WebView(
+                        initialUrl: url,
+                        javascriptMode: JavascriptMode.unrestricted,
+                        onWebViewCreated:
+                            (WebViewController webViewController) async {
+                          _controller.complete(webViewController);
 
-                              viewController = webViewController;
+                          viewController = webViewController;
 
-                              /// Get Cookie Statement
-                              await cookieHandler?.setCookies(
-                                cookieHandler!.cookieValue,
-                                cookieHandler!.domain,
-                                cookieHandler!.cookieName,
-                                cookieHandler!.url,
-                              );
-                            },
-                            onPageStarted: (String url) async {
-                              setState(() {
-                                isLoading = true;
-                              });
+                          /// Get Cookie Statement
+                          await cookieHandler?.setCookies(
+                            cookieHandler!.cookieValue,
+                            cookieHandler!.domain,
+                            cookieHandler!.cookieName,
+                            cookieHandler!.url,
+                          );
+                        },
+                        onPageStarted: (String url) async {
+                          setState(() {
+                            isLoading = true;
+                          });
 
-                              print("현재 페이지 주소: $url");
-                            },
-                            onPageFinished: (String url) async {
-                              setState(() {
-                                isLoading = false;
-                              });
+                          print("현재 페이지 주소: $url");
+                        },
+                        onPageFinished: (String url) async {
+                          setState(() {
+                            isLoading = false;
+                          });
 
-                              /// Soft Keyboard hide TextField on Android
-                              if (Platform.isAndroid) {
-                                if (url.contains(homeUrl) &&
-                                    viewController != null) {
-                                  await viewController!.runJavascript("""
-                              (function() {
-                              function scrollToFocusedInput(event) {
-                                const focusedElement = document.activeElement;
-                                if (focusedElement.tagName.toLowerCase() === 'input' || focusedElement.tagName.toLowerCase() === 'textarea') {
-                                  setTimeout(() => {
-                                    focusedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                  }, 500);
+                          /// Soft Keyboard hide TextField on Android
+                          if (Platform.isAndroid) {
+                            if (url.contains(homeUrl) &&
+                                viewController != null) {
+                              await viewController!.runJavascript("""
+                                (function() {
+                                function scrollToFocusedInput(event) {
+                                  const focusedElement = document.activeElement;
+                                  if (focusedElement.tagName.toLowerCase() === 'input' || focusedElement.tagName.toLowerCase() === 'textarea') {
+                                    setTimeout(() => {
+                                      focusedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    }, 500);
+                                  }
                                 }
-                              }
-                              document.addEventListener('focus', scrollToFocusedInput, true);
-                            })();
+                                document.addEventListener('focus', scrollToFocusedInput, true);
+                              })();
                             """);
-                                }
-                              }
+                            }
+                          }
 
-                              /// 외부 URL 처리
-                              if (!url.startsWith(homeUrl)) {
-                                setState(() {
-                                  showFloatingActionButton = true;
-                                });
-                              } else {
-                                setState(() {
-                                  showFloatingActionButton = false;
-                                });
-                              }
-                            },
-                            onWebResourceError: (error) {
-                              print("Error Code: ${error.errorCode}");
-                              print(
-                                  "RESOURCE ERROR Error Type ${error.errorType}");
-                              print(
-                                  "RESOURCE ERROR Failing URL ${error.domain}");
-                              print("Error Description: ${error.description}");
-                            },
-                            navigationDelegate: (request) async {
-                              final appScheme = ConvertUrl(request.url);
+                          /// 외부 URL 처리
+                          if (!url.startsWith(homeUrl)) {
+                            setState(() {
+                              showFloatingActionButton = true;
+                            });
+                          } else {
+                            setState(() {
+                              showFloatingActionButton = false;
+                            });
+                          }
+                        },
+                        onWebResourceError: (error) {
+                          print("RESOURCE ERROR Failing URL ${error.domain}");
+                          print("Error Code: ${error.errorCode}");
+                          print("Error Description: ${error.description}");
+                        },
+                        navigationDelegate: (request) async {
+                          /// Toss Payments
+                          final appScheme = ConvertUrl(request.url);
 
-                              /// Toss Payments
-                              if (appScheme.isAppLink()) {
-                                try {
-                                  await appScheme.launchApp();
-                                } on Error catch (e) {
-                                  print("Fail to start Toss Payments: $e");
-                                }
+                          if (appScheme.isAppLink()) {
+                            try {
+                              await appScheme.launchApp();
+                            } on Error catch (e) {
+                              print("Fail to start Toss Payments: $e");
+                            }
 
-                                return NavigationDecision.prevent;
-                              }
+                            return NavigationDecision.prevent;
+                          }
 
-                              return NavigationDecision.navigate;
-                            },
-                            zoomEnabled: false,
-                            gestureRecognizers: Set()
-                              ..add(
-                                Factory<EagerGestureRecognizer>(
-                                  () => EagerGestureRecognizer(),
-                                ),
-                              ),
-                            gestureNavigationEnabled: true,
-                            userAgent: snapshot.data,
+                          return NavigationDecision.navigate;
+                        },
+                        zoomEnabled: false,
+                        gestureRecognizers: Set()
+                          ..add(
+                            Factory<EagerGestureRecognizer>(
+                              () => EagerGestureRecognizer(),
+                            ),
                           ),
-                        ),
+                        gestureNavigationEnabled: true,
+                        userAgent: snapshot.data,
                       ),
-                    );
-                  } else {
-                    return const CircularProgressIndicator.adaptive();
-                  }
-                },
-              );
+                    ),
+                  ),
+                );
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator.adaptive(),
+                );
+              }
             },
           ),
           isLoading
