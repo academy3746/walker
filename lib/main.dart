@@ -3,8 +3,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:walker/common/widgets/steps_manager.dart';
 import 'package:walker/features/main_screen/main_screen.dart';
 import 'package:walker/features/splash_screen/splash_screen.dart';
+import 'package:workmanager/workmanager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +26,32 @@ void main() async {
       systemNavigationBarColor: Colors.white,
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
+  );
+
+  var now = DateTime.now();
+
+  var tomorrow = DateTime(
+    now.year,
+    now.month,
+    now.day + 1,
+  );
+
+  var remains = tomorrow.difference(now);
+
+  var uniqueName = "일일 걸음수 저장";
+
+  var taskName = "saveStepsTask";
+
+  await Workmanager().initialize(
+    callbackDispatcher,
+    isInDebugMode: true,
+  );
+
+  await Workmanager().registerPeriodicTask(
+    uniqueName,
+    taskName,
+    frequency: const Duration(hours: 24),
+    initialDelay: Duration(milliseconds: remains.inMilliseconds),
   );
 
   runApp(const WalkerApp());

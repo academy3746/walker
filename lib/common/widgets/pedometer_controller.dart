@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:walker/common/widgets/steps_manager.dart';
-import 'package:workmanager/workmanager.dart';
 
 class PedometerController {
   /// 걸음수 구독
@@ -78,20 +76,6 @@ class PedometerController {
 
   /// Pedometer Controller 초기화
   Future<void> initPlatformState(BuildContext context) async {
-    var now = DateTime.now();
-
-    var tomorrow = DateTime(
-      now.year,
-      now.month,
-      now.day + 1,
-    );
-
-    var remains = tomorrow.difference(now);
-
-    var uniqueName = "일일 걸음수 저장";
-
-    var taskName = "saveStepsTask";
-
     stepCountStream = Pedometer.stepCountStream;
 
     pedestrianStatusStream = Pedometer.pedestrianStatusStream;
@@ -105,18 +89,6 @@ class PedometerController {
     await _initDailyTimer();
 
     if (!context.mounted) return;
-
-    await Workmanager().initialize(
-      callbackDispatcher,
-      isInDebugMode: true,
-    );
-
-    await Workmanager().registerPeriodicTask(
-      uniqueName,
-      taskName,
-      frequency: const Duration(hours: 24),
-      initialDelay: Duration(milliseconds: remains.inMilliseconds),
-    );
   }
 
   /// Timer Reset (일일 단위)
