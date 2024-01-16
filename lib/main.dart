@@ -63,7 +63,7 @@ class WalkerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '부럽',
+      title: "부럽",
       theme: ThemeData(
         primaryColor: const Color(0xFF38BEEF),
         useMaterial3: false,
