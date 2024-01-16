@@ -48,7 +48,7 @@ class PedometerController {
 
     if (prefs.getInt("initialSteps") == null) {
       await prefs.setInt("initialSteps", currentSteps);
-    } else {
+    } else if (prefs.getInt("initialSteps") != null) {
       var initialSteps = prefs.getInt("initialSteps") ?? 0;
 
       var newSteps = currentSteps - initialSteps;
@@ -92,18 +92,6 @@ class PedometerController {
 
     var taskName = "saveStepsTask";
 
-    await Workmanager().initialize(
-      callbackDispatcher,
-      isInDebugMode: true,
-    );
-
-    await Workmanager().registerPeriodicTask(
-      uniqueName,
-      taskName,
-      frequency: const Duration(hours: 24),
-      initialDelay: Duration(milliseconds: remains.inMilliseconds),
-    );
-
     stepCountStream = Pedometer.stepCountStream;
 
     pedestrianStatusStream = Pedometer.pedestrianStatusStream;
@@ -117,6 +105,18 @@ class PedometerController {
     await _initDailyTimer();
 
     if (!context.mounted) return;
+
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: true,
+    );
+
+    await Workmanager().registerPeriodicTask(
+      uniqueName,
+      taskName,
+      frequency: const Duration(hours: 24),
+      initialDelay: Duration(milliseconds: remains.inMilliseconds),
+    );
   }
 
   /// Timer Reset (일일 단위)
