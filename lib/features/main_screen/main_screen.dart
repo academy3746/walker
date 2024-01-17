@@ -534,8 +534,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                   ),
                 );
               } else {
-                return const Center(
-                  child: CircularProgressIndicator.adaptive(),
+                return Center(
+                  child: GestureDetector(
+                    onTap: _loadHomeUrl,
+                    child: const Icon(Icons.refresh),
+                  ),
                 );
               }
             },
