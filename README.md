@@ -1,13 +1,16 @@
 # Introduction
-당신이 부러운 여행지, 부럽 (Android / IOS / <a href="https://boolub.com/">Web</a>)
-1. BackEnd CONFIG (개발중): PHP / AWS / Ubuntu / 자체 솔루션
-2. FrontEnd CONFIG: Flutter / Android / IOS
-3. Native App Performance
-- 인 앱 Push 서비스
-- GPS
-- 만보기
+당신이 부러운 여행지, 부럽 (외주 프로젝트)
+1. Service Scope: <a href="https://www.boolub.com">Web</a> / Android / IOS
+2. Application Developing Tool: Flutter / Android Studio / X Code
+3. Server Configuration: Ubuntu / AWS
+4. BackEnd Developing Tool: PHP / PHPMyAdmin (RDBMS) / 클라이언트 제공 솔루션
+5. Native App Performance
+- 인 앱 Push 서비스: Firebase Cloud Messaging
+- GPS: Geolocator
+- 만보기: Pedometer / WorkManager
+- PG 결제: Toss Payments
 
-# External Plugin List (pubspec.yaml)
+# External Plugin List
 1. cupertino_icons: ^1.0.2
 2. geolocator: ^10.1.0
 3. permission_handler: ^11.0.1
