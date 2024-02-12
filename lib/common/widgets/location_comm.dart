@@ -31,7 +31,7 @@ class LocationCommunication {
   Future<void> toJson(Map<String, dynamic> data) async {
     const String apiKey = "appUpdateCity.vn.php";
 
-    var redirectUrl = "https://boolub.com/addons/app/request/$apiKey";
+    var redirectUrl = "https://www.boolub.com/addons/app/request/$apiKey";
 
     var response = await http.post(
       Uri.parse(redirectUrl),

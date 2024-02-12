@@ -42,10 +42,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   WebViewController? viewController;
 
   /// Initialize App URL
-  final String url = "https://boolub.com/?is_app=y";
+  final String url = "https://www.boolub.com/?is_app=y";
 
   /// Initialize Home URL
-  final String homeUrl = "https://boolub.com/";
+  final String homeUrl = "https://www.boolub.com/";
 
   /// Import Back Action Handler
   BackHandlerButton? backHandlerButton;
