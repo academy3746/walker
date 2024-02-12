@@ -52,10 +52,17 @@
 <h3>TextField Focusing Issue on Android WebView</h3>
 
 <div style="margin-top: 50px">
+    <p>1. 안드로이드 시스템의 소프트 키보드가 차지한 영역만큼 화면이 밀려 올라가지 않는 문제</p>
+    <p>2. 사용자가 선택한 TextField 위치로 Auto Focusing이 되지 않는 문제</p>
     <p><img src="assets/images/issue01.png" style="height: 500px; width: 200px;"></p>
 </div>
 
-<!--
+<div style="margin-top: 50px">
+    <p>문제를 바라보는 관점에 따라 접근 방법 역시 달라짐을 유의해야 한다.</p>
+    <p>1번 문제라면 네이티브 앱에서 취할 수 있는 조치들이 따로 있다.</p>
+    <p>2번 문제라면 웹 앱에서 취할 수 있는 조치와 연관지어서 접근해야 한다.</p>
+</div>
+
 <div style="margin-top: 50px">
     <h4>제 1안</h4>
     <p>1111</p>
@@ -65,7 +72,6 @@
     <h4>제 2안</h4>
     <p>2222</p>
 </div>
--->
 
 # Issue02
 
