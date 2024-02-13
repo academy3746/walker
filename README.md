@@ -65,12 +65,26 @@
 </div>
 
 <div style="margin-top: 50px">
-    <h4>제 1안</h4>
-    <p>1111</p>
+    <h4>1. 안드로이드 시스템의 소프트 키보드가 차지한 영역만큼 화면이 밀려 올라가지 않는 문제</h4>
+    <p>1) SingleChildScrollView</p>
+    <p style="margin-left: 25px">대부분의 상황에서는 SingleChildScrollView 위젯을 사용하면 해결된다.</p>
+    <p style="margin-left: 25px">화면 전체를 자연스럽게 스크롤이 가능한 영역으로 잡는다는 접근방식이다.</p>
+    <p style="margin-left: 25px">TextField 위젯이 소프트 키보드에 가려질 때 가장 먼저 시도 해볼만 하다.</p>
+    <p style="margin-left: 25px">기본적으로 List 객체에 담긴 데이터 값들을 Row에서 렌더링할 때 쓰는 방법이다.</p>
+    <p style="margin-left: 25px">결과적으로는 문제를 해결하지 못했다.</p>
+    <p>2) Adjust Resize</p>
+    <p style="margin-left: 25px">안드로이드 설정 자체를 건드리는 방법도 있다.</p>
+    <p style="margin-left: 25px">'AndroidManifest.xml' 파일에서 'activity' 설정 값을 변경하는 것이다.</p>
+    <p style="margin-left: 25px">보통 'android:windowSoftInputMode' 값을 'adjustResize'로 설정한다.</p>
+    <p style="margin-left: 25px">디버깅 결과, 효과가 전혀 없는 것은 아니었다.</p>
+    <p style="margin-left: 25px">결과적으로는 TextField를 터치하였을 때, 키보드 영역만큼 화면이 밀려 올라가기는 했다.</p>
+    <p style="margin-left: 25px">문제는 이 동작이 열 번이면 열 번 전부 동일하게 작동하지는 않았다는 것이다.</p>
+    <p style="margin-left: 25px">짐작하기로는 MediaQuery가 안드로이드 웹뷰에서 완전하게 동기화 되지는 않는 것 같다.</p>
+    <p style="margin-left: 25px">다만, 이제는 접근 방법을 달리 해볼 필요가 있다는 것이다.</p>
 </div>
 
 <div style="margin-top: 50px">
-    <h4>제 2안</h4>
+    <h4>2. 사용자가 선택한 TextField 위치로 Focusing이 되지 않는 문제</h4>
     <p>2222</p>
 </div>
 
