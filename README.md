@@ -52,7 +52,7 @@
 <h3>TextField Focusing Issue on Android WebView</h3>
 
 <div style="margin-top: 50px">
-    <p>1. 안드로이드 시스템의 소프트 키보드가 차지한 영역만큼 화면이 밀려 올라가지 않는 문제</p>
+    <p>1. 소프트 키보드가 차지한 영역만큼 화면이 밀려 올라가지 않는 문제</p>
     <p>2. 사용자가 선택한 TextField 위치로 Focusing이 되지 않는 문제</p>
     <p><img src="assets/images/issue01.png" style="height: 500px; width: 200px;"></p>
 </div>
@@ -61,18 +61,17 @@
     <p>문제를 바라보는 관점에 따라 접근 방법 역시 달라진다.</p>
     <p>1번 문제라면 네이티브 앱에서만 취할 수 있는 조치들이 있다.</p>
     <p>2번 문제라면 웹에서 취할 수 있는 조치와 연관지어서 접근해야 한다.</p>
-    <p>네이티브적 접근방식 만으로는 문제 해결이 어려울 수도 있다는 뜻이다.</p>
 </div>
 
 <div style="margin-top: 50px">
-    <h4>1. 안드로이드 시스템의 소프트 키보드가 차지한 영역만큼 화면이 밀려 올라가지 않는 문제</h4>
-    <p>1) SingleChildScrollView</p>
+    <h4>1. 소프트 키보드가 차지한 영역만큼 화면이 밀려 올라가지 않는 문제</h4>
+    <p style="margin-top: 40px">1) SingleChildScrollView</p>
     <p style="margin-left: 25px">대부분의 상황에서는 SingleChildScrollView 위젯을 사용하면 해결된다.</p>
     <p style="margin-left: 25px">화면 전체를 자연스럽게 스크롤이 가능한 영역으로 잡는다는 접근방식이다.</p>
     <p style="margin-left: 25px">TextField 위젯이 소프트 키보드에 가려질 때 가장 먼저 시도 해볼만 하다.</p>
     <p style="margin-left: 25px">기본적으로 List 객체에 담긴 데이터 값들을 Row에서 렌더링할 때 쓰는 방법이다.</p>
     <p style="margin-left: 25px">결과적으로는 문제를 해결하지 못했다.</p>
-    <p>2) Adjust Resize</p>
+    <p style="margin-top: 40px">2) Adjust Resize</p>
     <p style="margin-left: 25px">안드로이드 설정 자체를 건드리는 방법도 있다.</p>
     <p style="margin-left: 25px">'AndroidManifest.xml' 파일에서 'activity' 설정 값을 변경하는 것이다.</p>
     <p style="margin-left: 25px">보통 'android:windowSoftInputMode' 값을 'adjustResize'로 설정한다.</p>
