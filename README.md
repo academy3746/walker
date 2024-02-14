@@ -84,7 +84,15 @@
 
 <div style="margin-top: 50px">
     <h4>2. 사용자가 선택한 TextField 위치로 Focusing이 되지 않는 문제</h4>
-    <p>2222</p>
+    <p style="margin-top: 40px">문제의 원인을 네이티브가 아닌 웹에서 찾으려고 한다면 관점이 살짝 달라진다.</p>
+    <p>소프트 키보드가 차지한 영역만큼 화면이 밀려 올라가는 것과</p>
+    <p>사용자가 터치한 TextField 위치로 시점이 전환되는 것은 사뭇 다르다.</p>
+    <p>우리의 앱은 기본적으로 반응형 웹을 패키징한 구조이기 때문에 이 부분은 JavaScript로 해결할 수 있다.</p>
+    <p>TextField를 터치하면 약 200ms 정도의 텀을 두고 해당 영역으로 Focusing이 되는 것이다.</p>
+    <p>WebView 위젯에서는 'runJavascript'를 사용하여 Javascript를 Enabled 시킬 수 있다.</p>
+    <p>해당 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L475">라인</a>을 참조 바란다.</p>
+    <p>위, 아래 TextField 어디를 터치하든지 간에 자연스럽게 Focusing이 됨을 확인할 수 있다.</p>
+    <p>당연히 소프트 키보드가 해당 영역을 가리지도 않는다.</p>
 </div>
 
 # Issue02
