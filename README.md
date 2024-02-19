@@ -8,7 +8,7 @@
 
 2. Application Developing Tool: Flutter / Android Studio / X Code
 3. Server Configuration: Ubuntu / AWS
-4. BackEnd Developing Tool: PHP / PHPMyAdmin (RDBMS) / 클라이언트 솔루션
+4. BackEnd Developing Tool: PHP / PHPMyAdmin (RDBMS) / 고객사 솔루션
 5. Native App Performance
 
 - 인 앱 Push 서비스: Firebase Cloud Messaging
@@ -54,7 +54,7 @@
 <div style="margin-top: 50px">
     <p>1. 소프트 키보드가 차지한 영역만큼 화면이 밀려 올라가지 않는 문제</p>
     <p>2. 사용자가 선택한 TextField 위치로 Focusing이 되지 않는 문제</p>
-    <p><img src="assets/images/issue01.png" style="height: 500px; width: 200px;"></p>
+    <p><img src="assets/images/issue01.png" style="height: 400px; width: 230px;"></p>
 </div>
 
 <div style="margin-top: 50px">
@@ -87,7 +87,7 @@
     <p style="margin-top: 40px">문제의 원인을 네이티브가 아닌 웹에서 찾으려고 한다면 관점이 살짝 달라진다.</p>
     <p>소프트 키보드가 차지한 영역만큼 화면이 밀려 올라가는 것과</p>
     <p>사용자가 터치한 TextField 위치로 시점이 전환되는 것은 사뭇 다르다.</p>
-    <p>우리의 앱은 기본적으로 반응형 웹을 패키징한 구조이기 때문에 이 부분은 JavaScript로 해결할 수 있다.</p>
+    <p>부럽 앱은 기본적으로 반응형 웹을 패키징한 구조이기 때문에 이 부분은 JavaScript로 해결할 수 있다.</p>
     <p>TextField를 터치하면 약 200ms 정도의 텀을 두고 해당 영역으로 Focusing이 되는 것이다.</p>
     <p>WebView 위젯에서는 'runJavascript'를 사용하여 Javascript를 Enabled 시킬 수 있다.</p>
     <p>해당 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L475">라인</a>을 참조 바란다.</p>
@@ -95,6 +95,39 @@
     <p>당연히 소프트 키보드가 해당 영역을 가리지도 않는다.</p>
 </div>
 
-# Issue02
+# Issue02 (수정중)
+
+<h3>In App WebView PG (Payment Gate) Issue</h3>
+
+<div style="margin-top: 50px">
+    <p>1. 기구축된 Toss Payments 결제 서비스가 앱에서 정상작동 하지 않는 문제</p>
+    <p>2. URL Type Scheme (Intent) Error</p>
+    <p><img src="assets/images/issue02.jpeg" style="height: 350px; width: 250px;"></p>
+</div>
+
+<div style="margin-top: 50px">
+    <p>Toss Payments는 다양한 형태의 간편 결제 서비스를 지원한다.</p>
+    <p>온갖 카드결제 항목은 사실상 옵션에 불과하다.</p>
+    <p>One Touch 결제가 가능한 네이버, 카카오페이야말로 서비스의 핵심 요소라고 할 수 있을 것이다.</p>
+    <p>문제는 플랫폼마다 서로 다른 URL 스키마를 결과값으로 반환한다는 것이다.</p>
+    <p>가령, 카카오페이의 경우는 'kakao://'와 같은 포맷으로 결제를 요청한다.</p>
+    <p>각종 카드사들은 말할 것도 없을 것이다.</p>
+</div>
+
+<div style="margin-top: 50px">
+    <p>물론, TOSS사의 백엔드 개발자들이 이 점을 간과했을 리가 없다.</p>
+    <p>그 증거로 Toss Payments 제공하는 결제 방식은 모두 일관된 URL 타입으로 파싱이 된 상태이다.</p>
+    <p><strong>https://payment-gateway.tosspayments.com/pc/payment-method/digital-wallet/option?token=${SAMPLE}&gtid=${SAMPLE}&cardCode=KAKAOPAY</strong></p>
+    <p>네이버페이는 cardCode의 GET값이 'NAVERPAY', 토스페이는 'TOSSPAY'이다.</p>
+</div>
+
+<div style="margin-top: 50px">
+    <p>하지만 TOSS 개발자들의 세심한 일처리는 딱 거기까지이다.</p>
+    <p>본인이 짐작하기에 해당 파싱 처리는 Mobile Web을 염두에 둔 조치 같다.</p>
+    <p>Flutter 앱에서 간편 결제를 진행하였을 때는 여전히 URL Scheme 에러가 발생하지만...</p>
+    <p>스마트폰의 크롬 브라우저에서 디버깅을 해봤을 때는 해당사항이 없었기 때문이다.</p>
+    <p>하이브리드 앱은 이러한 부분에서 오히려 시간을 더 많이 잡아먹을 때가 있다.</p>
+    <p><img src="assets/images/issue03.jpeg" style="height: 350px; width: 250px;"></p>
+</div>
 
 # Issue03
