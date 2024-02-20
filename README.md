@@ -88,12 +88,9 @@
     <p>소프트 키보드가 차지한 영역만큼 화면이 밀려 올라가는 것과,</p>
     <p>사용자가 터치한 TextField 위치로 시점이 전환되는 것은 어감에서 오는 느낌부터가 사뭇 다르다.</p>
     <p>부럽 앱은 기본적으로 반응형 웹을 패키징한 구조이기 때문에 이 부분은 JavaScript로 해결할 수 있다.</p>
-    <p>TextField를 터치하면 약 200ms 정도의 텀을 두고 해당 영역으로 Focusing이 되는 것이다.</p>
-    <p>WebView 위젯에서는 'runJavascript'를 사용하여 Javascript를 Enabled 시킬 수 있다.</p>
     <p>해당 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L475">라인</a>을 참조 바란다.</p>
     <p>위, 아래 TextField (input, textArea) 어디를 터치하든지 간에 자연스럽게 시점이 이동한다.</p>
     <p>또한, 네이티브 앱과 유사한 경험을 제공하기 위해 500ms 정도의 Interval을 두고 작동한다.</p>
-    <p>결론적으로 해당 이슈는 JavaScript Skill을 활용하는 것이 관건이다.</p>
 </div>
 
 # Issue02 (작업중)
