@@ -86,7 +86,7 @@
     <h4>2. 사용자가 선택한 TextField 위치로 Focusing이 되지 않는 문제</h4>
     <p style="margin-top: 40px">문제의 원인을 웹 서버에서 찾으려고 한다면 관점이 살짝 달라진다.</p>
     <p>소프트 키보드가 차지한 영역만큼 화면이 밀려 올라가는 것과,</p>
-    <p>사용자가 터치한 TextField 위치로 시점이 전환되는 것은 사뭇 다르다.</p>
+    <p>사용자가 터치한 TextField 위치로 시점이 전환되는 것은 어감에서 오는 느낌부터가 사뭇 다르다.</p>
     <p>부럽 앱은 기본적으로 반응형 웹을 패키징한 구조이기 때문에 이 부분은 JavaScript로 해결할 수 있다.</p>
     <p>TextField를 터치하면 약 200ms 정도의 텀을 두고 해당 영역으로 Focusing이 되는 것이다.</p>
     <p>WebView 위젯에서는 'runJavascript'를 사용하여 Javascript를 Enabled 시킬 수 있다.</p>
