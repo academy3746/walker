@@ -113,7 +113,7 @@
 <div style="margin-top: 50px">
     <p>물론, TOSS사의 백엔드 개발자들이 이 점을 간과했을 리가 없다.</p>
     <p>그 증거로 Toss Payments 제공하는 PG결제는 모두 일관된 URL 타입으로 파싱이 된 상태이다.</p>
-    <p><strong>https://payment-gateway.tosspayments.com/pc/payment-method/digital-wallet/option?token=${SAMPLE}&gtid=${SAMPLE}&cardCode=KAKAOPAY</strong></p>
+    <p><strong><a href="#" onclick="return false">https://payment-gateway.tosspayments.com/pc/payment-method/digital-wallet/option?token=${SAMPLE}&gtid=${SAMPLE}&cardCode=KAKAOPAY</a></strong></p>
     <p>네이버페이의 경우, cardCode의 GET값이 'NAVERPAY', 토스페이는 'TOSSPAY' 와 같은 식이다.</p>
 </div>
 
