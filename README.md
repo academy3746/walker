@@ -151,3 +151,13 @@
 </div>
 
 # Issue03
+
+<h3>Steps Count Management Issue</h3>
+
+<div style="margin-top: 50px">
+    <p>만보기 기능 구현 및 걸음수 관리 문제</p>
+</div>
+
+<div style="margin-top: 50px">
+    <p>11111</p>
+</div>
