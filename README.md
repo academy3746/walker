@@ -150,7 +150,7 @@
     <p>여담이지만, PG결제 페이지만큼은 증권사와의 API 연동 문제 때문에 WebView로 렌더링하는 경우가 많다고 한다.</p>
 </div>
 
-# Issue03
+# Issue03(작업중)
 
 <h3>Steps Count Management Issue</h3>
 
