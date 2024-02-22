@@ -11,10 +11,10 @@
 4. BackEnd Developing Tool: PHP / PHPMyAdmin (RDBMS) / 고객사 솔루션
 5. Native App Performance
 
-- 인 앱 Push 서비스: Firebase Cloud Messaging
+- inApp Push Service: Firebase Cloud Messaging
 - GPS: Geolocator
 - 만보기: Pedometer / WorkManager
-- In App WebView PG 결제: Toss Payments SDK
+- inAppWebView PG 결제: Toss Payments SDK
 
 # External Plugin List
 
@@ -93,12 +93,12 @@
     <p>또한, 네이티브 앱과 유사한 경험을 제공하기 위해 500ms 정도의 Interval을 두고 작동한다.</p>
 </div>
 
-# Issue02 (작업중)
+# Issue02
 
-<h3>URL Scheme Issue on InAppWebView</h3>
+<h3>URL Scheme Issue on Flutter inAppWebView</h3>
 
 <div style="margin-top: 50px">
-    <p>기구축된 Toss Payments 결제 서비스가 앱에서 정상작동 하지 않는 문제</p>
+    <p>기구축된 Toss Payments PG결제가 앱에서 정상작동 하지 않는 문제</p>
     <p><img src="assets/images/issue02.jpeg" style="height: 350px; width: 250px;"></p>
 </div>
 
@@ -118,45 +118,36 @@
 </div>
 
 <div style="margin-top: 50px">
-    <p>하지만 TOSS 개발자들의 안배는 딱 거기까지이다.</p>
+    <p>하지만 TOSS 개발자들의 세심한 안배는 딱 거기까지이다.</p>
     <p>Flutter 앱에서 간편 결제를 진행하였을 때는 여전히 URL Scheme 에러가 발생하지만...</p>
-    <p>스마트폰의 크롬 브라우저에서 디버깅을 해봤을 때는 오류 해당사항이 없었기 때문이다.</p>
-    <p>짐작건대, 이러한 파싱 처리는 Mobile Web을 염두에 둔 조치 같다.</p>
-    <p>하이브리드 앱은 이러한 부분에서 오히려 시간을 더 많이 잡아먹을 때가 있다.</p>
+    <p>스마트폰에 기본적으로 설치된 크롬 내지 사파리 브라우저는 해당사항이 없었기 때문이다.</p>
+    <p>아쉽지만, 이러한 조치는 Mobile Web 환경까지만 고려한 것 같다.</p>
     <p><img src="assets/images/issue03.jpeg" style="height: 350px; width: 250px;"></p>
 </div>
 
 <div style="margin-top: 50px">
-    <p>여기서 또 한 번 분기점이 갈라진다.</p>
-    <p>키보드 이슈와 마찬가지로 문제를 클라이언트에서 해결할지, 서버에서 풀어나갈지를 결정하는 것이다.</p>
-    <p>거두절미 하자면 양쪽 모두 유효한 접근방법이다.</p>
-    <p>방법론적으로는 후자가 더 간단할 수도 있다.</p>
-    <p>다만, 이번 이슈는 네이티브 앱을 중심으로 다뤄보겠다.</p>
-    <p>웹 서버에서의 접근방법은 <a href="https://github.com/academy3746/albup">여기</a>를 참고 바란다.</p>
+    <p>그래도 여기까지 접근했다면 문제를 거의 해결한 것과 진배하다.</p>
+    <p>TOSS 개발자들이 그러하였듯이 앱에서도 동일하게 외부 URL을 파싱하는 것이다.</p>
+    <p>사실, 호언장담 했던 것만큼 간단한 작업은 아니다.</p>
+    <p>Scheme 에러를 발생시킬 법한 요소를 찾아내어 필터링 하는 과정이 필요하다.</p>
+    <p>특정 패턴의 문자열을 분리하거나 대체하는 등의 가공 처리 말이다.</p>
+    <p>필자의 역량으로는 여기까지가 한계였다.</p>
 </div>
 
 <div style="margin-top: 50px">
-    <p>클라이언트에서 문제를 해결해보겠다고 호언장담을 하였으나, 해답은 이미 나와있다.</p>
-    <p>TOSS 개발자들이 그러했듯이, URL Parsing을 앱에서도 동일하게 처리해주는 것이다.</p>
-    <p>이해하기 쉽게 설명하자면 이런 식이다.</p>
-    <p>사용자들은 본인 편의에 따라 카드결제, 카카오페이, 토스페이 중에서 결제 방식을 선택할 것이다.</p>
-    <p>결제를 요청 (request)하는 창구는 수십, 수백 가지가 넘을 수도 있는 것이다.</p>
-    <p>그렇지만, 응답 (response)을 처리하는 창구는 부럽트래블 호스팅 서버 한 곳이다.</p>
-    <p>따라서 'toss://' 와 같은 형식의 스키마를 'https://' 포멧으로 변환해주는 과정이 필요하다.</p>
+    <p>하지만 Flutter에는 한계가 없나보다.</p>
+    <p>Toss Payments PG결제만을 위한 <a href="https://pub.dev/packages/tosspayments_widget_sdk_flutter">플러그인</a>이 따로 있을 줄이야?</p>
+    <p>필자가 필요로 하는 모든 요구사항이 플러그인에 내장되어 있으니 가져다 쓰기만 하면 되는 것이다.</p>
+    <p>상세한 작업 내용은 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L507">링크</a>를 참조 바란다.</p>
+    <p>그래도 간략하게나마 로직을 설명해보도록 하겠다.</p>
 </div>
 
 <div style="margin-top: 50px">
-    <p>Mobile Web에서는 PG결제에 포함된 내용이지만 Flutter WebView를 매개로 하면 간단하지 않다.</p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
+    <p>우선 프로젝트에서 'tosspayments_url.dart' 패키지를 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L14">import</a> 해주는 것이 첫 걸음이다.</p>
+    <p>다음으로 WebView 위젯 내부 'navigationDelegate' 프로퍼티에서 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L509C45-L509C55">ConvertUrl()</a> 플러그인 클래스를 호출한다.</p>
+    <p>이 ConvertUrl() 클래스 내부에 위치한 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L511">isAppLink()</a> 메서드에서 URL 파싱 작업이 이루어진다고 보아도 무방하다.</p>
+    <p>그리고, 최종적으로는 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L513C47-L513C58">launchApp()</a> 메서드에서 PG결제 처리를 진행하는 것이다.</p>
+    <p>여담이지만, PG결제 페이지만큼은 증권사 API와의 연동 문제 때문에 WebView로 렌더링하는 경우가 많다고 한다.</p>
 </div>
 
 # Issue03
