@@ -114,7 +114,7 @@
     <p>물론, TOSS사의 백엔드 개발자들이 이 점을 간과했을 리가 없다.</p>
     <p>그 증거로 Toss Payments 제공하는 PG결제는 모두 일관된 URL 타입으로 파싱이 된 상태이다.</p>
     <p><strong>https://payment-gateway.tosspayments.com/pc/payment-method/digital-wallet/option?token=${SAMPLE}&gtid=${SAMPLE}&cardCode=KAKAOPAY</strong></p>
-    <p>네이버페이는 cardCode의 GET값이 'NAVERPAY', 토스페이는 'TOSSPAY' 와 같은 포맷이다.</p>
+    <p>네이버페이의 경우, cardCode의 GET값이 'NAVERPAY', 토스페이는 'TOSSPAY' 와 같은 식이다.</p>
 </div>
 
 <div style="margin-top: 50px">
@@ -147,7 +147,7 @@
     <p>다음으로 WebView 위젯 내부 'navigationDelegate' 프로퍼티에서 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L509C45-L509C55">ConvertUrl()</a> 플러그인 클래스를 호출한다.</p>
     <p>이 ConvertUrl() 클래스 내부에 위치한 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L511">isAppLink()</a> 메서드에서 URL 파싱 작업이 이루어진다고 보아도 무방하다.</p>
     <p>그리고, 최종적으로는 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L513C47-L513C58">launchApp()</a> 메서드에서 PG결제 처리를 진행하는 것이다.</p>
-    <p>여담이지만, PG결제 페이지만큼은 증권사 API와의 연동 문제 때문에 WebView로 렌더링하는 경우가 많다고 한다.</p>
+    <p>여담이지만, PG결제 페이지만큼은 증권사와의 API 연동 문제 때문에 WebView로 렌더링하는 경우가 많다고 한다.</p>
 </div>
 
 # Issue03
