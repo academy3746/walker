@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:walker/common/widgets/fcm_controller.dart';
 import 'package:walker/common/widgets/steps_manager.dart';
 import 'package:walker/features/main_screen/main_screen.dart';
 import 'package:walker/features/splash_screen/splash_screen.dart';
@@ -12,6 +15,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
+
+  FirebaseMessaging.onBackgroundMessage((message) async {
+    var msgController = Get.put(MsgController());
+
+    await msgController.onBackgroundHandler(message);
+  });
 
   await SystemChrome.setPreferredOrientations(
     [DeviceOrientation.portraitUp],

@@ -165,4 +165,11 @@ class MsgController extends GetxController {
       print("푸시 전송 실패: $e");
     }
   }
+
+  /// Message Received on Background
+  Future onBackgroundHandler(RemoteMessage message) async {
+    print("onBackgroundMessage: ${message.data}");
+
+    return Future.value();
+  }
 }
