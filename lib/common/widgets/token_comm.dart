@@ -8,12 +8,9 @@ class FcmTokenCommunication {
 
   String? token;
 
-  String userAgent;
-
   FcmTokenCommunication({
     required this.appId,
     required this.token,
-    required this.userAgent,
   });
 
   Future<void> toJson(Map<String, dynamic> data) async {

@@ -239,18 +239,14 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     var appId = await userInfo.getDeviceId();
 
-    var userAgent = await userInfo.getAppScheme();
-
     FcmTokenCommunication fcmComm = FcmTokenCommunication(
       appId: appId,
       token: token,
-      userAgent: userAgent,
     );
 
     await fcmComm.toJson({
       "appID": appId,
       "fcmToken": token,
-      "userAgent": userAgent,
     });
   }
 
@@ -259,8 +255,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     var date = dateFormat.format(now);
     var time = timeFormat.format(now);
 
-    var userAgent = await userInfo.getAppScheme();
-
     LocationCommunication locationComm = LocationCommunication(
       countryName: currentCountryName,
       cityName: currentAddress,
@@ -268,7 +262,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       lng: currentPosition!.longitude.toString(),
       date: date,
       time: time,
-      userAgent: userAgent,
     );
 
     await locationComm.toJson({
@@ -278,7 +271,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       "lng": currentPosition!.longitude.toString(),
       "date": date,
       "time": time,
-      "userAgent": userAgent,
     });
   }
 
@@ -292,12 +284,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     _initialSteps = prefs.getInt("initialSteps") ?? 0;
     _newSteps = prefs.getInt("newSteps") ?? 0;
 
-    var userAgent = await userInfo.getAppScheme();
-
     StepsCommunication stepsComm = StepsCommunication(
       steps: steps,
       date: date,
-      userAgent: userAgent,
     );
 
     if (_initialSteps != 0) {
@@ -312,7 +301,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           await stepsComm.toJson({
             "steps": _nowWalking,
             "date": date,
-            "userAgent": userAgent,
           });
         } else {
           setState(() {
@@ -324,7 +312,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           await stepsComm.toJson({
             "steps": _nowWalking,
             "date": date,
-            "userAgent": userAgent,
           });
         }
       }
@@ -339,7 +326,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         await stepsComm.toJson({
           "steps": _nowWalking,
           "date": date,
-          "userAgent": userAgent,
         });
       }
     }
@@ -427,7 +413,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             future: userInfo.getAppScheme(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                //print("User Agent: $snapshot");
+                print("User Agent: ${snapshot.data}");
                 return WillPopScope(
                   onWillPop: () async {
                     if (backHandlerButton != null) {
