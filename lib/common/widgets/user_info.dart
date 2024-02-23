@@ -59,13 +59,13 @@ class UserInfo {
 
     var agent = await getDevicePlatform();
 
-    var hyApp = "hyapp;";
+    var hyApp = "hyapp";
 
     var appId = await getDeviceId();
 
     var version = await getAppVersion();
 
-    scheme = "$agent ($hyApp boolub.com $appId $version)";
+    scheme = "$agent ($hyApp; boolub.com; $appId; $version)";
 
     return scheme;
   }
