@@ -23,7 +23,6 @@ import 'package:walker/common/widgets/permission_controller.dart';
 import 'package:walker/common/widgets/steps_comm.dart';
 import 'package:walker/common/widgets/token_comm.dart';
 import 'package:walker/common/widgets/user_info.dart';
-import 'package:walker/constants/gaps.dart';
 import 'package:walker/constants/sizes.dart';
 
 class MainScreen extends StatefulWidget {
@@ -382,31 +381,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      appBar: kDebugMode
-          ? AppBar(
-              backgroundColor: Colors.white,
-              elevation: 0,
-              title: Row(
-                children: [
-                  const Icon(
-                    Icons.directions_walk_rounded,
-                    size: Sizes.size20,
-                    color: Colors.black,
-                  ),
-                  Gaps.h5,
-                  Text(
-                    _status == "walking"
-                        ? "[$_nowWalking걸음] 걷고 계시네요!"
-                        : "[$_nowWalking걸음] 조금만 더 걸어 볼까요?",
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: Sizes.size16,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : null,
       body: Stack(
         children: [
           FutureBuilder<String>(
