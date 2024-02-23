@@ -26,7 +26,7 @@ void main() async {
     [DeviceOrientation.portraitUp],
   );
 
-  runZonedGuarded(() async {}, (error, stack) {
+  await runZonedGuarded(() async {}, (error, stack) {
     FirebaseCrashlytics.instance.recordError(error, stack);
   });
 
