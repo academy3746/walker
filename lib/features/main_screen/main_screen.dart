@@ -344,7 +344,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     var dailySteps = prefs.getInt("dailySteps") ?? 0;
 
-    if (now.isAfter(midnight)) {
+    if (now.isAtSameMomentAs(midnight)) {
       if (dailySteps >= 10000) {
         await msgController.sendInternalPush(
           "축하드려요 💕",
