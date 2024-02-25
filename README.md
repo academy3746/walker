@@ -1,4 +1,4 @@
-# Introduction (작업중)
+# Introduction
 
 <h3>당신이 부러운 여행지, 부럽 (외주 프로젝트)</h3>
 
@@ -120,8 +120,8 @@
 <div style="margin-top: 50px">
     <p>하지만 TOSS 개발자들의 세심한 안배는 딱 거기까지이다.</p>
     <p>Flutter 앱에서 간편 결제를 진행하였을 때는 여전히 URL Scheme 에러가 발생하지만...</p>
-    <p>스마트폰에 기본적으로 설치된 크롬 내지 사파리 브라우저는 해당사항이 없었기 때문이다.</p>
-    <p>아쉽지만, 이러한 조치는 Mobile Web 환경까지만 고려한 것 같다.</p>
+    <p>스마트폰에 설치된 크롬 내지 사파리 브라우저는 해당사항이 없었기 때문이다.</p>
+    <p>아쉽지만 이러한 조치는 Mobile Web 환경까지만 고려한 것 같다.</p>
     <p><img src="assets/images/issue03.jpeg" style="height: 350px; width: 250px;"></p>
 </div>
 
@@ -147,17 +147,60 @@
     <p>다음으로 WebView 위젯 내부 'navigationDelegate' 프로퍼티에서 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L509C45-L509C55">ConvertUrl()</a> 플러그인 클래스를 호출한다.</p>
     <p>이 ConvertUrl() 클래스 내부에 위치한 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L511">isAppLink()</a> 메서드에서 URL 파싱 작업이 이루어진다고 보아도 무방하다.</p>
     <p>그리고, 최종적으로는 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L513C47-L513C58">launchApp()</a> 메서드에서 PG결제 처리를 진행하는 것이다.</p>
-    <p>여담이지만, PG결제 페이지만큼은 증권사와의 API 연동 문제 때문에 WebView로 렌더링하는 경우가 많다고 한다.</p>
+    <p>여담이지만 PG결제 페이지만큼은 증권사와의 API 연동 문제 때문에 WebView로 렌더링하는 경우가 많다고 한다.</p>
 </div>
 
 # Issue03(작업중)
 
-<h3>Steps Count Management Issue</h3>
+<h3>Daily Steps Count Management Issue</h3>
 
 <div style="margin-top: 50px">
-    <p>만보기 기능 구현 및 걸음수 관리 문제</p>
+    <p><img src="assets/images/issue04.png" style="height: 350px; width: 400px;"></p>
+    <p>고객사에서 직접 제작을 의뢰한 네이티브 기능중에 하나가 바로 만보기이다.</p>
+    <p>시중에 널리 사용중인 'Cash Walk' 종류의 앱들처럼 사용자의 걸음수를 클라이언트에서 직접 측정한 다음, 서버로 전송하는 것이다.</p>
+    <p>물론 의뢰 내용 자체는 도전을 불러일으킬 만큼 어렵지는 않았다.</p>
+    <p>Flutter는 안드로이드와 IOS 모두 사용 가능한 <a href="https://pub.dev/packages/pedometer">플러그인</a>을 당연히 제공하기 때문이다.</p>
+    <p>서버와의 통신 역시 <a href="https://pub.dev/packages/http">'http'</a> 패키지를 사용하면 간단하다.</p>
+    <p>클라이언트와 서버 사이에서 이루어지는 HTTP 통신 절차는 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L277">링크1</a>과 <a href="https://github.com/academy3746/walker/blob/main/lib/common/widgets/steps_comm.dart">링크2</a>를 참조 바란다.</p>
+    <p>진짜 문제는 UX와 운영 시스템 사이에서 발생하는 괴리에 있다.</p>
 </div>
 
 <div style="margin-top: 50px">
-    <p>11111</p>
+    <p>우선 UX 관점에서 문제를 직시할 필요가 있다.</p>
+    <p>만보기는 중요한 기능이기는 하지만 앱의 핵심 컨텐츠라고 할 정도는 아니다.</p>
+    <p>가령, 사용자는 여행지의 관광정보 및 파생상품을 찾아보기 위해 앱을 사용하는 것이 최우선 목표이다.</p>
+    <p>그 다음에 오늘 하루 얼마동안 걸었는지를 확인할 수도 있고, 안할 수도 있는 것이다.</p>
+    <p>그런데 사용자는 이 시점에서 부자연스러움을 느낄 수가 있다.</p>
+    <p>예컨대, 어제 하루만 총 1만 걸음을 걸었다고 가정해보자.</p>
+    <p>그리고 오늘 정오 즈음에 문득 앱을 확인해봤는데, 1만 2천 걸음 정도가 찍혀있는 것이다.</p>
+    <p>비슷한 종류의 앱을 다수 경험한 사용자라면 여기서 이런 생각을 가질 수도 있다.</p>
+    <p>'이제 밥 먹을 시간밖에 안됐는데 오전 사이에 1만보 넘게 걸었다고? 기록이 제대로 갱신된 게 맞아?'</p>
+    <p>결과적으로 사용자의 의심은 합리적이고, 하룻밤만 더 지나면 확신으로 바뀔 것이다.</p>
+</div>
+
+<div style="margin-top: 50px">
+    <p>이제는 운영 시스템 측에 문제가 있는지 살펴보아야 한다.</p>
+    <p>앞서 설치한 Flutter Pedometer 플러그인은 OS를 기반으로 작동하기 때문이다.</p>
+    <p>정확히는 기기에 내장된 신체활동 감지 센서에 기록된 '총 걸음 수'를 리얼타임으로 <a href="https://github.com/academy3746/walker/blob/main/lib/common/widgets/pedometer_controller.dart">구독</a>하는 게 기능의 전부이다.</p>
+    <p>즉, 패키지 자체적으로는 말 그대로 '총 걸음 수' 관련 데이터만 읽어올 뿐, 이것들을 일일 단위로 초기화하거나 관리할 수는 없는 것이다.</p>
+    <p>그래서 필자는 해당 이슈를 UX와 OS 사이에서 발생하는 괴리, 즉 현실적인 한계로 일축했다.</p>
+    <p>오늘 하루 얼마를 걸었든지간에 자정이 지나면 0에서부터 다시 기록을 시작해야 하는 게 자연스러운 UX이다.</p>
+    <p>다른 유저들 역시 필자와 비슷한 상황이었는지, 해당 기능에 대한 플러그인 업데이트를 요구하였지만...</p>
+    <p>컨트리뷰터 팀의 대답은 '이 이상은 재주껏 가공해서 쓸 것!'이었다.</p>
+    <p>매사에 유저친화적인 양반들이 이렇게까지 말을 한다면 더 이상 방법이 없다.</p>
+</div>
+
+<div style="margin-top: 50px">
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
 </div>
