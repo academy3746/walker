@@ -185,20 +185,41 @@
     <p>정확히는 기기에 내장된 신체활동 감지 센서에 기록된 '총 걸음 수'를 리얼타임으로 <a href="https://github.com/academy3746/walker/blob/main/lib/common/widgets/pedometer_controller.dart">구독</a>하는 게 기능의 전부이다.</p>
     <p>즉, 패키지 자체적으로는 '총 걸음 수' 관련 데이터만 읽어올 뿐, 이것들을 일일 단위로 초기화하거나 관리할 수는 없다.</p>
     <p>그래서 필자는 해당 이슈를 UX와 OS 사이에서 발생하는 괴리, 즉 기술적인 한계로 일축한 것이다.</p>
-    <p>매일밤 자정이 지날 때마다 다시 0부터 걸음 수를 집계하는 것이 사용자에게는 익숙한 경험이다.</p>
-    <p>하지만 공식 패키지에서도 해당 기능을 지원하지 않는다면, 자체적으로 고도화 작업을 진행해야 한다.</p>
+    <p>매일밤 자정이 지날 때마다 다시 0부터 걸음 수를 집계하는 것이 사용자에게는 경험적으로 익숙하다.</p>
+    <p>물론, 다른 플러그인을 찾아볼 법도 하지만 공식에 비해 버그가 많은 것이 사실이다.</p>
 </div>
 
 <div style="margin-top: 50px">
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
+    <p>그렇다면 남은 선택지는 딱 하나다.</p>
+    <p>필요한 기능을 직접 만들어서 쓰는 수밖에 없다.</p>
+    <p>Pedometer 컨트리뷰터들 역시 그것을 권장하고 있고 말이다.</p>
+</div>
+
+<div style="margin-top: 50px">
+    <p>요구사항은 복잡한 것 같으면서도 단순하다.</p>
+    <p>1. 걸음 수는 하루 단위로 측정 / 기록될 것</p>
+    <p>2. 매일밤 자정이 지나면 자동으로 걸음 수가 0으로 초기화 될 것</p>
+</div>
+
+<div style="margin-top: 50px">
+    <p>우선 1번 요구사항은 약간의 트릭이 필요할 수도 있다.</p>
+    <p>예컨대, 지난 하루는 총 7천 걸음을 걸었다고 가정해보자.</p>
+    <p>그리고 오늘 자정에 걸음 수를 다시 확인해보니 총 2만 걸음이 집계된 것이다.</p>
+    <p>그렇다면 오늘 하루는 약 1만 3천 걸음 정도를 걸은 셈이 된다.</p>
+    <p>그저 간단한 산수이다.</p>
+</div>
+
+<div style="margin-top: 50px">
+    <p>다만 간단하게나마 걸음 수를 저장할 공간이 필요하기는 하다.</p>
+    <p>그래야 금일과 익일을 구분해서 계산식을 세울 수 있지 않겠는가?</p>
+    <p>물론, 직접적인 데이터 관리는 서버에서 수행하기 때문에 내부 스토리지에 값을 저장할 필요는 없다.</p>
+    <p>대신, 데이터를 마치 Cache와 같은 개념으로 처리할 수 있는 '<a href="https://pub.dev/packages/shared_preferences">shared_preferences</a>'를 사용하여 '오늘'의 걸음 수를 저장하기로 한다.</p>
+    <p>상세한 로직은 <a href="https://github.com/academy3746/walker/blob/main/lib/common/widgets/pedometer_controller.dart">링크1</a>과 <a href="https://github.com/academy3746/walker/blob/main/lib/features/main_screen/main_screen.dart#L277">링크2</a>를 참조 바란다.</p>
+</div>
+
+<div style="margin-top: 50px">
+    <p>2번 요구사항은 백그라운드를 전제로 해야 한다.</p>
+    <p>앱을 사용중이지 않더라도 자정이 넘으면 자동으로 현재까지의 걸음 수를 집계, 차감해야 다시 0부터 시작하는 것이다.</p>
+    <p>기본적으로 지원되는 기능은 아니기 때문에 당연히 외부 <a href="https://pub.dev/packages/workmanager">플러그인</a>을 써야 한다.</p>
+    <p>상세한 비즈니스 로직은 <a href="https://github.com/academy3746/walker/blob/main/lib/common/widgets/steps_manager.dart">링크1</a>과 <a href="https://github.com/academy3746/walker/blob/main/lib/main.dart#L54">링크2</a>를 참조 바란다.</p>
 </div>
